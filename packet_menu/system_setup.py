@@ -15,5 +15,7 @@
     
     
 """
+import subprocess as sp
 
-import subprocess as sub
+def get_network_interfaces() -> bool:
+    return 0
