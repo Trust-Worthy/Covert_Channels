@@ -10,7 +10,9 @@ Main Function:
 Author: Trust-Worthy
 
 """
-from packet_menu.system_config import format_interfaces
+from packet_menu.system_config import get_network_interfaces
+from packet_menu.system_config import verify_interface
+from packet_menu.system_config import print_interfaces
 
 def print_help_message():
     print("You asked for help")
@@ -28,9 +30,16 @@ def welcome_message():
 def print_capture_options():
     print("Capture Options")
     print("Please select an interface to capture network traffic on")
-    format_interfaces()
+    print("_____________________________")
+    print("_____________________________")
 
-    user_interface: str = input("The format should be: Interface 'interface number' ")
+    print_interfaces(get_network_interfaces())
+
+
+    user_interface: str = input("The format should be: 'interface name' ex. en0")
+    verify_interface(user_interface)
+
+    
 
     return 0
 

@@ -34,39 +34,42 @@ def get_network_interfaces() -> dict:
             line.strip(".")
             interfaces.append(line)
 
-    
-
     return format_interfaces(interfaces)
 
 def format_interfaces(interfaces: list) -> dict:
     interface_dict = {} 
     print()
-    print()
-   # Loop through the list and process each entry
+    
+    # Loop through the list and process each entry
     for interface in interfaces:
         # Use regex to capture the interface number, name, and status
         match = re.match(r'(\d+)\.(\S+) \[(.*)\]', interface)
         if match:
-            number = match.group(1)
             name = match.group(2)
             status = match.group(3)
 
-            # Create the dictionary entry for the interface in the desired format
-            interface_str = f'Interface "{number}": "{name}" status: "{status}"'
+            # Add the interface name as the key and the status as the value in the dictionary
+            interface_dict[name] = status
 
-            # Store in the dictionary using the format: Interface "number" as key
-            interface_dict[f'Interface "{number}"'] = interface_str
-
-    # Print the resulting dictionary
-    for key, value in interface_dict.items():
-        print(value)
+   
+    return interface_dict
     
+def print_interfaces(interfaces:dict)->None:
+   # Print the resulting dictionary in the format: key: value
+    for key, value in interfaces.items():
+        print(f'{key}: {value}')
 
-def verify_interface(interface: str,interfaces:list):
+def verify_interface(interface: str,interfaces:list)->str:
+    interface = interface.lower()
     for i in interfaces:
-        break
-    return 0
+        
+        if interface in interfaces:
+            print("interface exists...")
+        else:
+            print("interface does not exist. please try again")
+    
+    return interface
 
 if __name__ == "__main__":
-   get_network_interfaces()
+   print_interfaces(get_network_interfaces())
 
