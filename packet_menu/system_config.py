@@ -18,11 +18,12 @@
 import subprocess
 import re
 
+
 interface_width = 15  # Adjust the number based on the longest interface name
 status_width = 40
 
 
-def get_network_interfaces() -> dict:
+def get_network_interfaces() -> dict[str,str]:
 
     result = subprocess.run(['tcpdump','-D'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
@@ -36,7 +37,7 @@ def get_network_interfaces() -> dict:
 
     return format_interfaces(interfaces)
 
-def format_interfaces(interfaces: list) -> dict:
+def format_interfaces(interfaces: list[str]) -> dict[str,str]:
     interface_dict = {} 
     print()
     
@@ -54,12 +55,12 @@ def format_interfaces(interfaces: list) -> dict:
    
     return interface_dict
     
-def print_interfaces(interfaces:dict)->None:
+def print_interfaces(interfaces: dict[str,str])->None:
    # Print the resulting dictionary in the format: key: value
     for key, value in interfaces.items():
         print(f'{key}: {value}')
 
-def verify_interface(interface: str,interfaces:list)->bool:
+def verify_interface(interface: str,interfaces:dict[str,str])->bool:
     if interface in interfaces:
         print("interface {} exists...".format(interface))
         return True
