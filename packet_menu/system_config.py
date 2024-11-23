@@ -59,17 +59,20 @@ def print_interfaces(interfaces:dict)->None:
     for key, value in interfaces.items():
         print(f'{key}: {value}')
 
-def verify_interface(interface: str,interfaces:list)->str:
-    interface = interface.lower()
-    for i in interfaces:
-        
-        if interface in interfaces:
-            print("interface exists...")
-        else:
-            print("interface does not exist. please try again")
+def verify_interface(interface: str,interfaces:list)->bool:
+    if interface in interfaces:
+        print("interface {} exists...".format(interface))
+        return True
+    else:
+        print(" {} is invalid. Try again".format(interface))
+        print_interfaces(interfaces)
+        return False
+
     
-    return interface
+    
 
 if __name__ == "__main__":
    print_interfaces(get_network_interfaces())
+
+   verify_interface("en0",get_network_interfaces())
 

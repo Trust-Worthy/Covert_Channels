@@ -27,7 +27,7 @@ def welcome_message():
     print("Welcome to the Packet Menu")
     print("Select an option to get started or type Help")
 
-def print_capture_options():
+def print_capture_options()->tuple:
     print("Capture Options")
     print("Please select an interface to capture network traffic on")
     print("_____________________________")
@@ -36,12 +36,20 @@ def print_capture_options():
     print_interfaces(get_network_interfaces())
 
 
-    user_interface: str = input("The format should be: 'interface name' ex. en0")
-    verify_interface(user_interface)
-
+    user_interface: str = input("Format: 'interface name' ex. en0")
+    while verify_interface(user_interface) == False:
+        verify_interface(user_interface)
     
+    print("Please specify packet type and # of packets to capture separated by a space")
 
-    return 0
+    try:
+        packet_type, num_packets = input("Format: 'packet type' '# of packets' ex. ICMP 10: ").split(" ")
+        num_packets = int(num_packets)  # Convert to integer
+    except ValueError:
+        print("Error: Please enter a valid packet type and number of packets.")
+        
+
+    return packet_type,num_packets
 
 def print_clean_packets_options():
     return 0
