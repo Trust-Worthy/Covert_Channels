@@ -8,14 +8,21 @@
 
 
  Dependencies:
- - subprocess: for executing linux commands through the python file.
+
 
 
  Author: Trust-Worthy
     
     
 """
-import subprocess as sp
+import subprocess
+import pyshark
+import platform
+from scapy.all import *
 
-def get_network_interfaces() -> bool:
-    return 0
+
+def get_network_interfaces() -> list:
+
+    interfaces: list = get_if_list()
+    
+    return interfaces
