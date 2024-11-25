@@ -87,7 +87,7 @@ def get_user_option()->str:
 
     return user_option
 
-def process_user_input(option: str):
+def process_user_input(option: str)->bool:
     option = option.lower()
     option_dict = {
         "option a":print_capture_options,
@@ -97,7 +97,12 @@ def process_user_input(option: str):
         "help":print_help_message,
     }
     # Print correct options or Invalid if key isn't found in the dictionary
-    option_dict.get(option,lambda:"Invalid Option please try again\n")()
+    if option not in option_dict:
+        print("Invalid Option please try again\n")
+        return False
+    else:
+        option_dict.get(option)()
+        return True
 
 def display_menu()->None:
     welcome_message()
