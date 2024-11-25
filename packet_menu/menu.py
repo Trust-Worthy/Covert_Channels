@@ -64,7 +64,7 @@ def print_capture_options()->Tuple[str,str,str]:
         
 
     print("Capturing {} {} packets on {}".format(quantity,packet_type,user_interface))
-    return user_interface,packet_type,quantity
+    return user_interface,packet_type,int(quantity)
 
 def print_clean_packets_options()->None:
     return 0
@@ -106,7 +106,7 @@ def process_user_input(option: str)->Union[bool,tuple,None,]:
         return False
     else:
         func = option_dict.get(option)
-        result:Tuple[str,int,str] = func()
+        result:Tuple[str,int,int] = func()
         
         if func == print_capture_options():
             capture_main(result)
@@ -135,3 +135,4 @@ def execute_option()->None:
 
 if __name__ == "__main__":
     display_menu()
+    execute_option()

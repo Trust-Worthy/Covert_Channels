@@ -22,7 +22,7 @@ count = 0
 
 
 # (interface:str,protocol:str,quantity:int)
-def construct_command(result: tuple[str, str, str])->tuple[list[str],str]:
+def construct_command(result: tuple[str, str, int])->tuple[list[str],str]:
     user_interface,packet_type,quantity = result
 
     output_dir = Path("../captured_packets")
@@ -36,21 +36,25 @@ def construct_command(result: tuple[str, str, str])->tuple[list[str],str]:
          '-i',
          user_interface, 
          '-c', 
-         quantity,
+         str(quantity),
          packet_type,
          '-w',output_file]
 
     return command,output_file
 
-def execute_command(command:list[str],output_file:str)->None:
+def execute_command(command:list[str,int],output_file:str)->None:
     try:
-        with open(output_file, 'w') as file:
-            result = subprocess.run(command, stdout=file, stderr=subprocess.PIPE, text=True)
-            
-            if result.returncode == 0:
-                print(f"Capture successful. Output written to {output_file}")
-            else:
-                print("Error occurred during capture:\n", result.stderr)
+
+        # Run the command using subprocess
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        
+        # Check if the command was successful
+        if result.returncode == 0:
+            print(f"Capture successful. Output written to {output_file}")
+        else:
+            print("Error occurred during capture:")
+            print(result.stderr)  # Display any error message from tcpdump
+        
     except Exception as e:
             print(f"An error occurred: {e}")
             
@@ -62,7 +66,8 @@ def capture_main(result: tuple[str, str, int])->None:
     return 0
 
 def main()->None:
-    capture_main()
+    result = ('en0','icmp',1)
+    capture_main(result)
 
 if __name__ == "__main__":
      main()
