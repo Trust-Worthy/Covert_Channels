@@ -48,6 +48,16 @@ def execute_command(command:list[str,int],output_file:str)->None:
         # Run the command using subprocess
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         
+
+        # Print out the stdout (capture output of tcpdump)
+        print("stdout output from tcpdump:")
+        print(result.stdout)  # Print the captured stdout
+        
+        # Print out any stderr (error output) from tcpdump, if any
+        if result.stderr:
+            print("stderr output from tcpdump:")
+            print(result.stderr)  # Print any error messages if they exist
+
         # Check if the command was successful
         if result.returncode == 0:
             print(f"Capture successful. Output written to {output_file}")
