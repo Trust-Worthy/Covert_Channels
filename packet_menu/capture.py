@@ -27,18 +27,23 @@ def construct_command(result: tuple[str, str, int])->tuple[list[str],str]:
 
     output_dir = Path("../captured_packets")
 
-    output_file: str = str(output_dir / f"capture{count}.pcap")
+    output_file: str = str(output_dir / f"capture{count}.txt")
 
     output_dir.mkdir(parents=True,exist_ok=True)
 
     command:list[str] = [
-         'tcpdump',
+         'tcpdump', # name of tool
          '-i',
          user_interface, 
-         '-c', 
+         '-c', # specify number of packets to capture
          str(quantity),
          packet_type,
-         '-w',output_file]
+         '-w', # write packet to an output file
+         output_file,
+         '-A',
+         #'-xx', # display in hexadecimal format
+         '-tttt', # print timestamp for each packet in human readable format
+         ]
 
     return command,output_file
 
