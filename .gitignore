@@ -9,6 +9,9 @@ __pycache__/
 # Reminders
 TO_DO.txt
 
+# Packet captures
+captured_packets
+
 # Distribution / packaging
 .Python
 build/
