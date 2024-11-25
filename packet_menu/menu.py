@@ -14,6 +14,9 @@ import os
 from system_config import get_network_interfaces
 from system_config import verify_interface
 from system_config import print_interfaces
+from typing import Union,Callable,Tuple
+
+from capture import capture_main
 
 def print_help_message()->None:
     print("You asked for help")
@@ -50,7 +53,7 @@ def print_capture_options()->tuple:
             packet_type, num_packets = input("Format: 'packet type' '# of packets' ex. ICMP 10:\n").split(" ")
             
             # Try to convert num_packets to an integer
-            num_packets:int = int(num_packets)
+            quantity:int = int(num_packets)
             
             # If everything is correct, break the loop
             break
@@ -59,8 +62,8 @@ def print_capture_options()->tuple:
             print("Error: Please enter a valid packet type and number of packets.\n")
         
 
-    print("Capturing {} {} packets on {}".format(num_packets,packet_type,user_interface))
-    return packet_type,num_packets
+    print("Capturing {} {} packets on {}".format(quantity,packet_type,user_interface))
+    return user_interface,packet_type,quantity
 
 def print_clean_packets_options()->None:
     return 0
@@ -87,10 +90,10 @@ def get_user_option()->str:
 
     return user_option
 
-def process_user_input(option: str)->bool:
+def process_user_input(option: str)->Union[bool,tuple,None,]:
     option = option.lower()
     option_dict = {
-        "option a":print_capture_options,
+        "option a":print_capture_options, # returns a tuple
         "option b":print_clean_packets_options,
         "option c":print_clean_packets_options,
         "option d":print_full_analysis_options,
@@ -101,18 +104,29 @@ def process_user_input(option: str)->bool:
         print("Invalid Option please try again\n")
         return False
     else:
-        option_dict.get(option)()
-        return True
+        func = option_dict.get(option)
+        result:Tuple[str,int,str] = func()
+        
+        if func == print_capture_options():
+            capture_main(result)
+
 
 def display_menu()->None:
+
+    # Show the welcome message
     welcome_message()
+    #Print the menu options
     print_menu_options()
 
-    
-    process_user_input(get_user_option())
 
+def execute_option()->None:
+    # Get the users first menu option
+    user_option = get_user_option()
 
+    # Process the user option
+    result = process_user_input(user_option)
 
+    # Create the 
 
 
 
