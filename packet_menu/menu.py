@@ -11,10 +11,12 @@ Author: Trust-Worthy
 
 """
 import os
+
 from system_config import get_network_interfaces
 from system_config import verify_interface
 from system_config import print_interfaces
-from typing import Union,Callable,Tuple
+from typing import Tuple, Union
+
 
 from capture import capture_main
 
@@ -31,7 +33,7 @@ def welcome_message()-> None:
     print("Welcome to the Packet Menu. Select an option to get started or type Help")
     print("")
 
-def print_capture_options()->tuple:
+def print_capture_options()->Tuple[str,str,str]:
     print("Capture Options")
     print("Please select an interface to capture network traffic on")
     print("_____________________________")
@@ -50,10 +52,9 @@ def print_capture_options()->tuple:
     while True:
         try:
             # Prompt the user for input
-            packet_type, num_packets = input("Format: 'packet type' '# of packets' ex. ICMP 10:\n").split(" ")
+            packet_type, quantity = input("Format: 'packet type' '# of packets' ex. ICMP 10:\n").split(" ")
             
-            # Try to convert num_packets to an integer
-            quantity:int = int(num_packets)
+
             
             # If everything is correct, break the loop
             break
