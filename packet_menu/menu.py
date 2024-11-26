@@ -105,10 +105,10 @@ def process_user_input(option: str)->Union[bool,tuple,None,]:
         print("Invalid Option please try again\n")
         return False
     else:
-        func = option_dict.get(option)
-        result:Tuple[str,int,int] = func()
+        returned_func = option_dict.get(option)
         
-        if func == print_capture_options():
+        if returned_func == print_capture_options:
+            result:Tuple[str,int,int] = returned_func() # Actually execute the function call
             capture_main(result)
 
 

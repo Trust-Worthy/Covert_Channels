@@ -16,20 +16,22 @@ import subprocess
 from typing import Tuple
 from pathlib import Path
 
-count = 0
+COUNT: int = 1
 
 
 
 
 # (interface:str,protocol:str,quantity:int)
-def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],str]:
+def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],str,str]:
+    global COUNT
+    
     user_interface,packet_type,quantity = result
 
     output_dir = Path("../captured_packets")
 
-    pcap_file: str = str(output_dir / f"capture{count}.pcap")
+    pcap_file: str = str(output_dir / f"capture{COUNT}.pcap")
 
-    output_txt = str(output_dir / f"capture{count}.txt")
+    output_txt = str(output_dir / f"capture{COUNT}.txt")
 
     output_dir.mkdir(parents=True,exist_ok=True)
 
@@ -55,6 +57,8 @@ def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],
          '-tttt',
          '-vv'
     ]
+    COUNT +=1 #increasing the number of total captured packets
+
     return command_1,command_2,pcap_file,output_txt
 
 def execute_commands(command_1:list[str,int],command_2:list[str],pcap_file:str,output_txt:str)->None:
@@ -83,17 +87,16 @@ def execute_commands(command_1:list[str,int],command_2:list[str],pcap_file:str,o
 
         except Exception as e:
             print(f"An error occurred: {e}")
-    
-            
+
+        
 def capture_main(result: tuple[str, str, int])->None:
 
     command_1,command_2,pcap_file,output_txt = construct_commands(result)
 
     execute_commands(command_1,command_2,pcap_file,output_txt)
-    return 0
 
 def main()->None:
-    result = ('en0','icmp',1)
+    result = ('en0','icmp',2)
     capture_main(result)
 
 if __name__ == "__main__":
