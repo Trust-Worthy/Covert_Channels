@@ -62,6 +62,18 @@ def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],
     return command_1,command_2,pcap_file,output_txt
 
 def execute_commands(command_1:list[str,int],command_2:list[str],pcap_file:str,output_txt:str)->None:
+        """_summary_
+
+        :param command_1: _description_
+        :type command_1: list[str,int]
+        :param command_2: _description_
+        :type command_2: list[str]
+        :param pcap_file: _description_
+        :type pcap_file: str
+        :param output_txt: _description_
+        :type output_txt: str
+        """        
+        
         try:
             # Open the pcap file and write packet data to that file using subprocess
             with open(pcap_file, 'wb') as pcap_file_handle:
@@ -96,6 +108,7 @@ def capture_main(result: tuple[str, str, int])->None:
     execute_commands(command_1,command_2,pcap_file,output_txt)
 
 def main()->None:
+    
     result = ('en0','icmp',2)
     capture_main(result)
 

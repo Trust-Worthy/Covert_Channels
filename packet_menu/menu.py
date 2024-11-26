@@ -70,9 +70,15 @@ def print_clean_packets_options()->None:
     return 0
 
 def print_packet_stats_options()->None:
+    
     return 0
 
 def print_full_analysis_options()->None:
+    """_summary_
+
+    Returns:
+        _type_ -- _description_
+    """    
     return 0
 
 def print_menu_options()->None:
@@ -85,13 +91,18 @@ def print_menu_options()->None:
     print("Option C: Packet Stats -> Displays options for doing statistics on packets previously captured")
     print("Option D: Full Analysis -> Displays options for Capturing packet, cleaning the packets, and then doing statistics on the packets")
 def get_user_option()->str:
+    """_summary_
+
+    Returns:
+        str: _description_
+    """    
     print()
     print()
     user_option: str = input("Enter option: ")
 
     return user_option
 
-def process_user_input(option: str)->Union[bool,tuple,None,]:
+def process_user_input(*,option: str)->Union[bool,tuple,None,]:
     option = option.lower()
     option_dict = {
         "option a":print_capture_options, # returns a tuple
@@ -125,7 +136,7 @@ def execute_option()->None:
     user_option = get_user_option()
 
     # Process the user option
-    result = process_user_input(user_option)
+    result = process_user_input(option=user_option)
 
     # Create the 
 
