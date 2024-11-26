@@ -61,7 +61,7 @@ def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],
 
     return command_1,command_2,pcap_file,output_txt
 
-def execute_commands(command_1:list[str,int],command_2:list[str],pcap_file:str,output_txt:str)->None:
+def execute_commands(command_1:list[str],command_2:list[str],pcap_file:str,output_txt:str)->None:
         """_summary_
 
         :param command_1: _description_
