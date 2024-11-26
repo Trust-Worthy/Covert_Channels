@@ -22,16 +22,18 @@ count = 0
 
 
 # (interface:str,protocol:str,quantity:int)
-def construct_command(result: tuple[str, str, int])->tuple[list[str],str]:
+def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],str]:
     user_interface,packet_type,quantity = result
 
     output_dir = Path("../captured_packets")
 
-    output_file: str = str(output_dir / f"capture{count}.txt")
+    pcap_file: str = str(output_dir / f"capture{count}.pcap")
+
+    output_txt = str(output_dir / f"capture{count}.txt")
 
     output_dir.mkdir(parents=True,exist_ok=True)
 
-    command:list[str] = [
+    command_1:list[str] = [
          'tcpdump', # name of tool
          '-i',
          user_interface, 
@@ -39,45 +41,55 @@ def construct_command(result: tuple[str, str, int])->tuple[list[str],str]:
          str(quantity),
          packet_type,
          '-w', # write packet to an output file
-         output_file,
-         '-A',
-         #'-xx', # display in hexadecimal format
+         pcap_file,
+         '-xx', # see the entire packet from the link layer up to the data payload.
          '-tttt', # print timestamp for each packet in human readable format
+         '-vv', # verbose output
          ]
 
-    return command,output_file
+    command_2:list[str] = [
+         'tcpdump',
+         '-r',
+         pcap_file,
+         '-xx',
+         '-tttt',
+         '-vv'
+    ]
+    return command_1,command_2,pcap_file,output_txt
 
-def execute_command(command:list[str,int],output_file:str)->None:
-    try:
+def execute_commands(command_1:list[str,int],command_2:list[str],pcap_file:str,output_txt:str)->None:
+        try:
+            # Open the pcap file and write packet data to that file using subprocess
+            with open(pcap_file, 'wb') as pcap_file_handle:
+                result_1 = subprocess.run(command_1, stdout=pcap_file_handle, stderr=subprocess.PIPE, text=True)
 
-        # Run the command using subprocess
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        
+            # Check if command_1 (capture command) was successful
+            if result_1.returncode == 0:
+                print(f"Capture successful. Output written to {pcap_file}")
+            else:
+                print("Error occurred during capture:")
+                print(result_1.stderr)  # Display error message from tcpdump
 
-        # Print out the stdout (capture output of tcpdump)
-        print("stdout output from tcpdump:")
-        print(result.stdout)  # Print the captured stdout
-        
-        # Print out any stderr (error output) from tcpdump, if any
-        if result.stderr:
-            print("stderr output from tcpdump:")
-            print(result.stderr)  # Print any error messages if they exist
+            # Now read the pcap file and write the output to the .txt file
+            with open(output_txt, 'w') as txt_file_handle:
+                result_2 = subprocess.run(command_2, stdout=txt_file_handle, stderr=subprocess.PIPE, text=True)
 
-        # Check if the command was successful
-        if result.returncode == 0:
-            print(f"Capture successful. Output written to {output_file}")
-        else:
-            print("Error occurred during capture:")
-            print(result.stderr)  # Display any error message from tcpdump
-        
-    except Exception as e:
+            # Check if command_2 (reading and converting pcap) was successful
+            if result_2.returncode == 0:
+                print(f"PCAP file has been converted to {output_txt}")
+            else:
+                print("Error occurred during conversion:")
+                print(result_2.stderr)  # Display error message from tcpdump
+
+        except Exception as e:
             print(f"An error occurred: {e}")
+    
             
 def capture_main(result: tuple[str, str, int])->None:
 
-    command,output_file = construct_command(result)
+    command_1,command_2,pcap_file,output_txt = construct_commands(result)
 
-    execute_command(command,output_file)
+    execute_commands(command_1,command_2,pcap_file,output_txt)
     return 0
 
 def main()->None:
