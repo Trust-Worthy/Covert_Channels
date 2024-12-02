@@ -33,7 +33,7 @@ def welcome_message()-> None:
     print("Welcome to the Packet Menu. Select an option to get started or type Help")
     print("")
 
-def print_capture_options()->Tuple[str,str,str]:
+def print_capture_options()->Tuple[str,str,int]:
     print("Capture Options")
     print("Please select an interface to capture network traffic on")
     print("_____________________________")
@@ -67,11 +67,11 @@ def print_capture_options()->Tuple[str,str,str]:
     return user_interface,packet_type,int(quantity)
 
 def print_clean_packets_options()->None:
-    return 0
+    return None
 
 def print_packet_stats_options()->None:
     
-    return 0
+    return None
 
 def print_full_analysis_options()->None:
     """_summary_
@@ -79,7 +79,7 @@ def print_full_analysis_options()->None:
     Returns:
         _type_ -- _description_
     """    
-    return 0
+    return None
 
 def print_menu_options()->None:
 
