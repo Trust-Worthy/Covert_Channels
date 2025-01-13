@@ -1,107 +1,80 @@
 import re
 from collections import defaultdict
 
-def parse_packet(packet_data):
-    """
-    Parses packet data to extract type and length based on different formats.
-    """
-    packet_info = {}
+# Function to parse each packet and extract relevant information
+def parse_packet(packet):
+    stats = defaultdict(int)
     
-    # Format 1: UDP packet with 'UDP, length 40'
-    udp_pattern = re.compile(r'\s+(\S+)\s+[\d\.]+(?:\.\d+)?\s+>\s+[\d\.]+(?:\.\d+)?\s*:\s*(\S+),\s*length\s*(\d+)')
-    dns_pattern = re.compile(r'\s+(\S+)\s+[\d\.]+(?:\.\d+)?\s+>\s+[\d\.]+(?:\.\d+)?\s*:\s*\d+\+(\S+)\s*\?(\S+)\s*\.\s*\((\d+)\)')
-    tcp_pattern = re.compile(r'\s+(\S+)\s+[\d\.]+(?:\.\d+)?\s+>\s+[\d\.]+(?:\.\d+)?\s*:\s*\(.*?length\s*(\d+)\)')
-
-    # Match UDP format
-    udp_match = udp_pattern.match(packet_data)
+    # Regex for matching packet details
+    timestamp_regex = r"^(\d+\.\d+)\s+"
+    ip_version_regex = r"IP(\d)"
+    icmp_type_regex = r"ICMP(\d+),\s([^,]+)"
+    udp_regex = r"UDP,\slength\s(\d+)"
+    packet_length_regex = r"length\s(\d+)"
+    
+    # Check if it's an IP packet (either IPv4 or IPv6)
+    ip_match = re.search(ip_version_regex, packet)
+    if ip_match:
+        ip_version = ip_match.group(1)
+        stats[f"IPv{ip_version}"] += 1
+    
+    # Check if it's ICMP and extract the ICMP type
+    icmp_match = re.search(icmp_type_regex, packet)
+    if icmp_match:
+        icmp_type = icmp_match.group(2).strip().lower()
+        stats[f"ICMP: {icmp_type}"] += 1
+    
+    # Check if it's a UDP packet and get the length
+    udp_match = re.search(udp_regex, packet)
     if udp_match:
-        packet_info['type'] = 'UDP'
-        packet_info['length'] = int(udp_match.group(3))
-        return packet_info
-
-    # Match DNS query format
-    dns_match = dns_pattern.match(packet_data)
-    if dns_match:
-        packet_info['type'] = 'DNS'
-        packet_info['length'] = int(dns_match.group(4))
-        return packet_info
-
-    # Match TCP format
-    tcp_match = tcp_pattern.match(packet_data)
-    if tcp_match:
-        packet_info['type'] = 'TCP'
-        packet_info['length'] = int(tcp_match.group(2))
-        return packet_info
-
-    # If no match found, return None
-    return None
+        udp_length = int(udp_match.group(1))
+        stats["UDP packets"] += 1
+        stats["Total UDP length"] += udp_length
+    
+    # Extract packet length
+    length_match = re.search(packet_length_regex, packet)
+    if length_match:
+        packet_length = int(length_match.group(1))
+        stats["Total packet length"] += packet_length
+        stats["Total packets"] += 1
+    
+    return stats
 
 
-def analyze_packets(file_path):
-    """
-    Analyzes packet statistics from the given file, considering multiple packet formats.
-    """
-    total_packets = 0
-    packet_types = defaultdict(int)
-    total_length = 0
-
-    with open(file_path, 'r') as f:
+# Main function to process the file and gather statistics
+def process_packets(file_path):
+    with open(file_path, 'r') as file:
+        stats = defaultdict(int)
+        
         packet_data = ""
-        for line in f:
-            line = line.strip()
-
-            # Detect if the line starts a new packet (based on timestamp)
-            if line and re.match(r'^\d{4}-\d{2}-\d{2}', line):  # Matches timestamp-based line
+        for line in file:
+            # If we encounter a line that is a packet header (e.g., IP6 or IP), process the previous packet
+            if line.startswith('1736800338'):  # Packet header line (timestamp)
                 if packet_data:
-                    packet_info = parse_packet(packet_data)
-                    if packet_info:
-                        total_packets += 1
-                        packet_types[packet_info['type']] += 1
-                        total_length += packet_info['length']
-                packet_data = line
+                    # Parse the previous packet
+                    packet_stats = parse_packet(packet_data)
+                    for key, value in packet_stats.items():
+                        stats[key] += value
+                packet_data = line.strip()  # Start new packet
             else:
-                # Continue accumulating hex dump lines or continuation lines
-                packet_data += " " + line
-
-        # Process the last packet in the file
+                packet_data += " " + line.strip()  # Continue appending packet data
+        
+        # Process the last packet after the file ends
         if packet_data:
-            packet_info = parse_packet(packet_data)
-            if packet_info:
-                total_packets += 1
-                packet_types[packet_info['type']] += 1
-                total_length += packet_info['length']
+            packet_stats = parse_packet(packet_data)
+            for key, value in packet_stats.items():
+                stats[key] += value
+    
+    return stats
 
-    # Compute statistics
-    packet_type_percentages = {
-        packet_type: (count / total_packets) * 100
-        for packet_type, count in packet_types.items()
-    }
-
-    average_packet_size = total_length / total_packets if total_packets else 0
-
-    return {
-        'total_packets': total_packets,
-        'packet_type_percentages': packet_type_percentages,
-        'average_packet_size': average_packet_size
-    }
-
-
-
-
-def main():
-     
-    # Example file path containing the packet data
-    file_path = 'captured_packets/capturecapture2.txt'
-
-    # Analyze the packets
-    stats = analyze_packets(file_path)
-
-    # Display the statistics
-    print(f"Total Packets: {stats['total_packets']}")
-    print("Packet Type Percentages:")
-    for packet_type, percentage in stats['packet_type_percentages'].items():
-        print(f"  {packet_type}: {percentage:.2f}%")
-    print(f"Average Packet Size: {stats['average_packet_size']:.2f} bytes")
+# Function to print statistics in a readable format
+def print_statistics(stats):
+    print("Packet Statistics:")
+    for key, value in stats.items():
+        print(f"{key}: {value}")
 
 if __name__ == "__main__":
-    main()
+    # Provide the path to your packet data file
+    file_path = "captured_packets/capturecapture1.txt"  # Replace with your file path
+    stats = process_packets(file_path)
+    print_statistics(stats)
