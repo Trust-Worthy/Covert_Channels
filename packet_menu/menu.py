@@ -86,7 +86,7 @@ def exit_program()->None:
     print("exiting program...")
     exit()
 def print_packet_stats_options()->None:
-    
+    return None
 
 def print_full_analysis_options()->None:
     """_summary_
