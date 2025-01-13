@@ -15,9 +15,8 @@ import os
 from system_config import get_network_interfaces
 from system_config import print_interfaces
 from typing import Tuple, Union
-
-
-
+from packet_stats import parse_packet_file
+from pathlib import Path
 from capture import capture_main
 
 PREV_CAPTURES = set()
@@ -86,7 +85,34 @@ def exit_program()->None:
     print("exiting program...")
     exit()
 def print_packet_stats_options()->None:
-    return None
+    path = Path('captured_packets')
+
+    # Gather all .txt files in the directory
+    txt_files = list(path.glob('*.txt'))
+
+    # If no files are found, inform the user and exit
+    if not txt_files:
+        print("No .txt files found in the directory.")
+        return
+
+    file_options = [file.name for file in txt_files]
+    file_options_set = set(file_options)
+
+    print("Please select a file to be analyzed:")
+    for i, file_name in enumerate(file_options, 1):
+        print(f"{i}. {file_name}")
+
+    while True:
+        user_file_opt = input("Enter the name corresponding to your file option: ").strip()
+        
+        if user_file_opt in file_options_set:
+            break
+        else:
+            print("That is not a valid file option. Please try again!")
+
+    file_path = path / user_file_opt
+    parse_packet_file(file_path)
+
 
 def print_full_analysis_options()->None:
     """_summary_
