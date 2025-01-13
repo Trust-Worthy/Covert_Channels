@@ -43,16 +43,17 @@ def print_capture_options()->Tuple[str,str,int]:
     print_interfaces(user_interfaces)
 
 
-    user_interface: str = input("Format: 'interface name' ex. en0:\n")
+    user_interface: str = input("Format: 'interface name' ex. en0:\n-->")
     while verify_interface(user_interface,user_interfaces) == False:
         verify_interface(user_interface,user_interfaces)
     
-    print("Please specify packet type and # of packets to capture separated by a space\n")
+    print("Please specify a certian number of packets to capture\n")
 
     while True:
         try:
             # Prompt the user for input
-            packet_type, quantity = input("Format: 'packet type' '# of packets' ex. ICMP 10:\n").split(" ")
+            # Edit: I am only supposed to be getting the number of packets. Not a specific type of packet.
+            quantity = input("Format: -->'# of packets' ex. -->10\n-->").split(" ")
             
 
             

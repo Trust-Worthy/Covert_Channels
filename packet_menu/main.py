@@ -20,3 +20,8 @@ def main():
 
     # Ask the user to select an option and process it
     execute_option()
+
+
+
+if __name__ == "__main__":
+    main()
