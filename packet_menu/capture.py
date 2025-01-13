@@ -23,7 +23,7 @@ from pathlib import Path
 # (interface:str,protocol:str,quantity:int)
 def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
-    output_dir = Path("../captured_packets")
+    output_dir = Path("captured_packets/")
 
     pcap_file: str = str(output_dir / f"capture{capture_name}.pcap")
 
@@ -32,6 +32,7 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
     output_dir.mkdir(parents=True,exist_ok=True)
 
     command_1:list[str] = [
+         'sudo',
          'tcpdump', # name of tool
          '-i',
          user_interface, 
@@ -46,6 +47,7 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          ]
 
     command_2:list[str] = [
+         'sudo',
          'tcpdump',
          '-r',
          pcap_file,
