@@ -39,21 +39,19 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          '-c', # specify number of packets to capture
          str(num_packets),
          #packet_type,
-         '-w', # write packet to an output file
-         pcap_file,
-         '-xx', # see the entire packet from the link layer up to the data payload.
+         '-w', pcap_file,# write packet to an output file 
+         '-xx', # display raw hex format.
          '-tttt', # print timestamp for each packet in human readable format
-         '-vv', # verbose output
+         #'-vv', # verbose output
          ]
 
     command_2:list[str] = [
          'sudo',
          'tcpdump',
-         '-r',
-         pcap_file,
+         '-r', pcap_file, # read the saved pcap file
          '-xx',
          '-tttt',
-         '-vv'
+         #'-vv' #verbose output
     ]
 
     return command_1,command_2,pcap_file,output_txt
