@@ -95,17 +95,12 @@ def print_menu_options()->None:
     print("Option B: Clean Packets -> Displays options for cleaning a file with packets previously captured")
     print("Option C: Packet Stats -> Displays options for doing statistics on packets previously captured")
     print("Option D: Full Analysis -> Displays options for Capturing packet, cleaning the packets, and then doing statistics on the packets")
-def get_user_option()->str:
-    """_summary_
-
-    Returns:
-        str: _description_
-    """    
-    print()
-    print()
+    print("Option C: Help -> Displays the help menu")
+    
     user_option: str = input("Enter option:\n-->")
 
     return user_option
+    
 
 def process_user_input(*,option: str)->None:
     option = option.lower()
@@ -120,28 +115,24 @@ def process_user_input(*,option: str)->None:
     while option not in option_dict:
         print(f"Invalid option: {option}. Please try again.")
         option = input("Enter an option:\n-->").lower()
-       
+    
+
+
     returned_func = option_dict[option]
-    result = returned_func()
-    capture_main(result)
+    returned_func()
     
 
 def display_menu()->None:
 
     # Show the welcome message
     welcome_message()
-    #Print the menu options
-    print_menu_options()
-
-
-def execute_option()->None:
-    # Get the users first menu option
-    user_option = get_user_option()
+    
+    #Print the menu options. Get the input from the user.
+    user_option = print_menu_options()
 
     # Process the user option
-    result = process_user_input(option=user_option)
-
-    # Create the 
+    process_user_input(option=user_option)
+    
 
 
 
@@ -149,4 +140,3 @@ def execute_option()->None:
 
 if __name__ == "__main__":
     display_menu()
-    execute_option()
