@@ -11,6 +11,7 @@ packet_patterns = {
 }
 
 def parse_packet_file(file_path):
+    from menu import print_menu_options
     packet_counts = defaultdict(int)
     total_packets = 0
 
@@ -39,6 +40,12 @@ def parse_packet_file(file_path):
     print(f"Total QUIC packets: {packet_counts['QUIC']}")
     print(f"Total IP packets: {packet_counts['IP']}")
     print(f"Total IP6 packets: {packet_counts['IP6']}")
+    
+    # restart the menu
+    print("__________________________________________")
+    print("Please select another option or exit the program")
+    print("__________________________________________")
+    print_menu_options()
 
 if __name__ == "__main__":
     # Specify the path to your packet text file
