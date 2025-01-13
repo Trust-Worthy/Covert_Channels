@@ -60,20 +60,9 @@ def print_interfaces(interfaces: dict[str,str])->None:
     for key, value in interfaces.items():
         print(f'{key}: {value}')
 
-def verify_interface(interface: str,interfaces:dict[str,str])->bool:
-    if interface in interfaces:
-        print("interface {} exists...".format(interface))
-        return True
-    else:
-        print(" {} is invalid. Try again".format(interface))
-        print_interfaces(interfaces)
-        return False
 
-    
-    
 
 if __name__ == "__main__":
    print_interfaces(get_network_interfaces())
 
-   verify_interface("en0",get_network_interfaces())
 

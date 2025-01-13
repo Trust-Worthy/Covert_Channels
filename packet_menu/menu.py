@@ -13,7 +13,6 @@ Author: Trust-Worthy
 import os
 
 from system_config import get_network_interfaces
-from system_config import verify_interface
 from system_config import print_interfaces
 from typing import Tuple, Union
 
@@ -45,18 +44,21 @@ def capture_options()->Tuple[str,int]:
     print_interfaces(user_interfaces)
 
 
-    user_interface: str = input("Format: 'interface name' ex. -->en0:\n-->")
-    while verify_interface(user_interface,user_interfaces) == False:
-        verify_interface(user_interface,user_interfaces)
+    desired_interface: str = input("Format: 'interface name' ex. -->en0:\n-->")
+    while desired_interface not in user_interfaces:
+        print(f" {desired_interface} is invalid. Try again")
+        print_interfaces(user_interfaces)
+        desired_interface: str = input("Format: 'interface name' ex. -->en0:\n-->")
+
     
     num_packets: int = get_num_user_packets()
     capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
-    while capture_name not in PREV_CAPTURES:
+    while capture_name in PREV_CAPTURES:
         print("Name of capture has already been used. Please enter a different name.")
         capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
-        
-    print("Capturing {} packets on {}".format(num_packets,user_interface))
-    capture_main(capture_name, user_interface,num_packets)
+
+    print("Capturing {} packets on {}".format(num_packets,desired_interface))
+    capture_main(capture_name, desired_interface,num_packets)
 def get_num_user_packets()->int:
     print("Please specify a certian number of packets to capture\n")
 
@@ -92,7 +94,7 @@ def print_full_analysis_options()->None:
     """    
     return None
 
-def print_menu_options()->None:
+def print_menu_options()->str:
 
     #capture
         # What type of packet do you want to capture?
@@ -105,8 +107,7 @@ def print_menu_options()->None:
     
     user_option: str = input("Enter option:\n-->")
 
-    return user_option
-    
+    process_user_input(option=user_option)
 
 def process_user_input(*,option: str)->None:
     option = option.lower()
@@ -136,10 +137,14 @@ def display_menu()->None:
     #Print the menu options. Get the input from the user.
     user_option = print_menu_options()
 
-    # Process the user option
-    process_user_input(option=user_option)
     
+    """
+    Control Flow:
 
+    Print menu options --> Process user input --> Func that handles specific option
+
+
+    """
 
 
 
