@@ -33,7 +33,7 @@ def welcome_message()-> None:
     print("Welcome to the Packet Menu. Select an option to get started or type Help")
     print("")
 
-def print_capture_options()->Tuple[str,str,int]:
+def print_capture_options()->Tuple[str,int]:
     print("Capture Options")
     print("Please select an interface to capture network traffic on")
     print("_____________________________")
@@ -47,25 +47,29 @@ def print_capture_options()->Tuple[str,str,int]:
     while verify_interface(user_interface,user_interfaces) == False:
         verify_interface(user_interface,user_interfaces)
     
+    num_packets: int = get_num_user_packets()
+
+    print("Capturing {} packets on {}".format(num_packets,user_interface))
+    return user_interface, num_packets
+def get_num_user_packets()->int:
     print("Please specify a certian number of packets to capture\n")
 
     while True:
         try:
             # Prompt the user for input
             # Edit: I am only supposed to be getting the number of packets. Not a specific type of packet.
-            quantity = input("Format: -->'# of packets' ex. -->10\n-->").split(" ")
-            
+            quantity:int = int(input("Format: -->'# of packets' ex. -->10\n-->"))
 
-            
-            # If everything is correct, break the loop
-            break
+            if quantity <= 0:
+                print("The number of packets must be a positive integer.\n")
+                continue  # Retry the loop if the number is not positive
+
+            return quantity
         except ValueError:
             # If an error occurs (e.g., wrong format or non-integer input)
-            print("Error: Please enter a valid packet type and number of packets.\n")
-        
-
-    print("Capturing {} {} packets on {}".format(quantity,packet_type,user_interface))
-    return user_interface,packet_type,int(quantity)
+            print("Incorrect type entered. Please enter integer number of packets.\n")
+             # Use continue to retry the loop without returning to the function
+            continue
 
 def print_clean_packets_options()->None:
     return None
@@ -99,30 +103,28 @@ def get_user_option()->str:
     """    
     print()
     print()
-    user_option: str = input("Enter option: ")
+    user_option: str = input("Enter option:\n-->")
 
     return user_option
 
-def process_user_input(*,option: str)->Union[bool,tuple,None,]:
+def process_user_input(*,option: str)->None:
     option = option.lower()
     option_dict = {
         "option a":print_capture_options, # returns a tuple
         "option b":print_clean_packets_options,
-        "option c":print_clean_packets_options,
+        "option c":print_packet_stats_options,
         "option d":print_full_analysis_options,
         "help":print_help_message,
     }
-    # Print correct options or Invalid if key isn't found in the dictionary
-    if option not in option_dict:
-        print("Invalid Option please try again\n")
-        return False
-    else:
-        returned_func = option_dict.get(option)
-        
-        if returned_func == print_capture_options:
-            result:Tuple[str,int,int] = returned_func() # Actually execute the function call
-            capture_main(result)
 
+    while option not in option_dict:
+        print(f"Invalid option: {option}. Please try again.")
+        option = input("Enter an option:\n-->").lower()
+       
+    returned_func = option_dict[option]
+    result = returned_func()
+    capture_main(result)
+    
 
 def display_menu()->None:
 

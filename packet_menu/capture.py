@@ -22,10 +22,10 @@ COUNT: int = 1
 
 
 # (interface:str,protocol:str,quantity:int)
-def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],str,str]:
+def construct_commands(result: tuple[str, int])->tuple[list[str],list[str],str,str]:
     global COUNT
     
-    user_interface,packet_type,quantity = result
+    user_interface,quantity = result
 
     output_dir = Path("../captured_packets")
 
@@ -41,7 +41,7 @@ def construct_commands(result: tuple[str, str, int])->tuple[list[str],list[str],
          user_interface, 
          '-c', # specify number of packets to capture
          str(quantity),
-         packet_type,
+         #packet_type,
          '-w', # write packet to an output file
          pcap_file,
          '-xx', # see the entire packet from the link layer up to the data payload.
@@ -101,7 +101,7 @@ def execute_commands(command_1:list[str],command_2:list[str],pcap_file:str,outpu
             print(f"An error occurred: {e}")
 
         
-def capture_main(result: tuple[str, str, int])->None:
+def capture_main(result: tuple[str, int])->None:
 
     command_1,command_2,pcap_file,output_txt = construct_commands(result)
 
