@@ -20,6 +20,8 @@ from typing import Tuple, Union
 
 from capture import capture_main
 
+PREV_CAPTURES = set()
+
 def print_help_message()->None:
     print("You asked for help")
     print("The viable options are listed below")
@@ -33,7 +35,7 @@ def welcome_message()-> None:
     print("Welcome to the Packet Menu. Select an option to get started or type Help")
     print("")
 
-def print_capture_options()->Tuple[str,int]:
+def capture_options()->Tuple[str,int]:
     print("Capture Options")
     print("Please select an interface to capture network traffic on")
     print("_____________________________")
@@ -43,14 +45,18 @@ def print_capture_options()->Tuple[str,int]:
     print_interfaces(user_interfaces)
 
 
-    user_interface: str = input("Format: 'interface name' ex. en0:\n-->")
+    user_interface: str = input("Format: 'interface name' ex. -->en0:\n-->")
     while verify_interface(user_interface,user_interfaces) == False:
         verify_interface(user_interface,user_interfaces)
     
     num_packets: int = get_num_user_packets()
-
+    capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
+    while capture_name not in PREV_CAPTURES:
+        print("Name of capture has already been used. Please enter a different name.")
+        capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
+        
     print("Capturing {} packets on {}".format(num_packets,user_interface))
-    return user_interface, num_packets
+    capture_main(capture_name, user_interface,num_packets)
 def get_num_user_packets()->int:
     print("Please specify a certian number of packets to capture\n")
 
@@ -95,7 +101,7 @@ def print_menu_options()->None:
     print("Option B: Clean Packets -> Displays options for cleaning a file with packets previously captured")
     print("Option C: Packet Stats -> Displays options for doing statistics on packets previously captured")
     print("Option D: Full Analysis -> Displays options for Capturing packet, cleaning the packets, and then doing statistics on the packets")
-    print("Option C: Help -> Displays the help menu")
+    print("Help: Displays the help menu\n")
     
     user_option: str = input("Enter option:\n-->")
 
@@ -105,7 +111,7 @@ def print_menu_options()->None:
 def process_user_input(*,option: str)->None:
     option = option.lower()
     option_dict = {
-        "option a":print_capture_options, # returns a tuple
+        "option a":capture_options, # returns a tuple
         "option b":print_clean_packets_options,
         "option c":print_packet_stats_options,
         "option d":print_full_analysis_options,
@@ -126,7 +132,7 @@ def display_menu()->None:
 
     # Show the welcome message
     welcome_message()
-    
+
     #Print the menu options. Get the input from the user.
     user_option = print_menu_options()
 

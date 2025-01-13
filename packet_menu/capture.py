@@ -16,22 +16,18 @@ import subprocess
 from typing import Tuple
 from pathlib import Path
 
-COUNT: int = 1
 
 
 
 
 # (interface:str,protocol:str,quantity:int)
-def construct_commands(result: tuple[str, int])->tuple[list[str],list[str],str,str]:
-    global COUNT
-    
-    user_interface,quantity = result
+def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
     output_dir = Path("../captured_packets")
 
-    pcap_file: str = str(output_dir / f"capture{COUNT}.pcap")
+    pcap_file: str = str(output_dir / f"capture{capture_name}.pcap")
 
-    output_txt = str(output_dir / f"capture{COUNT}.txt")
+    output_txt = str(output_dir / f"capture{capture_name}.txt")
 
     output_dir.mkdir(parents=True,exist_ok=True)
 
@@ -40,7 +36,7 @@ def construct_commands(result: tuple[str, int])->tuple[list[str],list[str],str,s
          '-i',
          user_interface, 
          '-c', # specify number of packets to capture
-         str(quantity),
+         str(num_packets),
          #packet_type,
          '-w', # write packet to an output file
          pcap_file,
@@ -57,7 +53,6 @@ def construct_commands(result: tuple[str, int])->tuple[list[str],list[str],str,s
          '-tttt',
          '-vv'
     ]
-    COUNT +=1 #increasing the number of total captured packets
 
     return command_1,command_2,pcap_file,output_txt
 
