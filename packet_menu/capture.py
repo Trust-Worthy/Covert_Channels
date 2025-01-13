@@ -97,15 +97,17 @@ def execute_commands(command_1:list[str],command_2:list[str],pcap_file:str,outpu
 
         
 def capture_main(capture_name:str,desired_interface:str,num_packets:int)->None:
-
+    from menu import print_menu_options
     command_1,command_2,pcap_file,output_txt = construct_commands(capture_name,desired_interface,num_packets)
 
     execute_commands(command_1,command_2,pcap_file,output_txt)
+    print()
+    print()
+    print_menu_options()
+
 
 def main()->None:
     
-    result = ('en0','icmp',2)
-    capture_main(result)
-
+   return None
 if __name__ == "__main__":
      main()

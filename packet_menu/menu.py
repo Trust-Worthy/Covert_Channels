@@ -17,6 +17,7 @@ from system_config import print_interfaces
 from typing import Tuple, Union
 
 
+
 from capture import capture_main
 
 PREV_CAPTURES = set()
@@ -81,9 +82,12 @@ def get_num_user_packets()->int:
 
 def print_clean_packets_options()->None:
     return None
-
+def exit_program()->None:
+    print("exiting program...")
+    exit()
 def print_packet_stats_options()->None:
-    
+    # What is the average packet size of a file?
+    # What are the percentage of protocols captured?
     return None
 
 def print_full_analysis_options()->None:
@@ -103,7 +107,8 @@ def print_menu_options()->str:
     print("Option B: Clean Packets -> Displays options for cleaning a file with packets previously captured")
     print("Option C: Packet Stats -> Displays options for doing statistics on packets previously captured")
     print("Option D: Full Analysis -> Displays options for Capturing packet, cleaning the packets, and then doing statistics on the packets")
-    print("Help: Displays the help menu\n")
+    print("Help: Displays the help menu")
+    print("Exit: Exit program and terminate.\n")
     
     user_option: str = input("Enter option:\n-->")
 
@@ -117,6 +122,7 @@ def process_user_input(*,option: str)->None:
         "option c":print_packet_stats_options,
         "option d":print_full_analysis_options,
         "help":print_help_message,
+        "exit":exit_program,
     }
 
     while option not in option_dict:
