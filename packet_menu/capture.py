@@ -41,7 +41,7 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          #packet_type,
          '-w', pcap_file,# write packet to an output file 
          '-xx', # display raw hex format.
-         '-tttt', # print timestamp for each packet in human readable format
+         '-tt',#ttt', # print timestamp for each packet in human readable format
          #'-vv', # verbose output
          ]
 
@@ -50,7 +50,7 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          'tcpdump',
          '-r', pcap_file, # read the saved pcap file
          '-xx',
-         '-tttt',
+         '-tt'#ttt', prints timestamps
          #'-vv' #verbose output
     ]
 
