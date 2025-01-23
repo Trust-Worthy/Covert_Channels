@@ -83,7 +83,15 @@ def __main__():
         print("####################################")
         print()
 
-        gen_net_mlp_main(X_train, Y_labels,X_test_file_list, Y_test_file_list, features, iterations, hidden_nodes, classes, alpha, batch_size)#, train_loader)
+        gen_net_mlp_main(X_train, 
+                         Y_labels,
+                         X_test_file_list, 
+                         Y_test_file_list, 
+                         features, iterations, 
+                         hidden_nodes, 
+                         classes, 
+                         alpha, 
+                         batch_size)#, train_loader)
         i=i+1
 
 __main__()
