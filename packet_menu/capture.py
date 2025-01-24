@@ -37,12 +37,13 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          '-i',
          user_interface, 
          '-c', # specify number of packets to capture
+         '-n', # removes the hostnames so that more DNS resolutions are required
          str(num_packets),
          #packet_type,
          '-w', pcap_file,# write packet to an output file 
          '-xx', # display raw hex format.
-         '-tt',#ttt', # print timestamp for each packet in human readable format
-         #'-vv', # verbose output
+         '-tttt',#ttt', # print timestamp for each packet in human readable format
+         '-vv', # verbose output
          ]
 
     command_2:list[str] = [

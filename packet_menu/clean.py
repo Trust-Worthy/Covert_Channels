@@ -12,7 +12,7 @@
 ## make the menu more simple. Add numbers to correspond to each menu option and file so that I don't have to
 ## type it manually
 
-## make sure to use the pid field to 
+## make sure to use the pid field to **identify stuff>?
 
 
 ### should I toss out the packets that aren't arp request , arp reply icmp request, or icmp reply
