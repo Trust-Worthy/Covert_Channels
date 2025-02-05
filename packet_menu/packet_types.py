@@ -11,6 +11,7 @@ Why is it important to have all of the respective fields for the different types
 functions that I need
 
 byte array to integer 
+
 byte array to numpy array unit8
 unit8 to byte array
 
@@ -50,7 +51,8 @@ class TCP_Packet(Ethernet_Packet):
     dst_address: bytearray # 31 - 34 bytes --> ip address
     source_port: bytearray  # 35 - 36 bytes offset --> source port
     dst_port: bytearray # 37 - 38 byte offset --> destination port
-
+    sequence_number: bytearray # 39 - 42 byte offset (4 bytes in total)
+    
 
 
 @dataclass
