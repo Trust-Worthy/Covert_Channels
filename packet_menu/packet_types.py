@@ -17,15 +17,20 @@ unit8 to byte array
 
 
 next prompt:
-I need some feedback on my code     
+I need some feedback on my code   
+
+
 
 '''
-
-
 
 import numpy as np
 from dataclasses import dataclass
 from datetime import datetime
+
+### TO-DO ###
+# What is the maximum size that a packet can be?
+# Create a get_packet_size_func
+
 
 @dataclass
 class Ethernet_Packet:
@@ -52,7 +57,17 @@ class TCP_Packet(Ethernet_Packet):
     source_port: bytearray  # 35 - 36 bytes offset --> source port
     dst_port: bytearray # 37 - 38 byte offset --> destination port
     sequence_number: bytearray # 39 - 42 byte offset (4 bytes in total)
-    
+    ack_number: bytearray # 43 - 46 byte offset (4 bytes in total)
+    header_length: bytearray # 47 byte offset (1 byte in total)
+    ack_flags: bytearray # 48 - 49 byte offset (2 bytes)
+    window: bytearray # 51 - 52 byte offset (2 bytes)
+    checksum: bytearray # 53 - 54 byte offset (2 bytes)
+    urgent_pointer: bytearray # 55 - 56 (2 bytes)
+    options: bytearray # 57 - 68 ( 12 bytes)
+    # options are: NOP, NOP, Timestamps
+
+
+
 
 
 @dataclass
