@@ -31,6 +31,8 @@ from typing import Optional
 
 
 ### TO-DO ###
+# Verify Chatgpt's work on the TLS
+# add error handling to TLS functions if necessary so that nothing breaks
 # What is the maximum size that a packet can be?
 # Create a get_packet_size_func
 
