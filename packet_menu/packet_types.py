@@ -35,6 +35,8 @@ from typing import Optional
 # Verify that all the fields for the class method are correct! Chatgpt is buggy as a mug
 # Add class method for all classes missing them!
 # Create a get_packet_size_func
+# Create functions in my clean.py for each class or create them in thie file. Basically... WAIT. I don't need 
+### 
 
 
 

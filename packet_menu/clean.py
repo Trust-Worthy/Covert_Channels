@@ -38,3 +38,21 @@
 ## Ask hartpence to share the video series
 
 ## Max pooling avg pooling. CNN methods of filtering.
+
+
+
+
+### 2/6/25
+
+## be wary of overfitting to 'one part' of the conversation: ex TLS application data
+## MLP --> multi layer perceptron
+### Create multiple neural networks to handle TCP, UDP ECT. use an initial NN to classify in TCP, UDP, ICMP
+#### Idea for the CNN shape. Instead of using a square... use a circle? Just like in soccer how you get a line
+## Creating ML features --> how much of the packet do I want to be my features. ex. 64 btyes for the entire size of the packet!
+# I get it. Packet statistics so that I can see the size of my dataset before curating my features (deciding what I want to anaylize with my NN)
+# I'm on the correct path 
+# training dataset
+# validation dataset ---> add ground truths (aka labels) (should be 1/10 of training)
+# test dataset --> data that the model has never seen. Just make sure that the 
+# make sure that all the datasets have
+# OOD Machine learning problem --> out of distribution 
