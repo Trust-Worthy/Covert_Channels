@@ -100,7 +100,7 @@ class TLS_Packet(TCP_Packet):
     # TLS 1.3 specific fields (handshake or record layer)
     tls_13_record_data: Optional[bytes] = None  # For TLS 1.3, the whole record is treated as a block of data
     encrypted_application_data: Optional[bytes] = None  # Raw encrypted data in the application record
-
+    
     def initialize_tls_fields(self, tls_message_type: str, packet_data: bytes):
         """
         Initializes the TLS packet fields based on the message type and packet data.
@@ -176,6 +176,34 @@ class TLS_Packet(TCP_Packet):
         self.tls_13_record_data = packet_data[5:]  # In TLS 1.3, we simply take the remaining data starting at byte 5
         # More detailed parsing of TLS 1.3 can be added depending on the specific handshake structure (e.g., ClientHello, ServerHello, etc.)
 
+@dataclass
+class ARP:
+    hardware_type: bytes         # Bytes 0-1: Hardware type (2 bytes)
+    protocol_type: bytes         # Bytes 2-3: Protocol type (2 bytes)
+    hardware_address_length: bytes  # Byte 4: Hardware address length (1 byte)
+    protocol_address_length: bytes  # Byte 5: Protocol address length (1 byte)
+    operation_code: bytes        # Bytes 6-7: Operation (2 bytes)
+    sender_hardware_address: bytes  # Bytes 8-13: Sender MAC address (6 bytes)
+    sender_protocol_address: bytes  # Bytes 14-17: Sender IP address (4 bytes)
+    target_hardware_address: bytes  # Bytes 18-23: Target MAC address (6 bytes)
+    target_protocol_address: bytes  # Bytes 24-27: Target IP address (4 bytes)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> "ARP":
+        if len(data) < 28:  # Minimum ARP packet size
+            raise ValueError("Insufficient data for ARP packet")
+        
+        return cls(
+            hardware_type=data[0:2],
+            protocol_type=data[2:4],
+            hardware_address_length=data[4:5],
+            protocol_address_length=data[5:6],
+            operation_code=data[6:8],
+            sender_hardware_address=data[8:14],
+            sender_protocol_address=data[14:18],
+            target_hardware_address=data[18:24],
+            target_protocol_address=data[24:28],
+        )
 
 '''
 # Example function that creates a TCP_Packet object
@@ -244,12 +272,8 @@ class DHCP:
 class DNS:
 
 
-@dataclass
-class TLS
 
 
-@dataclass
-class ARP
 
 @dataclass
 class ICMP
