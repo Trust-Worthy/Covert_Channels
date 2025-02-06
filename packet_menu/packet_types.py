@@ -36,7 +36,16 @@ from typing import Optional
 # Add class method for all classes missing them!
 # Create a get_packet_size_func
 # Create functions in my clean.py for each class or create them in thie file. Basically... WAIT. I don't need 
-### 
+### Next prompt ###
+'''
+
+
+So essentially I need to create getters for every protocol?
+
+So let's say that I'm parsing bytes from a txt file that I captured packets using tcpdump. 
+
+Would I declare an instance of ethernet? stop at the proper byte offset for ethernet. Then create the ip header class and call the getter for the ethernet class?
+'''
 
 
 
@@ -293,6 +302,7 @@ class DHCP(UDP):
             boot_file_name_bytes=packet_data[108:172],  # 128 bytes: Boot file name
             dhcp_options_bytes=packet_data[172:],  # Variable length: DHCP options
         )
+
 
 
 @dataclass
