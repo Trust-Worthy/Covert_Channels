@@ -30,9 +30,10 @@ from typing import Optional
 
 
 ### TO-DO ###
-# Verify Chatgpt's work on the TLS
 # add error handling to TLS functions if necessary so that nothing breaks
 # What is the maximum size that a packet can be?
+# Verify that all the fields for the class method are correct! Chatgpt is buggy as a mug
+# Add class method for all classes missing them!
 # Create a get_packet_size_func
 
 
@@ -82,6 +83,32 @@ class TCP_Packet(IP_Header):
     checksum: bytes  # Offset: Bytes 36-37 (2 bytes)
     urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
     options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
+
+@dataclass
+class UDP(IP_Header):
+    source_port: bytes  # Bytes 0-1 (2 bytes): Source Port
+    destination_port: bytes  # Bytes 2-3 (2 bytes): Destination Port
+    length: bytes  # Bytes 4-5 (2 bytes): Length of UDP header + payload
+    checksum: bytes  # Bytes 6-7 (2 bytes): Checksum (optional, used for integrity verification)
+    payload: bytes  # Bytes 8+: UDP Payload (e.g., DHCP, DNS, etc.)
+
+    @classmethod
+    def from_bytes(cls, packet_data: bytes) -> "UDP":
+        """
+        Parses a UDP packet from raw bytes.
+        :param packet_data: Raw UDP packet bytes
+        :return: Parsed UDP dataclass object
+        """
+        if len(packet_data) < 8:
+            raise ValueError("UDP header must be at least 8 bytes long.")
+
+        return cls(
+            source_port=packet_data[0:2],  # 2 bytes
+            destination_port=packet_data[2:4],  # 2 bytes
+            length=packet_data[4:6],  # 2 bytes
+            checksum=packet_data[6:8],  # 2 bytes
+            payload=packet_data[8:],  # Everything after 8 bytes is payload
+        )
 
 @dataclass
 class TLS_Packet(TCP_Packet):
@@ -178,68 +205,80 @@ class ARP(Ethernet_Packet):
         )
 
 
-'''
-# Example function that creates a TCP_Packet object
-def create_tcp_packet_from_bytes(packet_data: bytes) -> TCP_Packet:
-    # Extracting different fields from the raw packet data (as an example)
-    destination_mac = packet_data[:6]
-    source_mac = packet_data[6:12]
-    ethernet_type = packet_data[12:14]
-    version = packet_data[14:15]
-    diff_service_field = packet_data[15:16]
-    total_length = packet_data[16:18]
-    identification = packet_data[18:20]
-    flags = packet_data[20:22]
-    ttl = packet_data[22:23]
-    protocol = packet_data[23:24]
-    header_checksum = packet_data[24:26]
-    source_address = packet_data[26:30]
-    dst_address = packet_data[30:34]
-    source_port = packet_data[34:36]
-    dst_port = packet_data[36:38]
-    sequence_number = packet_data[38:42]
-    ack_number = packet_data[42:46]
-    header_length = packet_data[46:47]
-    ack_flags = packet_data[47:49]
-    window = packet_data[49:51]
-    checksum = packet_data[51:53]
-    urgent_pointer = packet_data[53:55]
-    options = packet_data[55:67]
+@dataclass
+class UDP(IP_Header):
+    source_port_bytes: bytes  # Bytes 0-1 (2 bytes): Source Port
+    destination_port_bytes: bytes  # Bytes 2-3 (2 bytes): Destination Port
+    length_bytes: bytes  # Bytes 4-5 (2 bytes): Length of UDP header + payload
+    checksum_bytes: bytes  # Bytes 6-7 (2 bytes): Checksum (optional, used for integrity verification)
+    payload_bytes: bytes  # Bytes 8+: UDP Payload (e.g., DHCP, DNS, etc.)
 
-    # Create the TCP_Packet object
-    return TCP_Packet(
-        destination_mac=destination_mac,
-        source_mac=source_mac,
-        ethernet_type=ethernet_type,
-        timestamp=datetime.now(),  # Just an example timestamp
-        packet_data_byte=packet_data,
-        packet_data_np=np.array(packet_data),
-        version=version,
-        diff_service_field=diff_service_field,
-        total_length=total_length,
-        identification=identification,
-        flags=flags,
-        ttl=ttl,
-        protocol=protocol,
-        header_checksum=header_checksum,
-        source_address=source_address,
-        dst_address=dst_address,
-        source_port=source_port,
-        dst_port=dst_port,
-        sequence_number=sequence_number,
-        ack_number=ack_number,
-        header_length=header_length,
-        ack_flags=ack_flags,
-        window=window,
-        checksum=checksum,
-        urgent_pointer=urgent_pointer,
-        options=options
-    )
+    @classmethod
+    def from_bytes(cls, packet_data: bytes) -> "UDP":
+        """
+        Parses a UDP packet from raw bytes.
+        :param packet_data: Raw UDP packet bytes
+        :return: Parsed UDP dataclass object
+        """
+        if len(packet_data) < 8:
+            raise ValueError("UDP header must be at least 8 bytes long.")
 
-'''
+        return cls(
+            source_port_bytes=packet_data[0:2],  # 2 bytes for source port
+            destination_port_bytes=packet_data[2:4],  # 2 bytes for destination port
+            length_bytes=packet_data[4:6],  # 2 bytes for length of UDP packet
+            checksum_bytes=packet_data[6:8],  # 2 bytes for checksum
+            payload_bytes=packet_data[8:],  # Remaining bytes are the payload (e.g., DHCP)
+        )
+
 
 @dataclass
-class DHCP:
+class DHCP(UDP):
+    # DHCP packet fields (from DHCPv4 standard)
+    operation_code_bytes: bytes  # Byte 0: Operation code (1 byte)
+    hardware_type_bytes: bytes  # Byte 1: Hardware type (1 byte)
+    hardware_address_length_bytes: bytes  # Byte 2: Hardware address length (1 byte)
+    hops_bytes: bytes  # Byte 3: Hops (1 byte)
+    transaction_id_bytes: bytes  # Bytes 4-7: Transaction ID (4 bytes)
+    seconds_elapsed_bytes: bytes  # Bytes 8-9: Seconds elapsed (2 bytes)
+    flags_bytes: bytes  # Bytes 10-11: Flags (2 bytes)
+    client_ip_address_bytes: bytes  # Bytes 12-15: Client IP address (4 bytes)
+    your_ip_address_bytes: bytes  # Bytes 16-19: Your (client) IP address (4 bytes)
+    server_ip_address_bytes: bytes  # Bytes 20-23: Server IP address (4 bytes)
+    gateway_ip_address_bytes: bytes  # Bytes 24-27: Gateway IP address (4 bytes)
+    client_hardware_address_bytes: bytes  # Bytes 28-43: Client hardware address (16 bytes)
+    server_host_name_bytes: bytes  # Bytes 44-107: Server host name (64 bytes)
+    boot_file_name_bytes: bytes  # Bytes 108-171: Boot file name (128 bytes)
+    dhcp_options_bytes: bytes  # Bytes 172+: DHCP options (variable length)
+
+    @classmethod
+    def from_bytes(cls, packet_data: bytes) -> "DHCP":
+        """
+        Parses a DHCP packet from raw bytes.
+        :param packet_data: Raw DHCP packet bytes
+        :return: Parsed DHCP dataclass object
+        """
+        if len(packet_data) < 240:
+            raise ValueError("DHCP packet must be at least 240 bytes long.")
+
+        return cls(
+            operation_code_bytes=packet_data[0:1],  # 1 byte: Operation code
+            hardware_type_bytes=packet_data[1:2],  # 1 byte: Hardware type
+            hardware_address_length_bytes=packet_data[2:3],  # 1 byte: Hardware address length
+            hops_bytes=packet_data[3:4],  # 1 byte: Hops
+            transaction_id_bytes=packet_data[4:8],  # 4 bytes: Transaction ID
+            seconds_elapsed_bytes=packet_data[8:10],  # 2 bytes: Seconds elapsed
+            flags_bytes=packet_data[10:12],  # 2 bytes: Flags
+            client_ip_address_bytes=packet_data[12:16],  # 4 bytes: Client IP address
+            your_ip_address_bytes=packet_data[16:20],  # 4 bytes: Your IP address
+            server_ip_address_bytes=packet_data[20:24],  # 4 bytes: Server IP address
+            gateway_ip_address_bytes=packet_data[24:28],  # 4 bytes: Gateway IP address
+            client_hardware_address_bytes=packet_data[28:44],  # 16 bytes: Client hardware address
+            server_host_name_bytes=packet_data[44:108],  # 64 bytes: Server host name
+            boot_file_name_bytes=packet_data[108:172],  # 128 bytes: Boot file name
+            dhcp_options_bytes=packet_data[172:],  # Variable length: DHCP options
+        )
+
 
 @dataclass
 class DNS:
