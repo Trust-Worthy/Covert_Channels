@@ -261,6 +261,19 @@ class DHCP(UDP):
         if len(packet_data) < 240:
             raise ValueError("DHCP packet must be at least 240 bytes long.")
 
+
+        # Call parent class to handle Ethernet header parsing
+        ethernet_packet = Ethernet_Packet.from_bytes(packet_data)
+        
+        # Call parent class to handle IP header parsing (after Ethernet)
+        ip_packet = IP_Header.from_bytes(ethernet_packet.payload_bytes)
+        
+        # Call parent class to handle UDP header parsing (after IP)
+        udp_packet = UDP.from_bytes(ip_packet.payload_bytes)
+
+        # Parse DHCP-specific fields from the payload (after UDP header)
+        dhcp_payload = udp_packet.payload_bytes
+
         return cls(
             operation_code_bytes=packet_data[0:1],  # 1 byte: Operation code
             hardware_type_bytes=packet_data[1:2],  # 1 byte: Hardware type
