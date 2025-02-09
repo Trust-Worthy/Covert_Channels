@@ -51,8 +51,15 @@
 ## Creating ML features --> how much of the packet do I want to be my features. ex. 64 btyes for the entire size of the packet!
 # I get it. Packet statistics so that I can see the size of my dataset before curating my features (deciding what I want to anaylize with my NN)
 # I'm on the correct path 
-# training dataset
-# validation dataset ---> add ground truths (aka labels) (should be 1/10 of training)
-# test dataset --> data that the model has never seen. Just make sure that the 
+# training dataset 90K
+# validation dataset ---> add ground truths (aka labels) (should be 1/10 of training) --> 9k
+# test dataset --> data that the model has never seen. Just make sure that the  
 # make sure that all the datasets have
 # OOD Machine learning problem --> out of distribution 
+
+
+
+'''
+Should we have an other dataclass?
+
+'''
