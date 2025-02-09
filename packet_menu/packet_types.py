@@ -215,34 +215,6 @@ class ARP(Ethernet_Packet):
             packet_data_np=np.frombuffer(data, dtype=np.uint8),
         )
 
-
-@dataclass
-class UDP(IP_Header):
-    source_port_bytes: bytes  # Bytes 0-1 (2 bytes): Source Port
-    destination_port_bytes: bytes  # Bytes 2-3 (2 bytes): Destination Port
-    length_bytes: bytes  # Bytes 4-5 (2 bytes): Length of UDP header + payload
-    checksum_bytes: bytes  # Bytes 6-7 (2 bytes): Checksum (optional, used for integrity verification)
-    payload_bytes: bytes  # Bytes 8+: UDP Payload (e.g., DHCP, DNS, etc.)
-
-    @classmethod
-    def from_bytes(cls, packet_data: bytes) -> "UDP":
-        """
-        Parses a UDP packet from raw bytes.
-        :param packet_data: Raw UDP packet bytes
-        :return: Parsed UDP dataclass object
-        """
-        if len(packet_data) < 8:
-            raise ValueError("UDP header must be at least 8 bytes long.")
-
-        return cls(
-            source_port_bytes=packet_data[0:2],  # 2 bytes for source port
-            destination_port_bytes=packet_data[2:4],  # 2 bytes for destination port
-            length_bytes=packet_data[4:6],  # 2 bytes for length of UDP packet
-            checksum_bytes=packet_data[6:8],  # 2 bytes for checksum
-            payload_bytes=packet_data[8:],  # Remaining bytes are the payload (e.g., DHCP)
-        )
-
-
 @dataclass
 class DHCP(UDP):
     # DHCP packet fields (from DHCPv4 standard)
@@ -317,3 +289,16 @@ class ICMP
 
 @dataclass
 class OTHER
+
+
+'''
+arp request 
+arp reply
+icmp request 
+icmp reply
+dns 
+https
+tls
+quic
+
+'''
