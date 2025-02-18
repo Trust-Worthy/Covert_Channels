@@ -52,7 +52,7 @@ class Packet_parser:
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
 
 
-    def store_and_track_bytes(self, raw_bytes: bytes, field: Any) -> None:
+    def store_and_track_bytes(self, raw_bytes: bytes) -> None:
         """
         Updates byte_pointer, total_bytes_read, and appends the bytes to the packet data bytes.
 
@@ -64,10 +64,9 @@ class Packet_parser:
 
         Args:
             raw_bytes (bytes): The bytes being tracked
-            field (Any): The field to which the bytes will be assigned
+
         """
 
-        field = raw_bytes ### Setting some protocol field to the bytes being tracked
         self.move_byte_pointer = len(raw_bytes) ### Moving byte pointer to the next offset internally doing +=
         self.total_bytes_read = len(raw_bytes) ###  += under the hood in the setter
         self.packet_data_bytes = raw_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
@@ -127,9 +126,9 @@ class Ethernet_Packet:
         self._parser: Packet_parser = Packet_parser()
 
 
-        self._parse_ethernet_frame(raw_bytes,self.parser)
+        self.parse_ethernet_frame(raw_bytes,self._parser)
 
-    def _parse_ethernet_frame(self,raw_bytes:bytes, parser: Packet_parser)-> None:
+    def parse_ethernet_frame(self,raw_bytes:bytes, parser: Packet_parser)-> None:
         """
 
 
@@ -139,8 +138,14 @@ class Ethernet_Packet:
         """
 
         self._destination_mac = raw_bytes[0:6] ### Set field first! This a very important step.
-        self._parser.store_and_track_bytes(raw_bytes,self.destination_mac)
+        self._source_mac = raw_bytes[6:11]
+        self._ethernet_type = raw_bytes[11:13]
+        self._timestamp = 
+        parser.store_and_track_bytes(self._destination_mac) ### Update pointer, bytes read, and all bytes collected (array)
 
+        
+        parser.store_and_track_bytes(raw_bytes)
+ 
 
     
 

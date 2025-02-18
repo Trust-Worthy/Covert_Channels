@@ -36,13 +36,13 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          'tcpdump', # name of tool
          '-i',
          user_interface, 
-         '-c', # specify number of packets to capture
          '-n', # removes the hostnames so that more DNS resolutions are required
+         '-c', # specify number of packets to capture
          str(num_packets),
          #packet_type,
          '-w', pcap_file,# write packet to an output file 
          '-xx', # display raw hex format.
-         '-tttt',#ttt', # print timestamp for each packet in human readable format
+         '--time-stamp-precision=micro',#ttt', # print timestamp for each packet in human readable format
          '-vv', # verbose output
          ]
 
@@ -51,8 +51,8 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          'tcpdump',
          '-r', pcap_file, # read the saved pcap file
          '-xx',
-         '-tt'#ttt', prints timestamps
-         #'-vv' #verbose output
+         '-tttt',#ttt', prints timestamps
+         '-vv' #verbose output
     ]
 
     return command_1,command_2,pcap_file,output_txt
