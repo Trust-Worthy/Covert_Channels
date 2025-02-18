@@ -48,6 +48,26 @@ So let's say that I'm parsing bytes from a txt file that I captured packets usin
 Would I declare an instance of ethernet? stop at the proper byte offset for ethernet. Then create the ip header class and call the getter for the ethernet class?
 '''
 
+class Parser:
+    def __init__(self):
+        self._byte_pointer: int = 0
+        self._total_bytes_read: int = 0
+    
+
+    @property
+    def byte_pointer(self):
+        return self._byte_pointer
+    
+    @byte_pointer.setter
+    def byte_pointer(self,value:int):
+        self._byte_pointer += value
+        self._total_bytes_read += value
+
+    @property
+    def 
+
+    
+
 
 
 @dataclass
@@ -58,6 +78,7 @@ class Ethernet_Packet:
     timestamp: datetime  # Timestamp of packet capture
     packet_data_byte: bytes  # Full packet data in bytes
     packet_data_np: np.array  # Full packet data as a NumPy array
+    LAST_PARSED_OFFSET
 
     @classmethod
     def from_bytes(cls, data: bytes, timestamp: datetime) -> "Ethernet_Packet":
@@ -85,16 +106,18 @@ class IP_Header(Ethernet_Packet):
 
 @dataclass
 class TCP_Packet(IP_Header):
-    source_port: bytes  # Offset: Bytes 20-21 (2 bytes)
-    dst_port: bytes  # Offset: Bytes 22-23 (2 bytes)
-    sequence_number: bytes  # Offset: Bytes 24-27 (4 bytes)
-    ack_number: bytes  # Offset: Bytes 28-31 (4 bytes)
-    header_length: bytes  # Offset: Byte 32 (4 bits for data offset)
-    flags: bytes  # Offset: Byte 33 (1 byte, includes flags)
-    window: bytes  # Offset: Bytes 34-35 (2 bytes)
-    checksum: bytes  # Offset: Bytes 36-37 (2 bytes)
-    urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
-    options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
+    def __init__(self,raw_bytes: bytes):
+
+        source_port: bytes  # Offset: Bytes 20-21 (2 bytes)
+        dst_port: bytes  # Offset: Bytes 22-23 (2 bytes)
+        sequence_number: bytes  # Offset: Bytes 24-27 (4 bytes)
+        ack_number: bytes  # Offset: Bytes 28-31 (4 bytes)
+        header_length: bytes  # Offset: Byte 32 (4 bits for data offset)
+        flags: bytes  # Offset: Byte 33 (1 byte, includes flags)
+        window: bytes  # Offset: Bytes 34-35 (2 bytes)
+        checksum: bytes  # Offset: Bytes 36-37 (2 bytes)
+        urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
+        options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
 
 @dataclass
 class UDP(IP_Header):
@@ -122,27 +145,31 @@ class UDP(IP_Header):
             payload=packet_data[8:],  # Everything after 8 bytes is payload
         )
 
-@dataclass
 class TLS_Packet(TCP_Packet):
-    tls_record_data: Optional[bytes] = None
-    handshake_type: Optional[bytes] = None  # Offset: Byte 5 (1 byte)
-    handshake_length: Optional[bytes] = None  # Offset: Bytes 6-9 (4 bytes)
-    
-    client_hello_version: Optional[bytes] = None  # Offset: Bytes 10-11 (2 bytes, TLS 1.2 only)
-    random_bytes: Optional[bytes] = None  # Offset: Bytes 12-43 (32 bytes, TLS 1.2 only)
-    session_id_length: Optional[bytes] = None  # Offset: Byte 44 (1 byte, TLS 1.2 only)
-    session_id: Optional[bytes] = None
-    cipher_suites_length: Optional[bytes] = None
-    cipher_suites: Optional[bytes] = None
-    compression_methods_length: Optional[bytes] = None
-    compression_methods: Optional[bytes] = None
-    extensions_length: Optional[bytes] = None
-    extensions: Optional[bytes] = None
-    
-    tls_13_record_data: Optional[bytes] = None
-    encrypted_application_data: Optional[bytes] = None
 
-    @classmethod
+
+    def __init__():
+        tls_record_data: Optional[bytes] = None
+        handshake_type: Optional[bytes] = None  # Offset: Byte 5 (1 byte)
+        handshake_length: Optional[bytes] = None  # Offset: Bytes 6-9 (4 bytes)
+        
+        client_hello_version: Optional[bytes] = None  # Offset: Bytes 10-11 (2 bytes, TLS 1.2 only)
+        random_bytes: Optional[bytes] = None  # Offset: Bytes 12-43 (32 bytes, TLS 1.2 only)
+        session_id_length: Optional[bytes] = None  # Offset: Byte 44 (1 byte, TLS 1.2 only)
+        session_id: Optional[bytes] = None
+        cipher_suites_length: Optional[bytes] = None
+        cipher_suites: Optional[bytes] = None
+        compression_methods_length: Optional[bytes] = None
+        compression_methods: Optional[bytes] = None
+        extensions_length: Optional[bytes] = None
+        extensions: Optional[bytes] = None
+        
+        tls_13_record_data: Optional[bytes] = None
+        encrypted_application_data: Optional[bytes] = None
+
+    
+
+   
     def from_bytes(cls, data: bytes) -> "TLS_Packet":
         tls_packet = cls(
             packet_data_byte=data,
@@ -236,56 +263,57 @@ class ICMP_REPLY:
 
 @dataclass
 class HTTP_Packet(TCP_Packet):
-    is_request: Optional[bool] = None  # True if request, False if response
-    method: Optional[bytes] = None  # Present in requests
-    request_uri: Optional[bytes] = None  # Present in requests
-    http_version: Optional[bytes] = None  # Present in both request/response
-    
-    status_code: Optional[bytes] = None  # Present in responses
-    status_message: Optional[bytes] = None  # Present in responses
-    
-    headers: Optional[dict] = None  # Common in both
-    body: Optional[bytes] = None  # Optional in both
-    
     def __init__(self, raw_data: bytes):
-        """Parses an HTTP request or response from raw bytes."""
-        try:
-            # Split request into headers and body
-            header_section, body_section = raw_data.split(b"\r\n\r\n", 1) if b"\r\n\r\n" in raw_data else (raw_data, b"")
-
-            # Split headers into lines
-            header_lines = header_section.split(b"\r\n")
-            
-            # First line determines if it's a request or response
-            first_line_parts = header_lines[0].split(b" ")
-            
-            if first_line_parts[0].startswith(b"HTTP/"):  
-                # This is an **HTTP Response**
-                self.is_request = False
-                self.http_version = first_line_parts[0]  # First part is HTTP version (e.g., HTTP/1.1)
-                self.status_code = first_line_parts[1]  # Second part is status code (e.g., 200)
-                self.status_message = b" ".join(first_line_parts[2:])  # Remaining is status message
-            else:
-                # This is an **HTTP Request**
-                self.is_request = True
-                self.method = first_line_parts[0]  # First word (e.g., GET, POST)
-                self.request_uri = first_line_parts[1]  # Second word (e.g., /index.html)
-                self.http_version = first_line_parts[2]  # Third word (e.g., HTTP/1.1)
-            
-            # Parse headers
-            self.headers = {}
-            for line in header_lines[1:]:  # Skip first line
-                if b": " in line:
-                    key, value = line.split(b": ", 1)
-                    self.headers[key.decode()] = value.decode()
-            
-            # Store body if present
-            self.body = body_section if body_section else None
-
-        except Exception as e:
-            print(f"Error parsing HTTP packet: {e}")
+        super.__init__()
 
 
+        self.is_request: Optional[bool] = None  # True if request, False if response
+        self.method: Optional[bytes] = None  # Only for requests
+        self.request_uri: Optional[bytes] = None  # Only for requests
+        self.http_version: Optional[bytes] = None  # In both requests and responses
+        
+        self.status_code: Optional[bytes] = None  # Only for responses
+        self.status_message: Optional[bytes] = None  # Only for responses
+        
+        self.headers: Dict[bytes, bytes] = {}  # Headers dictionary
+        self.body: Optional[bytes] = None  # Optional body
+        
+        self.parse(raw_data)  # Parse the raw HTTP data when an instance is created
+
+    def parse(self, raw_data: bytes):
+        # Separate headers and body
+        header_section, body_section = raw_data.split(b"\r\n\r\n", 1) if b"\r\n\r\n" in raw_data else (raw_data, b"")
+        
+        # Split headers into lines
+        header_lines = header_section.split(b"\r\n")
+        
+        if not header_lines:
+            return
+        
+        # Split the first line (Request-Line or Status-Line)
+        first_line_parts = header_lines[0].split(b" ")
+        
+        if first_line_parts[0].startswith(b"HTTP/"):
+            # This is a response
+            self.is_request = False
+            self.http_version = first_line_parts[0]  # e.g., HTTP/1.1
+            self.status_code = first_line_parts[1]  # e.g., 200
+            self.status_message = b" ".join(first_line_parts[2:])  # e.g., OK
+        else:
+            # This is a request
+            self.is_request = True
+            self.method = first_line_parts[0]  # e.g., GET
+            self.request_uri = first_line_parts[1]  # e.g., /index.html
+            self.http_version = first_line_parts[2]  # e.g., HTTP/1.1
+        
+        # Parse headers
+        for line in header_lines[1:]:
+            if b": " in line:
+                key, value = line.split(b": ", 1)
+                self.headers[key] = value
+        
+        # Store body
+        self.body = body_section
 
 @dataclass
 class DNS:
