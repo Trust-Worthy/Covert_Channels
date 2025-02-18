@@ -44,7 +44,7 @@ Would I declare an instance of ethernet? stop at the proper byte offset for ethe
 '''
 
 class Packet_parser:
-    def __init__(self, raw_data: bytes):
+    def __init__(self):
         self._offset_pointer: int = 0
         self._total_bytes_read: int = 0
         self._packet_data_bytes: bytearray  # Full packet data in bytes
@@ -56,34 +56,29 @@ class Packet_parser:
         """
         Updates byte_pointer, total_bytes_read, and appends the bytes to the packet data bytes.
 
-         When the byte_pointer is moved, update...
+        Anytime the byte_pointer is moved, update...
         
-        1) The byte_pointer
+        1) The byte_pointer itself
         2) The total_bytes_read
-        3)
+        3) The byte array containing all the packet data. packet_data_bytes
 
         Args:
             raw_bytes (bytes): The bytes being tracked
             field (Any): The field to which the bytes will be assigned
         """
-    
-
-
-       
 
         field = raw_bytes ### Setting some protocol field to the bytes being tracked
-        self.move_byte_pointer += raw_bytes ### Moving byte pointer to the next offset
-        self.total_bytes_read += raw_bytes
-        self.packet_data_bytes.append(bytes)
-
-
-    '''
-    so i'm doing += in this method but under the hood it's really doing += correct? Can I do += and it still be fine just so it's easier to read
-    and I don't get freaked out that the byte pointer is being overwritten.
-    
-    '''
+        self.move_byte_pointer = raw_bytes ### Moving byte pointer to the next offset internally doing +=
+        self.total_bytes_read = raw_bytes ###  += under the hood in the setter
+        self.packet_data_bytes.append(bytes) ### Adding bytes to the entire byte array
 
     def create_np_array_from_bytes(self) -> np.ndarray:
+        """
+        Creates numpy array from bytearray.
+
+        Returns:
+            np.ndarray: a numpy array of type np.uint8 containing the same inforation as the packet_data_types bytearray
+        """
         self.packet_data_np_arr = np.frombuffer(self.packet_data_bytes,dtype=np.uint8)
 
         return self.packet_data_np_arr
