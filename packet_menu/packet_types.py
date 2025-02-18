@@ -44,19 +44,31 @@ Would I declare an instance of ethernet? stop at the proper byte offset for ethe
 '''
 
 class Parser:
-    def __init__(self):
+    def __init__(self, raw_data: bytes):
         self._offset_pointer: int = 0
         self._total_bytes_read: int = 0
-    
+        self._packet_data_bytes: bytearray  # Full packet data in bytes
+        self._packet_data_np: np.ndarray  # Full packet data as a NumPy array
 
     @property
     def offset_pointer(self) -> int:
         return self._offset_pointer
     
     @offset_pointer.setter
-    def byte_pointer(self,value:int) -> None:
+    def byte_pointer(self,value: bytes) -> None:
+        """
+        When the byte_pointer is moved, update...
+        
+        1) The byte_pointer
+        2) The total_bytes_read
+        3)
+
+        Args:
+            value (int): _description_
+        """
         self._offset_pointer += value
         self._total_bytes_read += value
+        self._packet_data_bytes.append(value)
 
     @property
     def total_bytes_read(self)-> int:
@@ -67,24 +79,35 @@ class Parser:
         self._total_bytes_read += value
 
     
+    @property
+    def packet_data_bytes(self) -> bytearray:
+        return self._packet_data_bytes
+    
+    @packet_data_bytes.setter
+    def packet_data_bytes(self, value:bytes) -> None:
+        self._packet_data_bytes.append(value)
 
-
+    @property
+    def packet_data_np(self) -> np.ndarray:
+        return self._packet_data_np
 
 
 class Ethernet_Packet:
 
 
-    def __init__(self):
+    def __init__(self, raw_bytes: bytes):
         
         self._destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
-        selt._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
-        timestamp: datetime  # Timestamp of packet capture
-        packet_data_byte: bytes  # Full packet data in bytes
-        packet_data_np: np.array  # Full packet data as a NumPy array
-        parser = Parser
+        self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
+        self._timestamp: datetime  # Timestamp of packet capture
+        self._parser: Parser = Parser()
 
 
+        self._parse_ethernet_frame(raw_bytes)
+
+    def _parse_ethernet_frame(raw_bytes:bytes)-> None:
+        
 
     def from_bytes(cls, data: bytes, timestamp: datetime) -> "Ethernet_Packet":
         return cls(
@@ -95,6 +118,56 @@ class Ethernet_Packet:
             packet_data_byte=data,
             packet_data_np=np.frombuffer(data, dtype=np.uint8)
         )
+
+    # Getter and setter for destination_mac
+    @property
+    def destination_mac(self) -> bytes:
+        return self._destination_mac
+
+    @destination_mac.setter
+    def destination_mac(self, value: bytes):
+        if len(value) != 6:
+            raise ValueError("MAC address must be 6 bytes long")
+        self._destination_mac = value
+
+    # Getter and setter for source_mac
+    @property
+    def source_mac(self) -> bytes:
+        return self._source_mac
+
+    @source_mac.setter
+    def source_mac(self, value: bytes):
+        if len(value) != 6:
+            raise ValueError("MAC address must be 6 bytes long")
+        self._source_mac = value
+
+    # Getter and setter for ethernet_type
+    @property
+    def ethernet_type(self) -> bytes:
+        return self._ethernet_type
+
+    @ethernet_type.setter
+    def ethernet_type(self, value: bytes):
+        if len(value) != 2:
+            raise ValueError("Ethernet type must be 2 bytes long")
+        self._ethernet_type = value
+
+    # Getter for timestamp (no setter needed, as it's set on initialization)
+    @property
+    def timestamp(self) -> datetime:
+        return self._timestamp
+
+    # Getter and setter for parser (if needed)
+    @property
+    def parser(self) -> 'Parser':  # Assuming Parser is a class
+        return self._parser
+
+    @parser.setter
+    def parser(self, value: 'Parser'):
+        if not isinstance(value, Parser):
+            raise ValueError("parser must be an instance of the Parser class")
+        self._parser = value
+
 
 @dataclass
 class IP_Header(Ethernet_Packet):
