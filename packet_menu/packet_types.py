@@ -48,27 +48,45 @@ class Packet_parser:
         self._offset_pointer: int = 0
         self._total_bytes_read: int = 0
         self._packet_data_bytes: bytearray  # Full packet data in bytes
-        self._packet_data_np: np.ndarray  # Full packet data as a NumPy array
-        self._finished_parsing: bool
+        self._packet_data_np_arr: np.ndarray  # Full packet data as a NumPy array
+        self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
 
 
     def store_and_track_bytes(self, raw_bytes: bytes, field: Any) -> None:
+        """
+        Updates byte_pointer, total_bytes_read, and appends the bytes to the packet data bytes.
+
+         When the byte_pointer is moved, update...
+        
+        1) The byte_pointer
+        2) The total_bytes_read
+        3)
+
+        Args:
+            raw_bytes (bytes): The bytes being tracked
+            field (Any): The field to which the bytes will be assigned
+        """
+    
+
+
+       
 
         field = raw_bytes ### Setting some protocol field to the bytes being tracked
         self.move_byte_pointer += raw_bytes ### Moving byte pointer to the next offset
         self.total_bytes_read += raw_bytes
         self.packet_data_bytes.append(bytes)
-        self.packet_data_np.
 
 
     '''
-    so i'm doing = in this method but under the hood it's really doing += correct? Can I do += and it still be fine just so it's easier to read
+    so i'm doing += in this method but under the hood it's really doing += correct? Can I do += and it still be fine just so it's easier to read
     and I don't get freaked out that the byte pointer is being overwritten.
     
     '''
 
     def create_np_array_from_bytes(self) -> np.ndarray:
-        np_array = np.frombuffer(self._packet_data_bytes)
+        self.packet_data_np_arr = np.frombuffer(self.packet_data_bytes,dtype=np.uint8)
+
+        return self.packet_data_np_arr
 
     @property
     def offset_pointer(self) -> int:
@@ -76,19 +94,8 @@ class Packet_parser:
     
     @offset_pointer.setter
     def move_byte_pointer(self,value: bytes) -> None:
-        """
-        When the byte_pointer is moved, update...
         
-        1) The byte_pointer
-        2) The total_bytes_read
-        3)
-
-        Args:
-            value (int): _description_
-        """
         self._offset_pointer += len(value)
-        self._total_bytes_read += value
-        self._packet_data_bytes.append(value)
 
 
     @property
@@ -109,8 +116,8 @@ class Packet_parser:
         self._packet_data_bytes.append(value)
 
     @property
-    def packet_data_np(self) -> np.ndarray:
-        return self._packet_data_np
+    def packet_data_np_arr(self) -> np.ndarray:
+        return self._packet_data_np_arr
 
 
 class Ethernet_Packet:
@@ -143,7 +150,7 @@ class Ethernet_Packet:
             ethernet_type=data[12:14],
             timestamp=timestamp,
             packet_data_byte=data,
-            packet_data_np=np.frombuffer(data, dtype=np.uint8)
+            packet_data_np_arr=np.frombuffer(data, dtype=np.uint8)
         )
 
     # Getter and setter for destination_mac
@@ -278,7 +285,7 @@ class TLS_Packet(TCP_Packet):
     def from_bytes(cls, data: bytes) -> "TLS_Packet":
         tls_packet = cls(
             packet_data_byte=data,
-            packet_data_np=np.frombuffer(data, dtype=np.uint8)
+            packet_data_np_arr=np.frombuffer(data, dtype=np.uint8)
         )
         tls_packet.parse_tls(data)
         return tls_packet
