@@ -44,7 +44,15 @@ Would I declare an instance of ethernet? stop at the proper byte offset for ethe
 '''
 
 class Packet_parser:
+    """
+    Packet Parser class exists to track important offset information and track all the bytes for the MLP model.
+    After packet is parsed, a numpy array will be initialized in preparation for machine learning with pytorch.
+    """
     def __init__(self):
+        """
+        Initializes packet parser with empty values.
+        """
+        
         self._offset_pointer: int = 0
         self._total_bytes_read: int = 0
         self._packet_data_bytes: bytearray  # Full packet data in bytes
@@ -115,49 +123,57 @@ class Packet_parser:
 
 
 class Ethernet_Packet:
+    """
+    Simple Ethernet Packet class for tracking the ethernet frame data.
+    """
 
+    def __init__(self, timestamp_data: str, raw_bytes: bytes):
+        """
+        Ethernet Packet initialization function.
 
-    def __init__(self, raw_bytes: bytes):
+        Args:
+            timestamp_data (str): This is the timestamp data from when the packet was captured.
+            raw_bytes (bytes): The raw bytes in hex format following the timestamp in the capture file.
+        """
         
         self._destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
-        self._timestamp: datetime  # Timestamp of packet capture
+        self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
         self._parser: Packet_parser = Packet_parser()
 
-
+        self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(raw_bytes,self._parser)
+
+    def parse_str_to_datetime_obj(self, timestamp_data:str) -> None:
+        """
+        Gets the timestamp data from the first line of the txt file and initializes the timestamp field
+        in the Ethernet Packet class.
+
+        Args:
+            timestamp_data (str): timestamp data from tcpdump.
+        """
+
+        self._timestamp = datetime.strptime(timestamp_data, "%H:%M:%S.%f")
 
     def parse_ethernet_frame(self,raw_bytes:bytes, parser: Packet_parser)-> None:
         """
-
+        Specific function to place all the bytes via the correct offset into their respective fields.
 
         Args:
-            raw_bytes (bytes): _description_
-            parser (Packet_parser): _description_
+            raw_bytes (bytes): hex byte data containing ALL packet information. This must be parsed to get the packet information specific
+            to the ethernet framee. 
+            parser (Packet_parser): is used to track the offset using its offset "pointer".
         """
-
+        if len(raw_bytes) < 14:
+            raise ValueError("Raw bytes are too short to form a valid Ethernet frame")
         self._destination_mac = raw_bytes[0:6] ### Set field first! This a very important step.
         self._source_mac = raw_bytes[6:11]
         self._ethernet_type = raw_bytes[11:13]
-        self._timestamp = 
         parser.store_and_track_bytes(self._destination_mac) ### Update pointer, bytes read, and all bytes collected (array)
 
         
         parser.store_and_track_bytes(raw_bytes)
- 
-
-    
-
-    def from_bytes(cls, data: bytes, timestamp: datetime) -> "Ethernet_Packet":
-        return cls(
-            destination_mac=data[0:6],
-            source_mac=data[6:12],
-            ethernet_type=data[12:14],
-            timestamp=timestamp,
-            packet_data_byte=data,
-            packet_data_np_arr=np.frombuffer(data, dtype=np.uint8)
-        )
 
     # Getter and setter for destination_mac
     @property
