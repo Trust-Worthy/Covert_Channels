@@ -68,9 +68,9 @@ class Packet_parser:
         """
 
         field = raw_bytes ### Setting some protocol field to the bytes being tracked
-        self.move_byte_pointer = raw_bytes ### Moving byte pointer to the next offset internally doing +=
-        self.total_bytes_read = raw_bytes ###  += under the hood in the setter
-        self.packet_data_bytes.append(bytes) ### Adding bytes to the entire byte array
+        self.move_byte_pointer = len(raw_bytes) ### Moving byte pointer to the next offset internally doing +=
+        self.total_bytes_read = len(raw_bytes) ###  += under the hood in the setter
+        self.packet_data_bytes = raw_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
 
     def create_np_array_from_bytes(self) -> np.ndarray:
         """
@@ -111,7 +111,7 @@ class Packet_parser:
         self._packet_data_bytes.append(value)
 
     @property
-    def packet_data_np_arr(self) -> np.ndarray:
+    def packet_data_np_arr(self) -> np.ndarray: 
         return self._packet_data_np_arr
 
 
@@ -124,16 +124,22 @@ class Ethernet_Packet:
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
         self._timestamp: datetime  # Timestamp of packet capture
-        self._parser: Parser = Parser()
+        self._parser: Packet_parser = Packet_parser()
 
 
-        self._parse_ethernet_frame(raw_bytes)
+        self._parse_ethernet_frame(raw_bytes,self.parser)
 
-    def _parse_ethernet_frame(self,raw_bytes:bytes, parser: Parser)-> None:
+    def _parse_ethernet_frame(self,raw_bytes:bytes, parser: Packet_parser)-> None:
+        """
 
-        self._destination_mac = raw_bytes[0:6]
-        parser.byte_pointer = 
 
+        Args:
+            raw_bytes (bytes): _description_
+            parser (Packet_parser): _description_
+        """
+
+        self._destination_mac = raw_bytes[0:6] ### Set field first! This a very important step.
+        self._parser.store_and_track_bytes(raw_bytes,self.destination_mac)
 
 
     
@@ -188,13 +194,13 @@ class Ethernet_Packet:
 
     # Getter and setter for parser (if needed)
     @property
-    def parser(self) -> 'Parser':  # Assuming Parser is a class
+    def parser(self) -> 'Packet_parser':  # Assuming Packet_parser is a class
         return self._parser
 
     @parser.setter
-    def parser(self, value: 'Parser'):
-        if not isinstance(value, Parser):
-            raise ValueError("parser must be an instance of the Parser class")
+    def parser(self, value: 'Packet_parser'):
+        if not isinstance(value, Packet_parser):
+            raise ValueError("parser must be an instance of the Packet_parser class")
         self._parser = value
 
 
