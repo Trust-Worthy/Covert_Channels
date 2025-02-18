@@ -43,27 +43,39 @@ So let's say that I'm parsing bytes from a txt file that I captured packets usin
 Would I declare an instance of ethernet? stop at the proper byte offset for ethernet. Then create the ip header class and call the getter for the ethernet class?
 '''
 
-class Parser:
+class Packet_parser:
     def __init__(self, raw_data: bytes):
         self._offset_pointer: int = 0
         self._total_bytes_read: int = 0
         self._packet_data_bytes: bytearray  # Full packet data in bytes
         self._packet_data_np: np.ndarray  # Full packet data as a NumPy array
+        self._finished_parsing: bool
 
 
-    @classmethod
-    def parse_bytes(cls, raw_bytes: bytes, field: Any, parser: 'Parser') -> None:
+    def store_and_track_bytes(self, raw_bytes: bytes, field: Any) -> None:
 
-        field = raw_bytes
-        parser.byte_pointer = len(raw_bytes)
+        field = raw_bytes ### Setting some protocol field to the bytes being tracked
+        self.move_byte_pointer += raw_bytes ### Moving byte pointer to the next offset
+        self.total_bytes_read += raw_bytes
+        self.packet_data_bytes.append(bytes)
+        self.packet_data_np.
 
-        
+
+    '''
+    so i'm doing = in this method but under the hood it's really doing += correct? Can I do += and it still be fine just so it's easier to read
+    and I don't get freaked out that the byte pointer is being overwritten.
+    
+    '''
+
+    def create_np_array_from_bytes(self) -> np.ndarray:
+        np_array = np.frombuffer(self._packet_data_bytes)
+
     @property
     def offset_pointer(self) -> int:
         return self._offset_pointer
     
     @offset_pointer.setter
-    def byte_pointer(self,value: bytes) -> None:
+    def move_byte_pointer(self,value: bytes) -> None:
         """
         When the byte_pointer is moved, update...
         
@@ -74,7 +86,7 @@ class Parser:
         Args:
             value (int): _description_
         """
-        self._offset_pointer += value
+        self._offset_pointer += len(value)
         self._total_bytes_read += value
         self._packet_data_bytes.append(value)
 
