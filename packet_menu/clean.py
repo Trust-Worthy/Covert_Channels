@@ -60,6 +60,9 @@
 
 
 '''
-Should we have an other dataclass?
+Should we have an 'other' dataclass?
+
+
+Create a board in milanote 
 
 '''

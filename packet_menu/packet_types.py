@@ -216,65 +216,7 @@ class ARP(Ethernet_Packet):
             packet_data_np=np.frombuffer(data, dtype=np.uint8),
         )
 
-# @dataclass
-# class DHCP(UDP):
-#     # DHCP packet fields (from DHCPv4 standard)
-#     operation_code_bytes: bytes  # Byte 0: Operation code (1 byte)
-#     hardware_type_bytes: bytes  # Byte 1: Hardware type (1 byte)
-#     hardware_address_length_bytes: bytes  # Byte 2: Hardware address length (1 byte)
-#     hops_bytes: bytes  # Byte 3: Hops (1 byte)
-#     transaction_id_bytes: bytes  # Bytes 4-7: Transaction ID (4 bytes)
-#     seconds_elapsed_bytes: bytes  # Bytes 8-9: Seconds elapsed (2 bytes)
-#     flags_bytes: bytes  # Bytes 10-11: Flags (2 bytes)
-#     client_ip_address_bytes: bytes  # Bytes 12-15: Client IP address (4 bytes)
-#     your_ip_address_bytes: bytes  # Bytes 16-19: Your (client) IP address (4 bytes)
-#     server_ip_address_bytes: bytes  # Bytes 20-23: Server IP address (4 bytes)
-#     gateway_ip_address_bytes: bytes  # Bytes 24-27: Gateway IP address (4 bytes)
-#     client_hardware_address_bytes: bytes  # Bytes 28-43: Client hardware address (16 bytes)
-#     server_host_name_bytes: bytes  # Bytes 44-107: Server host name (64 bytes)
-#     boot_file_name_bytes: bytes  # Bytes 108-171: Boot file name (128 bytes)
-#     dhcp_options_bytes: bytes  # Bytes 172+: DHCP options (variable length)
 
-#     @classmethod
-#     def from_bytes(cls, packet_data: bytes) -> "DHCP":
-#         """
-#         Parses a DHCP packet from raw bytes.
-#         :param packet_data: Raw DHCP packet bytes
-#         :return: Parsed DHCP dataclass object
-#         """
-#         if len(packet_data) < 240:
-#             raise ValueError("DHCP packet must be at least 240 bytes long.")
-
-
-#         # Call parent class to handle Ethernet header parsing
-#         ethernet_packet = Ethernet_Packet.from_bytes(packet_data)
-        
-#         # Call parent class to handle IP header parsing (after Ethernet)
-#         ip_packet = IP_Header.from_bytes(ethernet_packet.payload_bytes)
-        
-#         # Call parent class to handle UDP header parsing (after IP)
-#         udp_packet = UDP.from_bytes(ip_packet.payload_bytes)
-
-#         # Parse DHCP-specific fields from the payload (after UDP header)
-#         dhcp_payload = udp_packet.payload_bytes
-
-#         return cls(
-#             operation_code_bytes=packet_data[0:1],  # 1 byte: Operation code
-#             hardware_type_bytes=packet_data[1:2],  # 1 byte: Hardware type
-#             hardware_address_length_bytes=packet_data[2:3],  # 1 byte: Hardware address length
-#             hops_bytes=packet_data[3:4],  # 1 byte: Hops
-#             transaction_id_bytes=packet_data[4:8],  # 4 bytes: Transaction ID
-#             seconds_elapsed_bytes=packet_data[8:10],  # 2 bytes: Seconds elapsed
-#             flags_bytes=packet_data[10:12],  # 2 bytes: Flags
-#             client_ip_address_bytes=packet_data[12:16],  # 4 bytes: Client IP address
-#             your_ip_address_bytes=packet_data[16:20],  # 4 bytes: Your IP address
-#             server_ip_address_bytes=packet_data[20:24],  # 4 bytes: Server IP address
-#             gateway_ip_address_bytes=packet_data[24:28],  # 4 bytes: Gateway IP address
-#             client_hardware_address_bytes=packet_data[28:44],  # 16 bytes: Client hardware address
-#             server_host_name_bytes=packet_data[44:108],  # 64 bytes: Server host name
-#             boot_file_name_bytes=packet_data[108:172],  # 128 bytes: Boot file name
-#             dhcp_options_bytes=packet_data[172:],  # Variable length: DHCP options
-#         )
 
 
 
@@ -298,7 +240,7 @@ arp reply
 icmp request 
 icmp reply
 dns 
-https
+http
 tls
 quic
 other 
