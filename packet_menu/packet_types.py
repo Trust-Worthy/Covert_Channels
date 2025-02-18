@@ -16,11 +16,6 @@ byte array to numpy array unit8
 unit8 to byte array
 
 
-next prompt:
-I need some feedback on my code   
-
-
-
 '''
 
 import numpy as np
@@ -50,37 +45,47 @@ Would I declare an instance of ethernet? stop at the proper byte offset for ethe
 
 class Parser:
     def __init__(self):
-        self._byte_pointer: int = 0
+        self._offset_pointer: int = 0
         self._total_bytes_read: int = 0
     
 
     @property
-    def byte_pointer(self):
-        return self._byte_pointer
+    def offset_pointer(self) -> int:
+        return self._offset_pointer
     
-    @byte_pointer.setter
-    def byte_pointer(self,value:int):
-        self._byte_pointer += value
+    @offset_pointer.setter
+    def byte_pointer(self,value:int) -> None:
+        self._offset_pointer += value
         self._total_bytes_read += value
 
     @property
-    def 
+    def total_bytes_read(self)-> int:
+        return self._total_bytes_read
+    
+    @total_bytes_read.setter
+    def total_bytes_read(self,value:int) -> None:
+        self._total_bytes_read += value
 
     
 
 
 
-@dataclass
-class Ethernet_Packet:
-    destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
-    source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
-    ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
-    timestamp: datetime  # Timestamp of packet capture
-    packet_data_byte: bytes  # Full packet data in bytes
-    packet_data_np: np.array  # Full packet data as a NumPy array
-    LAST_PARSED_OFFSET
 
-    @classmethod
+class Ethernet_Packet:
+
+
+    def __init__(self):
+        
+        self._destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
+        self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
+        selt._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
+        timestamp: datetime  # Timestamp of packet capture
+        packet_data_byte: bytes  # Full packet data in bytes
+        packet_data_np: np.array  # Full packet data as a NumPy array
+        parser = Parser
+
+
+
     def from_bytes(cls, data: bytes, timestamp: datetime) -> "Ethernet_Packet":
         return cls(
             destination_mac=data[0:6],
