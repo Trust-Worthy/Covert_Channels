@@ -39,20 +39,20 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
          '-n', # removes the hostnames so that more DNS resolutions are required
          '-c', # specify number of packets to capture
          str(num_packets),
-         #packet_type,
          '-w', pcap_file,# write packet to an output file 
-         '-xx', # display raw hex format.
+         '-x', # display raw hex format.
+         #'-tttt',
          '--time-stamp-precision=micro',#ttt', # print timestamp for each packet in human readable format
-         '-vv', # verbose output
+         #'-vv', # verbose output
          ]
 
     command_2:list[str] = [
          'sudo',
          'tcpdump',
+         '-n',
          '-r', pcap_file, # read the saved pcap file
-         '-xx',
-         '-tttt',#ttt', prints timestamps
-         '-vv' #verbose output
+         '-x',
+         '--time-stamp-precision=micro',#ttt', prints timestamps
     ]
 
     return command_1,command_2,pcap_file,output_txt
