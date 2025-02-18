@@ -21,7 +21,7 @@ unit8 to byte array
 import numpy as np
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 
 ### TO-DO ###
@@ -50,6 +50,14 @@ class Parser:
         self._packet_data_bytes: bytearray  # Full packet data in bytes
         self._packet_data_np: np.ndarray  # Full packet data as a NumPy array
 
+
+    @classmethod
+    def parse_bytes(cls, raw_bytes: bytes, field: Any, parser: 'Parser') -> None:
+
+        field = raw_bytes
+        parser.byte_pointer = len(raw_bytes)
+
+        
     @property
     def offset_pointer(self) -> int:
         return self._offset_pointer
@@ -69,6 +77,7 @@ class Parser:
         self._offset_pointer += value
         self._total_bytes_read += value
         self._packet_data_bytes.append(value)
+
 
     @property
     def total_bytes_read(self)-> int:
@@ -106,8 +115,14 @@ class Ethernet_Packet:
 
         self._parse_ethernet_frame(raw_bytes)
 
-    def _parse_ethernet_frame(raw_bytes:bytes)-> None:
-        
+    def _parse_ethernet_frame(self,raw_bytes:bytes, parser: Parser)-> None:
+
+        self._destination_mac = raw_bytes[0:6]
+        parser.byte_pointer = 
+
+
+
+    
 
     def from_bytes(cls, data: bytes, timestamp: datetime) -> "Ethernet_Packet":
         return cls(
