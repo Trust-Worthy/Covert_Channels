@@ -18,10 +18,12 @@ unit8 to byte array
 
 '''
 
-import numpy as np
+
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Any
+
+from packet_parser import Packet_parser
 
 
 ### TO-DO ###
@@ -43,97 +45,20 @@ So let's say that I'm parsing bytes from a txt file that I captured packets usin
 Would I declare an instance of ethernet? stop at the proper byte offset for ethernet. Then create the ip header class and call the getter for the ethernet class?
 '''
 
-class Packet_parser:
+
+
+class Ethernet_Frame:
     """
-    Packet Parser class exists to track important offset information and track all the bytes for the MLP model.
-    After packet is parsed, a numpy array will be initialized in preparation for machine learning with pytorch.
-    """
-    def __init__(self):
-        """
-        Initializes packet parser with empty values.
-        """
-        
-        self._offset_pointer: int = 0
-        self._total_bytes_read: int = 0
-        self._packet_data_bytes: bytearray  # Full packet data in bytes
-        self._packet_data_np_arr: np.ndarray  # Full packet data as a NumPy array
-        self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
-
-
-    def store_and_track_bytes(self, raw_bytes: bytes) -> None:
-        """
-        Updates byte_pointer, total_bytes_read, and appends the bytes to the packet data bytes.
-
-        Anytime the byte_pointer is moved, update...
-        
-        1) The byte_pointer itself
-        2) The total_bytes_read
-        3) The byte array containing all the packet data. packet_data_bytes
-
-        Args:
-            raw_bytes (bytes): The bytes being tracked
-
-        """
-
-        self.move_byte_pointer = len(raw_bytes) ### Moving byte pointer to the next offset internally doing +=
-        self.total_bytes_read = len(raw_bytes) ###  += under the hood in the setter
-        self.packet_data_bytes = raw_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
-
-    def create_np_array_from_bytes(self) -> np.ndarray:
-        """
-        Creates numpy array from bytearray.
-
-        Returns:
-            np.ndarray: a numpy array of type np.uint8 containing the same inforation as the packet_data_types bytearray
-        """
-        self.packet_data_np_arr = np.frombuffer(self.packet_data_bytes,dtype=np.uint8)
-
-        return self.packet_data_np_arr
-
-    @property
-    def offset_pointer(self) -> int:
-        return self._offset_pointer
-    
-    @offset_pointer.setter
-    def move_byte_pointer(self,value: bytes) -> None:
-        
-        self._offset_pointer += len(value)
-
-
-    @property
-    def total_bytes_read(self)-> int:
-        return self._total_bytes_read
-    
-    @total_bytes_read.setter
-    def total_bytes_read(self,value:int) -> None:
-        self._total_bytes_read += value
-
-    
-    @property
-    def packet_data_bytes(self) -> bytearray:
-        return self._packet_data_bytes
-    
-    @packet_data_bytes.setter
-    def packet_data_bytes(self, value:bytes) -> None:
-        self._packet_data_bytes.append(value)
-
-    @property
-    def packet_data_np_arr(self) -> np.ndarray: 
-        return self._packet_data_np_arr
-
-
-class Ethernet_Packet:
-    """
-    Simple Ethernet Packet class for tracking the ethernet frame data.
+    Simple Ethernet Frame class for tracking the ethernet frame data.
     """
 
-    def __init__(self, timestamp_data: str, raw_bytes: bytes):
+    def __init__(self, timestamp_data: str, all_bytes: bytes):
         """
-        Ethernet Packet initialization function.
+        Ethernet Frame initialization function.
 
         Args:
             timestamp_data (str): This is the timestamp data from when the packet was captured.
-            raw_bytes (bytes): The raw bytes in hex format following the timestamp in the capture file.
+            all_bytes (bytes): All the bytes from the packet capture in hex format following the timestamp in the capture file.
         """
         
         self._destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
@@ -143,12 +68,14 @@ class Ethernet_Packet:
         self._parser: Packet_parser = Packet_parser()
 
         self.parse_str_to_datetime_obj(timestamp_data)
-        self.parse_ethernet_frame(raw_bytes,self._parser)
+        self.parse_ethernet_frame(all_bytes,self._parser)
+
+    def 
 
     def parse_str_to_datetime_obj(self, timestamp_data:str) -> None:
         """
         Gets the timestamp data from the first line of the txt file and initializes the timestamp field
-        in the Ethernet Packet class.
+        in the Ethernet Frame class.
 
         Args:
             timestamp_data (str): timestamp data from tcpdump.
@@ -156,24 +83,24 @@ class Ethernet_Packet:
 
         self._timestamp = datetime.strptime(timestamp_data, "%H:%M:%S.%f")
 
-    def parse_ethernet_frame(self,raw_bytes:bytes, parser: Packet_parser)-> None:
+    def parse_ethernet_frame(self,all_bytes:bytes, parser: Packet_parser)-> None:
         """
         Specific function to place all the bytes via the correct offset into their respective fields.
 
         Args:
-            raw_bytes (bytes): hex byte data containing ALL packet information. This must be parsed to get the packet information specific
+            all_bytes (bytes): hex byte data containing ALL packet information. This must be parsed to get the packet information specific
             to the ethernet framee. 
             parser (Packet_parser): is used to track the offset using its offset "pointer".
         """
-        if len(raw_bytes) < 14:
-            raise ValueError("Raw bytes are too short to form a valid Ethernet frame")
-        self._destination_mac = raw_bytes[0:6] ### Set field first! This a very important step.
-        self._source_mac = raw_bytes[6:11]
-        self._ethernet_type = raw_bytes[11:13]
+        
+        self._destination_mac = all_bytes[0:6] ### Set field first! This a very important step.
+        self._source_mac = all_bytes[6:11]
+        self._ethernet_type = all_bytes[11:13]
+        
         parser.store_and_track_bytes(self._destination_mac) ### Update pointer, bytes read, and all bytes collected (array)
 
         
-        parser.store_and_track_bytes(raw_bytes)
+        parser.store_and_track_bytes(all_bytes)
 
     # Getter and setter for destination_mac
     @property
@@ -225,22 +152,12 @@ class Ethernet_Packet:
         self._parser = value
 
 
-@dataclass
-class IP_Header(Ethernet_Packet):
-    version: bytes  # Offset: Byte 0 (4 bits for version)
-    diff_service_field: bytes  # Offset: Byte 1 (1 byte)
-    total_length: bytes  # Offset: Bytes 2-3 (2 bytes)
-    identification: bytes  # Offset: Bytes 4-5 (2 bytes)
-    flags: bytes  # Offset: Bytes 6-7 (2 bytes)
-    ttl: bytes  # Offset: Byte 8 (1 byte)
-    protocol: bytes  # Offset: Byte 9 (1 byte)
-    header_checksum: bytes  # Offset: Bytes 10-11 (2 bytes)
-    source_address: bytes  # Offset: Bytes 12-15 (4 bytes)
-    dst_address: bytes  # Offset: Bytes 16-19 (4 bytes)
+
+
 
 @dataclass
 class TCP_Packet(IP_Header):
-    def __init__(self,raw_bytes: bytes):
+    def __init__(self,all_bytes: bytes):
 
         source_port: bytes  # Offset: Bytes 20-21 (2 bytes)
         dst_port: bytes  # Offset: Bytes 22-23 (2 bytes)
