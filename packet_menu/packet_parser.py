@@ -11,8 +11,8 @@ class Packet_parser:
         Initializes packet parser with empty values.
         """
         
-        self._offset_pointer: int = 0
-        self._total_bytes_read: int = 0
+        self._offset_pointer: int = -1 ### references the index to start the next parsing operation
+        self._total_bytes_read: int = 0 ### counts total bytes read
         self._packet_data_bytes: bytearray  # Full packet data in bytes
         self._packet_data_np_arr: np.ndarray  # Full packet data as a NumPy array
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
@@ -38,16 +38,26 @@ class Packet_parser:
         self.packet_data_bytes = all_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
         self.packet_data_np_arr = self.packet_data_bytes
         
+    def check_if_finished_parsing(self)-> bool:
+        """
+        This function checks if the offset_pointer and total_bytes_read fields
+        match the length of all the bytes that need to be process.
 
-
+        Returns:
+            bool: returns True if offset_pointer and total_bytes_read equal the length of packet_data_bytes
+        """
+        if self.total_bytes_read == len(self.packet_data_bytes):
+            return True
+        else:
+            return False
     @property
     def offset_pointer(self) -> int:
         return self._offset_pointer
     
     @offset_pointer.setter
-    def move_byte_pointer(self,value: bytes) -> None:
+    def move_byte_pointer(self, value) -> None:
         
-        self._offset_pointer += len(value)
+        self._offset_pointer += value
 
 
     @property

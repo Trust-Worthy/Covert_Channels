@@ -24,6 +24,7 @@ from datetime import datetime
 from typing import Optional, Any
 
 from packet_parser import Packet_parser
+from ip_header import IP_Header
 
 
 ### TO-DO ###
@@ -66,11 +67,18 @@ class Ethernet_Frame:
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
         self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
         self._parser: Packet_parser = Packet_parser()
+        self._ip_header: IP_Header
 
         self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(all_bytes,self._parser)
 
-    def 
+        if len(all_bytes) > 14:
+            self._ip_header = 
+
+    def create_next_protocol(self,)
+
+    def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes, parser: Packet_parser) -> bytearray:
+        remaining_bytes
 
     def parse_str_to_datetime_obj(self, timestamp_data:str) -> None:
         """
@@ -96,7 +104,7 @@ class Ethernet_Frame:
         self._destination_mac = all_bytes[0:6] ### Set field first! This a very important step.
         self._source_mac = all_bytes[6:11]
         self._ethernet_type = all_bytes[11:13]
-        
+
         parser.store_and_track_bytes(self._destination_mac) ### Update pointer, bytes read, and all bytes collected (array)
 
         
