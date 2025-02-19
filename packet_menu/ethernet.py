@@ -22,6 +22,7 @@ unit8 to byte array
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Any
+import sys
 
 from packet_parser import Packet_parser
 from ip_header import IP_Header
@@ -72,13 +73,28 @@ class Ethernet_Frame:
         self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(all_bytes,self._parser)
 
-        if len(all_bytes) > 14:
-            self._ip_header = 
+        if self.parser.check_if_finished_parsing:
+            self._ip_header = self.create_next_protocol()
 
-    def create_next_protocol(self,)
+    def create_next_protocol(self,all_bytes:bytes,parser:Packet_parser) -> IP_Header:
+
+        remaining_bytes:bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
+
+        ip_header = IP_Header(remaining_bytes)
+
+        return ip_header
+        
 
     def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes, parser: Packet_parser) -> bytearray:
-        remaining_bytes
+        
+        if parser.check_if_finished_parsing and (parser.total_bytes_read == 14): ### if True
+            
+            ### If there are more bytes left
+            remaining_bytes: bytearray = all_bytes[parser.offset_pointer:]
+            return remaining_bytes
+        else:
+            ### TO-DO log termination here
+            sys.exit(1)
 
     def parse_str_to_datetime_obj(self, timestamp_data:str) -> None:
         """

@@ -37,16 +37,20 @@ class Packet_parser:
         self.total_bytes_read = offset ###  += under the hood in the setter
         self.packet_data_bytes = all_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
         self.packet_data_np_arr = self.packet_data_bytes
-        
+   
     def check_if_finished_parsing(self)-> bool:
         """
         This function checks if the offset_pointer and total_bytes_read fields
         match the length of all the bytes that need to be process.
 
+        Final state: total_bytes_read should equal the length of the packet_data_bytes
+                     offset_pointer shoud equal the length of the pacaket_data_byes minus 1 (bc of list indexing)
+
         Returns:
             bool: returns True if offset_pointer and total_bytes_read equal the length of packet_data_bytes
         """
-        if self.total_bytes_read == len(self.packet_data_bytes):
+        if self.total_bytes_read == len(self.packet_data_bytes) and self.offset_pointer == (len(self.packet_data_bytes) - 1):
+            
             return True
         else:
             return False
