@@ -76,9 +76,9 @@ class Ethernet_Frame:
         if self.parser.check_if_finished_parsing:
             self._ip_header = self.create_next_protocol()
 
-    def create_next_protocol(self,all_bytes:bytes,parser:Packet_parser) -> IP_Header:
+    def create_next_protocol(self, all_bytes: bytes,parser:Packet_parser) -> IP_Header:
 
-        remaining_bytes:bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
+        remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
 
         ip_header = IP_Header(remaining_bytes)
 
@@ -179,229 +179,17 @@ class Ethernet_Frame:
 
 
 
-@dataclass
-class TCP_Packet(IP_Header):
-    def __init__(self,all_bytes: bytes):
-
-        source_port: bytes  # Offset: Bytes 20-21 (2 bytes)
-        dst_port: bytes  # Offset: Bytes 22-23 (2 bytes)
-        sequence_number: bytes  # Offset: Bytes 24-27 (4 bytes)
-        ack_number: bytes  # Offset: Bytes 28-31 (4 bytes)
-        header_length: bytes  # Offset: Byte 32 (4 bits for data offset)
-        flags: bytes  # Offset: Byte 33 (1 byte, includes flags)
-        window: bytes  # Offset: Bytes 34-35 (2 bytes)
-        checksum: bytes  # Offset: Bytes 36-37 (2 bytes)
-        urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
-        options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
-
-@dataclass
-class UDP(IP_Header):
-    source_port: bytes  # Bytes 0-1 (2 bytes): Source Port
-    destination_port: bytes  # Bytes 2-3 (2 bytes): Destination Port
-    length: bytes  # Bytes 4-5 (2 bytes): Length of UDP header + payload
-    checksum: bytes  # Bytes 6-7 (2 bytes): Checksum (optional, used for integrity verification)
-    payload: bytes  # Bytes 8+: UDP Payload (e.g., DHCP, DNS, etc.)
-
-    @classmethod
-    def from_bytes(cls, packet_data: bytes) -> "UDP":
-        """
-        Parses a UDP packet from raw bytes.
-        :param packet_data: Raw UDP packet bytes
-        :return: Parsed UDP dataclass object
-        """
-        if len(packet_data) < 8:
-            raise ValueError("UDP header must be at least 8 bytes long.")
-
-        return cls(
-            source_port=packet_data[0:2],  # 2 bytes
-            destination_port=packet_data[2:4],  # 2 bytes
-            length=packet_data[4:6],  # 2 bytes
-            checksum=packet_data[6:8],  # 2 bytes
-            payload=packet_data[8:],  # Everything after 8 bytes is payload
-        )
-
-class TLS_Packet(TCP_Packet):
 
 
-    def __init__():
-        tls_record_data: Optional[bytes] = None
-        handshake_type: Optional[bytes] = None  # Offset: Byte 5 (1 byte)
-        handshake_length: Optional[bytes] = None  # Offset: Bytes 6-9 (4 bytes)
-        
-        client_hello_version: Optional[bytes] = None  # Offset: Bytes 10-11 (2 bytes, TLS 1.2 only)
-        random_bytes: Optional[bytes] = None  # Offset: Bytes 12-43 (32 bytes, TLS 1.2 only)
-        session_id_length: Optional[bytes] = None  # Offset: Byte 44 (1 byte, TLS 1.2 only)
-        session_id: Optional[bytes] = None
-        cipher_suites_length: Optional[bytes] = None
-        cipher_suites: Optional[bytes] = None
-        compression_methods_length: Optional[bytes] = None
-        compression_methods: Optional[bytes] = None
-        extensions_length: Optional[bytes] = None
-        extensions: Optional[bytes] = None
-        
-        tls_13_record_data: Optional[bytes] = None
-        encrypted_application_data: Optional[bytes] = None
-
-    
-
-   
-    def from_bytes(cls, data: bytes) -> "TLS_Packet":
-        tls_packet = cls(
-            packet_data_byte=data,
-            packet_data_np_arr=np.frombuffer(data, dtype=np.uint8)
-        )
-        tls_packet.parse_tls(data)
-        return tls_packet
-
-    def parse_tls(self, data: bytes):
-        if data[0:1] == b'\x16' and data[1:2] == b'\x03':
-            version = data[1:3]
-            if version == b'\x03\x03':  # TLS 1.2
-                self._parse_tls_1_2(data)
-            elif version == b'\x03\x04':  # TLS 1.3
-                self._parse_tls_1_3(data)
-
-    def _parse_tls_1_2(self, data: bytes):
-        self.client_hello_version = data[10:12]
-        self.random_bytes = data[12:44]
-        self.session_id_length = data[44:45]
-        session_id_len = int.from_bytes(self.session_id_length, 'big')
-        self.session_id = data[45:45 + session_id_len]
-        offset = 45 + session_id_len
-        self.cipher_suites_length = data[offset:offset + 2]
-        cipher_suites_len = int.from_bytes(self.cipher_suites_length, 'big')
-        self.cipher_suites = data[offset + 2:offset + 2 + cipher_suites_len]
-        offset += 2 + cipher_suites_len
-        self.compression_methods_length = data[offset:offset + 1]
-        comp_methods_len = int.from_bytes(self.compression_methods_length, 'big')
-        self.compression_methods = data[offset + 1:offset + 1 + comp_methods_len]
-        offset += 1 + comp_methods_len
-        self.extensions_length = data[offset:offset + 2]
-        ext_len = int.from_bytes(self.extensions_length, 'big')
-        self.extensions = data[offset + 2:offset + 2 + ext_len]
-
-    def _parse_tls_1_3(self, data: bytes):
-        self.tls_13_record_data = data[5:]  # Capture full record data for TLS 1.3
-        self.encrypted_application_data = data[5:]  # Since everything after handshake is encrypted
-
-@dataclass
-class ARP(Ethernet_Packet):
-    hardware_type: bytes  # Bytes 14-15: Hardware type (2 bytes)
-    protocol_type: bytes  # Bytes 16-17: Protocol type (2 bytes)
-    hardware_address_length: bytes  # Byte 18: Hardware address length (1 byte)
-    protocol_address_length: bytes  # Byte 19: Protocol address length (1 byte)
-    operation_code: bytes  # Bytes 20-21: Operation (2 bytes) ### ARP REquest or ARP Reply
-    sender_hardware_address: bytes  # Bytes 22-27: Sender MAC address (6 bytes)
-    sender_protocol_address: bytes  # Bytes 28-31: Sender IP address (4 bytes)
-    target_hardware_address: bytes  # Bytes 32-37: Target MAC address (6 bytes)
-    target_protocol_address: bytes  # Bytes 38-41: Target IP address (4 bytes)
 
 
-    @classmethod
-    def from_bytes(cls, data: bytes) -> "ARP":
-        if len(data) < 28:
-            raise ValueError("Insufficient data for ARP packet")
-        return cls(
-            destination_mac=data[0:6],
-            source_mac=data[6:12],
-            ethernet_type=data[12:14],
-            hardware_type=data[14:16],
-            protocol_type=data[16:18],
-            hardware_address_length=data[18:19],
-            protocol_address_length=data[19:20],
-            operation_code=data[20:22],
-            sender_hardware_address=data[22:28],
-            sender_protocol_address=data[28:32],
-            target_hardware_address=data[32:38],
-            target_protocol_address=data[38:42],
-            timestamp=datetime.now(),
-            packet_data_byte=data,
-            packet_data_np=np.frombuffer(data, dtype=np.uint8),
-        )
-    
-
-@dataclass
-class ARP_REQUEST(ARP):
-    pass
-
-@dataclass
-class ARP_REPLY(ARP):
-    pass
-
-@dataclass
-class ICMP_REQUEST:
-    pass
-
-@dataclass
-class ICMP_REPLY:
-    pass
-
-@dataclass
-class HTTP_Packet(TCP_Packet):
-    def __init__(self, raw_data: bytes):
-        super.__init__()
 
 
-        self.is_request: Optional[bool] = None  # True if request, False if response
-        self.method: Optional[bytes] = None  # Only for requests
-        self.request_uri: Optional[bytes] = None  # Only for requests
-        self.http_version: Optional[bytes] = None  # In both requests and responses
-        
-        self.status_code: Optional[bytes] = None  # Only for responses
-        self.status_message: Optional[bytes] = None  # Only for responses
-        
-        self.headers: Dict[bytes, bytes] = {}  # Headers dictionary
-        self.body: Optional[bytes] = None  # Optional body
-        
-        self.parse(raw_data)  # Parse the raw HTTP data when an instance is created
-
-    def parse(self, raw_data: bytes):
-        # Separate headers and body
-        header_section, body_section = raw_data.split(b"\r\n\r\n", 1) if b"\r\n\r\n" in raw_data else (raw_data, b"")
-        
-        # Split headers into lines
-        header_lines = header_section.split(b"\r\n")
-        
-        if not header_lines:
-            return
-        
-        # Split the first line (Request-Line or Status-Line)
-        first_line_parts = header_lines[0].split(b" ")
-        
-        if first_line_parts[0].startswith(b"HTTP/"):
-            # This is a response
-            self.is_request = False
-            self.http_version = first_line_parts[0]  # e.g., HTTP/1.1
-            self.status_code = first_line_parts[1]  # e.g., 200
-            self.status_message = b" ".join(first_line_parts[2:])  # e.g., OK
-        else:
-            # This is a request
-            self.is_request = True
-            self.method = first_line_parts[0]  # e.g., GET
-            self.request_uri = first_line_parts[1]  # e.g., /index.html
-            self.http_version = first_line_parts[2]  # e.g., HTTP/1.1
-        
-        # Parse headers
-        for line in header_lines[1:]:
-            if b": " in line:
-                key, value = line.split(b": ", 1)
-                self.headers[key] = value
-        
-        # Store body
-        self.body = body_section
-
-@dataclass
-class DNS:
-    pass
-
-@dataclass
-class QUIC:
-    pass
 
 
-@dataclass
-class OTHER:
-    pass
+
+
+
 
 
 '''

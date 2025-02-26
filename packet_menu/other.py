@@ -1,0 +1,4 @@
+
+@dataclass
+class OTHER:
+    pass

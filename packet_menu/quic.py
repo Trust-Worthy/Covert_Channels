@@ -1,0 +1,5 @@
+
+
+@dataclass
+class QUIC:
+    pass

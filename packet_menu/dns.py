@@ -1,0 +1,4 @@
+
+@dataclass
+class DNS:
+    pass
