@@ -23,12 +23,12 @@ Author: Trust-Worthy
 """
 import os
 
-from system_config import get_network_interfaces
-from system_config import print_interfaces
+from packet_menu.configuration.system_config import get_network_interfaces
+from packet_menu.configuration.system_config import print_interfaces
 from typing import Tuple, Union
-from packet_stats import parse_packet_file
+from packet_menu.metrics.packet_stats import parse_packet_file
 from pathlib import Path
-from capture import capture_main
+from packet_menu.capture_data.capture import capture_main
 
 PREV_CAPTURES = set()
 

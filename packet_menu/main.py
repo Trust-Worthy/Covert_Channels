@@ -5,7 +5,7 @@
 
 
 from menu import display_menu, execute_option
-import system_config 
+import packet_menu.configuration.system_config as system_config 
 
 
 client_interfaces = []

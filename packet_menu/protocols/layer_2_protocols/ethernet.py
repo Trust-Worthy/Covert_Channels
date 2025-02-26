@@ -24,8 +24,8 @@ from datetime import datetime
 from typing import Optional, Any
 import sys
 
-from packet_parser import Packet_parser
-from packet_menu.layer_3_protocols.ip_header import IP_Header
+from packet_menu.cleaning_captures.packet_parser import Packet_parser
+from layer_3_protocols.ip import IP_Header
 
 
 ### TO-DO ###
