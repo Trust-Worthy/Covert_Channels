@@ -25,6 +25,8 @@ from typing import Optional, Any
 import sys
 
 from packet_menu.cleaning_captures.packet_parser import Packet_parser
+from layer_3_protocols.arp import ARP
+from layer_3_protocols.icmp import ICMP
 from layer_3_protocols.ip import IP_Header
 
 
@@ -77,7 +79,9 @@ class Ethernet_Frame:
             self._ip_header = self.create_next_protocol()
 
     def create_next_protocol(self, all_bytes: bytes,parser:Packet_parser) -> IP_Header:
-
+        
+        ### TO-DO ###
+        # Write code that makes decision whether to create an ip, icmp, or arp based on they next bytes!!!!
         remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
 
         ip_header = IP_Header(remaining_bytes)
