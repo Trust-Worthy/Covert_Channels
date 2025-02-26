@@ -5,7 +5,18 @@ Date 11-23-2024
 
 Main Function:
 
+'''
+arp request 
+arp reply
+icmp request 
+icmp reply
+dns 
+http
+tls
+quic
+other 
 
+'''
 
 Author: Trust-Worthy
 

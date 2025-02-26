@@ -1,5 +1,4 @@
-from ethernet import Ethernet_Frame
-from packet_parser import Packet_parser
+
 
 class IP_Header():
     """

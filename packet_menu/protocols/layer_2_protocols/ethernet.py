@@ -25,7 +25,7 @@ from typing import Optional, Any
 import sys
 
 from packet_parser import Packet_parser
-from ip_header import IP_Header
+from packet_menu.layer_3_protocols.ip_header import IP_Header
 
 
 ### TO-DO ###
@@ -192,15 +192,3 @@ class Ethernet_Frame:
 
 
 
-'''
-arp request 
-arp reply
-icmp request 
-icmp reply
-dns 
-http
-tls
-quic
-other 
-
-'''
