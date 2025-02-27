@@ -15,7 +15,7 @@ class ICMP_MESSAGE():
         self._checksum: bytes         # 2 bytes (ICMP Checksum)
         self._identifier: bytes       # 2 bytes (Identifier for matching Request/Reply)
         self._sequence_num: bytes     # 2 bytes (Sequence Number for distinguishing requests)
-        self._data: bytes             # Data field (for echo data or padding)
+        self._data: bytes = None      # Data field (for echo data or padding)
         self._is_request: bool
         self._timestamp: int = None
 
@@ -29,6 +29,8 @@ class ICMP_MESSAGE():
             self._is_request = True
         elif self._type == 0x00:  # Echo Reply
             self._is_request = False
+        else:
+            raise ValueError("Unsupported ICMP Type")
         
         self._code = all_bytes[1]
         self._checksum = all_bytes[2:4]
@@ -37,12 +39,8 @@ class ICMP_MESSAGE():
 
         if len(all_bytes) > 8:
 
-
-        self._data = all_bytes[len(all_bytes) - 8]
-
-    def create_icmp_request(self) -> 
-
-
+            self._timestamp = int.from_bytes(all_bytes[8:12], byteorder='big')
+            self._data = all_bytes[12:]
 
 
     # Getters and Setters for the fields
