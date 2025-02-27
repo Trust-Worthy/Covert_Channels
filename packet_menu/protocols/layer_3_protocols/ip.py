@@ -27,7 +27,7 @@ class IP_HEADER():
         ## Pass on the parser to the next protocol
         self._parser: Packet_parser = parser
         self._parser._packet_type = type(self)
-        
+
         self._version: int
         self._ihl: int
         self._ip_options: bytes = None
@@ -116,7 +116,7 @@ class IP_HEADER():
     def next_protocol(self) -> bytes:
         return self._next_protocol
     @next_protocol.setter
-    def next_protocol(self, value: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE])
+    def next_protocol(self, value: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE]):
         self._next_protocol = value
 
     @property
