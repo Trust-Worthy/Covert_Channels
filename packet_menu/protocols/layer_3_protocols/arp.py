@@ -1,7 +1,7 @@
 
 from layer_2_protocols.ethernet import Ethernet_Frame
 @dataclass
-class ARP_Packet(Ethernet_Frame):
+class ARP_PACKET(Ethernet_Frame):
     hardware_type: bytes  # Bytes 14-15: Hardware type (2 bytes)
     protocol_type: bytes  # Bytes 16-17: Protocol type (2 bytes)
     hardware_address_length: bytes  # Byte 18: Hardware address length (1 byte)

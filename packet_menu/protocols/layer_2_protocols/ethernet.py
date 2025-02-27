@@ -21,12 +21,12 @@ unit8 to byte array
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Any
+from typing import Optional, Union
 import sys
 
 from packet_menu.cleaning_captures.packet_parser import Packet_parser
-from layer_3_protocols.arp import ARP_Packet
-from layer_3_protocols.ip import IP_Header
+from layer_3_protocols.arp import ARP_PACKET
+from layer_3_protocols.ip import IP_HEADER
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
@@ -69,6 +69,8 @@ class Ethernet_Frame:
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
         self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
+        self._next_protocol: Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL]
+        
         self._ip_header: IP_Header = None
         self._arp_packet: ARP_Packet = None
         self._other_protocol: OTHER_PROTOCOL = None
@@ -121,19 +123,26 @@ class Ethernet_Frame:
         else:
             ### TO-DO log termination here
             sys.exit(1)
-    def create_next_protocol(self, remaining_bytes: bytes,parser:Packet_parser) -> IP_Header:
+    def create_next_protocol(self, remaining_bytes: bytes,parser:Packet_parser) -> Union[IP_Header,ARP_Packet,OTHER_PROTOCOL]:
         
         ### TO-DO ###
         # Write code that makes decision whether to create an ip, icmp, or arp based on they next bytes!!!!
 
         if self.ethernet_type == 0x0800:
-            self._ip_header = IP_Header(remaining_bytes, parser)
+            self._other_protocol = IP_HEADER(remaining_bytes, parser)
         elif self.ethernet_type == 0x0806:
-            self.arp_packet = ARP_Packet(remaining_bytes, parser)
+            self._other_protocol = ARP_PACKET(remaining_bytes, parser)
         else:
             self.other_protocol = OTHER_PROTOCOL(remaining_bytes,parser)
-            
-    
+
+    # Getter and setter for next protocol        
+    @property
+    def next_protocol(self) -> Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL]:
+        return self._other_protocol
+    @next_protocol.setter
+    def next_protocol(self, value: Union[IP_HEADER, ARP_PACKET, OTHER_PROTOCOL]):
+        self._other_protocol = value
+
     # Getter and setter for other packet
     @property
     def other_protocol(self) -> Optional[OTHER_PROTOCOL]:
@@ -145,20 +154,20 @@ class Ethernet_Frame:
     
     @property
     # Getter and setter for arp packet
-    def arp_packet(self) -> Optional[ARP_Packet]:
+    def arp_packet(self) -> Optional[ARP_PACKET]:
         return self._arp_packet
     
     @arp_packet.setter
-    def arp_packet(self, value: ARP_Packet) -> None:
+    def arp_packet(self, value: ARP_PACKET) -> None:
         self._arp_packet = value
 
     @property
     # Getter and setter for ip header
-    def ip_header(self) -> Optional[IP_Header]:
+    def ip_header(self) -> Optional[IP_HEADER]:
         return self._ip_header
     
     @ip_header.setter
-    def ip_header(self, value: IP_Header) -> None:
+    def ip_header(self, value: IP_HEADER) -> None:
         self._ip_header = value
     # Getter and setter for destination_mac
     @property
@@ -200,11 +209,11 @@ class Ethernet_Frame:
 
     # Getter and setter for parser (if needed)
     @property
-    def parser(self) -> 'Packet_parser':  # Assuming Packet_parser is a class
+    def parser(self) -> Packet_parser:  # Assuming Packet_parser is a class
         return self._parser
 
     @parser.setter
-    def parser(self, value: 'Packet_parser'):
+    def parser(self, value: Packet_parser):
         if not isinstance(value, Packet_parser):
             raise ValueError("parser must be an instance of the Packet_parser class")
         self._parser = value

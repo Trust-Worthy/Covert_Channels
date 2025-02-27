@@ -2,7 +2,7 @@
 
 
 @dataclass
-class TCP_Packet(IP_Header):
+class TCP_SEGMENT(IP_Header):
     def __init__(self,all_bytes: bytes):
 
         source_port: bytes  # Offset: Bytes 20-21 (2 bytes)

@@ -1,7 +1,9 @@
 
 
+
+
 @dataclass
-class UDP(IP_Header):
+class UDP_DATAGRAM(IP_Header):
     source_port: bytes  # Bytes 0-1 (2 bytes): Source Port
     destination_port: bytes  # Bytes 2-3 (2 bytes): Destination Port
     length: bytes  # Bytes 4-5 (2 bytes): Length of UDP header + payload
