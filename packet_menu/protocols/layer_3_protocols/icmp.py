@@ -40,12 +40,16 @@ class ICMP_MESSAGE():
         self._identifier = all_bytes[4:6]
         self._sequence_num = all_bytes[6:8]
 
+        offset: int = 8
         if len(all_bytes) > 8:
 
             self._timestamp = int.from_bytes(all_bytes[8:12], byteorder='big')
+            offset += len(self._timestamp)
             self._data = all_bytes[12:]
+            offset += len(self._data)
 
-
+        self.parser.store_and_track_bytes(offset)
+    
     # Getters and Setters for the fields
     
     @property
