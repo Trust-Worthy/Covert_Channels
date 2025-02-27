@@ -15,11 +15,14 @@ class ICMP_MESSAGE():
         self._checksum: bytes         # 2 bytes (ICMP Checksum)
         self._identifier: bytes       # 2 bytes (Identifier for matching Request/Reply)
         self._sequence_num: bytes     # 2 bytes (Sequence Number for distinguishing requests)
-        self._data: bytes = None      # Data field (for echo data or padding)
+        self._data: bytes       # Data field (for echo data or padding)
         self._is_request: bool
-        self._timestamp: int = None
+        self._timestamp: int
 
+        self.parse_icmp_message(all_bytes)
 
+        if not self.parser.check_if_finished_parsing:
+            raise ValueError("There should be no bytes left bruh")
     
     def parse_icmp_message(self, all_bytes: bytearray) -> None:
 
@@ -30,7 +33,7 @@ class ICMP_MESSAGE():
         elif self._type == 0x00:  # Echo Reply
             self._is_request = False
         else:
-            raise ValueError("Unsupported ICMP Type")
+            raise ValueError(f"Invalid ICMP Type: {self._type}")
         
         self._code = all_bytes[1]
         self._checksum = all_bytes[2:4]
