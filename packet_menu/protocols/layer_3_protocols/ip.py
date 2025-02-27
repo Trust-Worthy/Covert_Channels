@@ -1,10 +1,11 @@
 from typing import Optional, Union
-
+import sys
 
 
 from cleaning_captures.packet_parser import Packet_parser
 from layer_4_protocols.tcp import TCP_SEGMENT
 from layer_4_protocols.udp import UDP_DATAGRAM
+from layer_3_protocols.icmp import ICMP_MESSAGE
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
@@ -25,18 +26,25 @@ class IP_HEADER():
         """
         ## Pass on the parser to the next protocol
         self._parser: Packet_parser = parser
+        
         self._version: bytes 
+        self._ihl: bytes
+        self._ip_options: bytes = None
         self._diff_service_field: bytes 
         self._total_length: bytes  
         self._identification: bytes 
-        self._flags: bytes
+        self._flags_and_fragment_offset: bytes
         self._ttl: bytes
-        self._protocol_type: bytes 
+        self._next_protocol_type: bytes 
         self._header_checksum: bytes 
         self._source_address: bytes 
         self._dst_address: bytes
-        self._ip_options: bytes = None
+        self._next_protocol: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE,OTHER_PROTOCOL]
 
+        self.parse_ip_header(all_bytes, self.parser)
+        remaining_bytes: bytearray = self.get_remaining_bytes_after_ip_header(all_bytes)
+        if not self.parser.check_if_finished_parsing:
+            self.create_next_protocol(remaining_bytes,self.parser)
 
     def parse_ip_header(self, all_bytes: bytearray) -> None:
         """
@@ -49,7 +57,6 @@ class IP_HEADER():
 
         self._version: bytes = all_bytes[0] >> 4  # Extracts the upper 4 bits (Version)
         self._ihl: bytes = all_bytes[0] & 0x0F  # Extracts the lower 4 bits (IHL - Internet Header Length)
-        self._options: bytes = None
 
         ### By default, IPv4 is 20 bytes.
         offset: int = 20 
@@ -58,8 +65,8 @@ class IP_HEADER():
                 # Convert IHL (32-bit words) to bytes
             header_size_in_bytes: int = self._ihl * 4
 
-            self._options = all_bytes[20:header_size_in_bytes]  # Options field (variable size)
-            offset += header_size_in_bytes
+            self._ip_options = all_bytes[20:header_size_in_bytes]  # Options field (variable size)
+            offset = header_size_in_bytes
 
         ### Process all fields up to byte 20 because these are guaranteed ###
         self._diff_service_field: bytes = all_bytes[1:2]  # 1 byte (DSCP + ECN)
@@ -72,29 +79,34 @@ class IP_HEADER():
         self._source_address: bytes = all_bytes[12:16]  # 4 bytes (IPv4 address)
         self._dst_address: bytes = all_bytes[16:20]  # 4 bytes (IPv4 address)
 
-
-        
-
         self.parser.store_and_track_bytes(offset)
 
-    def get_remaining_bytes_after_ip_header(self, remaining_bytes: bytearray,) -> bytearray:
+    def get_remaining_bytes_after_ip_header(self, all_bytes: bytearray,) -> bytearray:
         
-        if self.parser.check_if_finished_parsing and (self.parser.total_bytes_read == )
-    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_SEGMENT, UDP_DATAGRAM]:
+        if self.parser.check_if_finished_parsing and (self.parser.total_bytes_read >= 20 and self.parser.total_bytes_read < 60):
+            remaining_bytes: bytearray = all_bytes[self.parser.offset_pointer:]
+            return remaining_bytes
+        else:
+            ### TO-DO log termination here (use logging)
+            sys.exit(1)
+
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_SEGMENT, UDP_DATAGRAM, ICMP_MESSAGE]:
     ### TO-DO ###
     # write logic that decides what protocol is created next based off of the next bytes.
     ### first call parse_ip_header
     ### remember, I create next protocol after I call get_remaining_bytes_after_ip_header
         
         if self.protocol_type == 0x01: ### ICMP 
-             
+            self.next_protocol = ICMP_MESSAGE(remaining_bytes,parser)
         elif self.protocol_type == 0x06: ### TCP
-            pass
+            self.next_protocol == TCP_SEGMENT(remaining_bytes,parser)
         elif self.protocol_type == 0x11: ### UDP
-            pass
+            self.next_protocol == UDP_DATAGRAM(remaining_bytes,parser)
         else:
             self.protocol_type = OTHER_PROTOCOL(remaining_bytes,parser)
 
+
+        return self.next_protocol
     
     @property
     def ip_options(self) -> bytes:
@@ -103,7 +115,11 @@ class IP_HEADER():
     def ip_options(self, value: bytes):
         self._ip_options = value
     
-
+    @property
+    def next_protocol(self) -> bytes:
+        return self._next_protocol
+    def next_protocol(self, value: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE])
+        self._next_protocol = value
 
     @property
     def parser(self):
@@ -158,11 +174,11 @@ class IP_HEADER():
         self._ttl = value
 
     @property
-    def protocol_type(self):
-        return self.__protocol_type
+    def next_protocol_type(self) -> bytes:
+        return self._next_protocol_type
 
-    @protocol_type.setter
-    def protocol_type(self, value: bytes):
+    @next_protocol_type.setter
+    def next_protocol_type(self, value: bytes):
         self._protocol_type = value
 
     @property

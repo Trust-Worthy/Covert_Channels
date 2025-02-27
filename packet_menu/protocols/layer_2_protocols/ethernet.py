@@ -74,9 +74,9 @@ class Ethernet_Frame:
         self._parser: Packet_parser = Packet_parser()
 
         self.parse_str_to_datetime_obj(timestamp_data)
-        self.parse_ethernet_frame(all_bytes,self._parser)
+        self.parse_ethernet_frame(all_bytes,self.parser)
         remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes)
-        if self.parser.check_if_finished_parsing:
+        if not self.parser.check_if_finished_parsing:
             self.create_next_protocol(remaining_bytes,self.parser)
 
 
@@ -190,12 +190,8 @@ class Ethernet_Frame:
 
 
 
-
-
-
-
-
-
+if __name__ == "__main__":
+    eth_frame = Ethernet_Frame()
 
 
 

@@ -1,7 +1,7 @@
 
 from layer_2_protocols.ethernet import Ethernet_Frame
 
-class ICMP(Ethernet_Frame):
+class ICMP_MESSAGE(Ethernet_Frame):
     pass
 
 @dataclass
