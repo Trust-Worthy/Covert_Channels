@@ -201,3 +201,7 @@ class IP_HEADER():
     @dst_address.setter
     def dst_address(self, value: bytes):
         self._dst_address = value
+
+
+if __name__ == "__main__":
+    ip_header = IP_HEADER()
