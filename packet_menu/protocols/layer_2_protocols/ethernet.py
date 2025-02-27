@@ -68,12 +68,9 @@ class Ethernet_Frame:
         self._destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
-        self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
-        self._next_protocol: Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL]
         
-        self._ip_header: IP_Header = None
-        self._arp_packet: ARP_Packet = None
-        self._other_protocol: OTHER_PROTOCOL = None
+        self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
+        self._next_protocol: Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL] = None
         self._parser: Packet_parser = Packet_parser()
 
         self.parse_str_to_datetime_obj(timestamp_data)
@@ -95,7 +92,7 @@ class Ethernet_Frame:
         self._timestamp = datetime.strptime(timestamp_data, "%H:%M:%S.%f")
 
 
-    def parse_ethernet_frame(self,all_bytes:bytes, parser: Packet_parser)-> None:
+    def parse_ethernet_frame(self,all_bytes:bytes)-> None:
         """
         Specific function to place all the bytes via the correct offset into their respective fields.
 
@@ -110,7 +107,7 @@ class Ethernet_Frame:
         self._ethernet_type = all_bytes[12:14]
 
         offset: int = len(self.destination_mac + self.source_mac + self.ethernet_type)
-        parser.store_and_track_bytes(offset,all_bytes,is_eth=True) ### Update pointer, bytes read, and all bytes collected (array)
+        self.parser.store_and_track_bytes(offset,all_bytes=all_bytes,is_eth=True) ### Update pointer, bytes read, and store ALL the bytes in the entire packet
 
 
     def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes) -> bytearray:
@@ -123,7 +120,7 @@ class Ethernet_Frame:
         else:
             ### TO-DO log termination here
             sys.exit(1)
-    def create_next_protocol(self, remaining_bytes: bytes,parser:Packet_parser) -> Union[IP_Header,ARP_Packet,OTHER_PROTOCOL]:
+    def create_next_protocol(self, remaining_bytes: bytes, parser:Packet_parser) -> Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL]:
         
         ### TO-DO ###
         # Write code that makes decision whether to create an ip, icmp, or arp based on they next bytes!!!!
@@ -143,33 +140,6 @@ class Ethernet_Frame:
     def next_protocol(self, value: Union[IP_HEADER, ARP_PACKET, OTHER_PROTOCOL]):
         self._other_protocol = value
 
-    # Getter and setter for other packet
-    @property
-    def other_protocol(self) -> Optional[OTHER_PROTOCOL]:
-        return self._other_protocol
-    
-    @other_protocol.setter
-    def other_protocol(self,value: OTHER_PROTOCOL):
-        self._other_protocol = value
-    
-    @property
-    # Getter and setter for arp packet
-    def arp_packet(self) -> Optional[ARP_PACKET]:
-        return self._arp_packet
-    
-    @arp_packet.setter
-    def arp_packet(self, value: ARP_PACKET) -> None:
-        self._arp_packet = value
-
-    @property
-    # Getter and setter for ip header
-    def ip_header(self) -> Optional[IP_HEADER]:
-        return self._ip_header
-    
-    @ip_header.setter
-    def ip_header(self, value: IP_HEADER) -> None:
-        self._ip_header = value
-    # Getter and setter for destination_mac
     @property
     def destination_mac(self) -> bytes:
         return self._destination_mac

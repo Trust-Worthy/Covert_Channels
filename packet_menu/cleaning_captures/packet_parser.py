@@ -19,7 +19,7 @@ class Packet_parser:
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
 
 
-    def store_and_track_bytes(self, offset:int , all_bytes: bytes, is_eth: bool) -> None:
+    def store_and_track_bytes(self, offset:int , all_bytes: bytes = None, is_eth: bool = False) -> None:
         """
         Updates byte_pointer, total_bytes_read, and appends the bytes to the packet data bytes.
 
