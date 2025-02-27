@@ -119,7 +119,7 @@ class Ethernet_Frame:
             return remaining_bytes
         else:
             ### TO-DO log termination here
-            sys.exit(1)
+            raise ValueError("Error: Incomplete or invalid IP header")
     def create_next_protocol(self, remaining_bytes: bytes, parser:Packet_parser) -> Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL]:
         
         ### TO-DO ###

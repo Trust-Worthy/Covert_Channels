@@ -27,18 +27,18 @@ class IP_HEADER():
         ## Pass on the parser to the next protocol
         self._parser: Packet_parser = parser
         
-        self._version: bytes 
-        self._ihl: bytes
+        self._version: int
+        self._ihl: int
         self._ip_options: bytes = None
         self._diff_service_field: bytes 
         self._total_length: bytes  
         self._identification: bytes 
         self._flags_and_fragment_offset: bytes
         self._ttl: bytes
-        self._next_protocol_type: bytes 
         self._header_checksum: bytes 
         self._source_address: bytes 
         self._dst_address: bytes
+        self._next_protocol_type: bytes 
         self._next_protocol: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE,OTHER_PROTOCOL]
 
         self.parse_ip_header(all_bytes, self.parser)
@@ -88,23 +88,19 @@ class IP_HEADER():
             return remaining_bytes
         else:
             ### TO-DO log termination here (use logging)
-            sys.exit(1)
+            raise ValueError("Error: Incomplete or invalid IP header")
 
     def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_SEGMENT, UDP_DATAGRAM, ICMP_MESSAGE]:
-    ### TO-DO ###
-    # write logic that decides what protocol is created next based off of the next bytes.
-    ### first call parse_ip_header
-    ### remember, I create next protocol after I call get_remaining_bytes_after_ip_header
         
-        if self.protocol_type == 0x01: ### ICMP 
-            self.next_protocol = ICMP_MESSAGE(remaining_bytes,parser)
-        elif self.protocol_type == 0x06: ### TCP
-            self.next_protocol == TCP_SEGMENT(remaining_bytes,parser)
-        elif self.protocol_type == 0x11: ### UDP
-            self.next_protocol == UDP_DATAGRAM(remaining_bytes,parser)
-        else:
-            self.protocol_type = OTHER_PROTOCOL(remaining_bytes,parser)
+        protocol_handlers = {
+            0x01: ICMP_MESSAGE,
+            0x06: TCP_SEGMENT,
+            0x11: UDP_DATAGRAM
+        }
+        
 
+        handler = protocol_handlers.get(self._next_protocol_type, OTHER_PROTOCOL)
+        self._next_protocol = handler(remaining_bytes,parser) ### Instantiate the class
 
         return self.next_protocol
     
@@ -118,6 +114,7 @@ class IP_HEADER():
     @property
     def next_protocol(self) -> bytes:
         return self._next_protocol
+    @next_protocol.setter
     def next_protocol(self, value: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE])
         self._next_protocol = value
 
