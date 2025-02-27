@@ -1,4 +1,4 @@
 
 @dataclass
-class OTHER:
+class OTHER_PROTOCOL:
     pass

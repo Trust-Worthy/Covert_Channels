@@ -27,7 +27,7 @@ import sys
 from packet_menu.cleaning_captures.packet_parser import Packet_parser
 from layer_3_protocols.arp import ARP_Packet
 from layer_3_protocols.ip import IP_Header
-from undefined_layer.undefined_protocol import OTHER
+from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
 ### TO-DO ###
@@ -69,10 +69,10 @@ class Ethernet_Frame:
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
         self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
+        self._ip_header: IP_Header = None
+        self._arp_packet: ARP_Packet = None
+        self._other_protocol: OTHER_PROTOCOL = None
         self._parser: Packet_parser = Packet_parser()
-        self._ip_header: IP_Header
-        self._arp_packet: ARP_Packet
-        self._undefined_data: OTHER
 
         self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(all_bytes,self._parser)
@@ -128,17 +128,20 @@ class Ethernet_Frame:
 
         if self.ethernet_type == 0x0800:
             self._ip_header = IP_Header(remaining_bytes, parser)
-            self._
         elif self.ethernet_type == 0x0806:
-            arp_packet = ARP(remaining_bytes, parser)
-            return arp_packet
+            self.arp_packet = ARP_Packet(remaining_bytes, parser)
         else:
-            undefined_layer = OTHER(remaining_bytes,parser)
-            return undefined_layer
+            self.other_protocol = OTHER_PROTOCOL(remaining_bytes,parser)
+            
     
     # Getter and setter for other packet
     @property
-    def un
+    def other_protocol(self) -> Optional[OTHER_PROTOCOL]:
+        return self._other_protocol
+    
+    @other_protocol.setter
+    def other_protocol(self,value: OTHER_PROTOCOL):
+        self._other_protocol = value
     
     @property
     # Getter and setter for arp packet
