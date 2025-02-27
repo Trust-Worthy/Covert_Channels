@@ -25,9 +25,9 @@ from typing import Optional, Any
 import sys
 
 from packet_menu.cleaning_captures.packet_parser import Packet_parser
-from layer_3_protocols.arp import ARP
-from layer_3_protocols.icmp import ICMP
+from layer_3_protocols.arp import ARP_Packet
 from layer_3_protocols.ip import IP_Header
+from undefined_layer.undefined_protocol import OTHER
 
 
 ### TO-DO ###
@@ -71,12 +71,14 @@ class Ethernet_Frame:
         self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
         self._parser: Packet_parser = Packet_parser()
         self._ip_header: IP_Header
+        self._arp_packet: ARP_Packet
+        self._undefined_data: OTHER
 
         self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(all_bytes,self._parser)
-
+        remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes)
         if self.parser.check_if_finished_parsing:
-            self._ip_header = self.create_next_protocol()
+            self.create_next_protocol(remaining_bytes,self.parser)
 
 
     def parse_str_to_datetime_obj(self, timestamp_data:str) -> None:
@@ -109,27 +111,52 @@ class Ethernet_Frame:
         parser.store_and_track_bytes(offset,all_bytes,is_eth=True) ### Update pointer, bytes read, and all bytes collected (array)
 
 
-    def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes, parser: Packet_parser) -> bytearray:
+    def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes) -> bytearray:
         
-        if parser.check_if_finished_parsing and (parser.total_bytes_read == 14): ### if True
+        if self.parser.check_if_finished_parsing and (self.parser.total_bytes_read == 14): ### if True
             
             ### If there are more bytes left
-            remaining_bytes: bytearray = all_bytes[parser.offset_pointer:]
+            remaining_bytes: bytearray = all_bytes[self.parser.offset_pointer:]
             return remaining_bytes
         else:
             ### TO-DO log termination here
             sys.exit(1)
-    def create_next_protocol(self, all_bytes: bytes,parser:Packet_parser) -> IP_Header:
+    def create_next_protocol(self, remaining_bytes: bytes,parser:Packet_parser) -> IP_Header:
         
         ### TO-DO ###
         # Write code that makes decision whether to create an ip, icmp, or arp based on they next bytes!!!!
-        remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
 
-        ip_header = IP_Header(remaining_bytes)
+        if self.ethernet_type == 0x0800:
+            self._ip_header = IP_Header(remaining_bytes, parser)
+            self._
+        elif self.ethernet_type == 0x0806:
+            arp_packet = ARP(remaining_bytes, parser)
+            return arp_packet
+        else:
+            undefined_layer = OTHER(remaining_bytes,parser)
+            return undefined_layer
+    
+    # Getter and setter for other packet
+    @property
+    def un
+    
+    @property
+    # Getter and setter for arp packet
+    def arp_packet(self) -> Optional[ARP_Packet]:
+        return self._arp_packet
+    
+    @arp_packet.setter
+    def arp_packet(self, value: ARP_Packet) -> None:
+        self._arp_packet = value
 
-        return ip_header
-        
-
+    @property
+    # Getter and setter for ip header
+    def ip_header(self) -> Optional[IP_Header]:
+        return self._ip_header
+    
+    @ip_header.setter
+    def ip_header(self, value: IP_Header) -> None:
+        self._ip_header = value
     # Getter and setter for destination_mac
     @property
     def destination_mac(self) -> bytes:
