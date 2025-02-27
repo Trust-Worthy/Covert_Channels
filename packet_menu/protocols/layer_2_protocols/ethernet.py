@@ -78,27 +78,6 @@ class Ethernet_Frame:
         if self.parser.check_if_finished_parsing:
             self._ip_header = self.create_next_protocol()
 
-    def create_next_protocol(self, all_bytes: bytes,parser:Packet_parser) -> IP_Header:
-        
-        ### TO-DO ###
-        # Write code that makes decision whether to create an ip, icmp, or arp based on they next bytes!!!!
-        remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
-
-        ip_header = IP_Header(remaining_bytes)
-
-        return ip_header
-        
-
-    def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes, parser: Packet_parser) -> bytearray:
-        
-        if parser.check_if_finished_parsing and (parser.total_bytes_read == 14): ### if True
-            
-            ### If there are more bytes left
-            remaining_bytes: bytearray = all_bytes[parser.offset_pointer:]
-            return remaining_bytes
-        else:
-            ### TO-DO log termination here
-            sys.exit(1)
 
     def parse_str_to_datetime_obj(self, timestamp_data:str) -> None:
         """
@@ -111,6 +90,7 @@ class Ethernet_Frame:
 
         self._timestamp = datetime.strptime(timestamp_data, "%H:%M:%S.%f")
 
+
     def parse_ethernet_frame(self,all_bytes:bytes, parser: Packet_parser)-> None:
         """
         Specific function to place all the bytes via the correct offset into their respective fields.
@@ -122,13 +102,33 @@ class Ethernet_Frame:
         """
         
         self._destination_mac = all_bytes[0:6] ### Set field first! This a very important step.
-        self._source_mac = all_bytes[6:11]
-        self._ethernet_type = all_bytes[11:13]
+        self._source_mac = all_bytes[6:12]
+        self._ethernet_type = all_bytes[12:14]
 
-        parser.store_and_track_bytes(self._destination_mac) ### Update pointer, bytes read, and all bytes collected (array)
+        offset: int = len(self.destination_mac + self.source_mac + self.ethernet_type)
+        parser.store_and_track_bytes(offset,all_bytes,is_eth=True) ### Update pointer, bytes read, and all bytes collected (array)
 
+
+    def get_remaining_bytes_after_ethernet_frame(self, all_bytes:bytes, parser: Packet_parser) -> bytearray:
         
-        parser.store_and_track_bytes(all_bytes)
+        if parser.check_if_finished_parsing and (parser.total_bytes_read == 14): ### if True
+            
+            ### If there are more bytes left
+            remaining_bytes: bytearray = all_bytes[parser.offset_pointer:]
+            return remaining_bytes
+        else:
+            ### TO-DO log termination here
+            sys.exit(1)
+    def create_next_protocol(self, all_bytes: bytes,parser:Packet_parser) -> IP_Header:
+        
+        ### TO-DO ###
+        # Write code that makes decision whether to create an ip, icmp, or arp based on they next bytes!!!!
+        remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes,parser)
+
+        ip_header = IP_Header(remaining_bytes)
+
+        return ip_header
+        
 
     # Getter and setter for destination_mac
     @property

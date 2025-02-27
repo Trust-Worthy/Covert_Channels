@@ -10,15 +10,16 @@ class Packet_parser:
         """
         Initializes packet parser with empty values.
         """
+        #Most parsers move sequentially through a buffer, so it makes sense to begin at the next available byte after what’s already parsed.
+        self._offset_pointer: int = 0 ### references the index to start the next parsing operation
         
-        self._offset_pointer: int = -1 ### references the index to start the next parsing operation
         self._total_bytes_read: int = 0 ### counts total bytes read
         self._packet_data_bytes: bytearray  # Full packet data in bytes
         self._packet_data_np_arr: np.ndarray  # Full packet data as a NumPy array
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
 
 
-    def store_and_track_bytes(self, offset:int , all_bytes: bytes) -> None:
+    def store_and_track_bytes(self, offset:int , all_bytes: bytes, is_eth: bool) -> None:
         """
         Updates byte_pointer, total_bytes_read, and appends the bytes to the packet data bytes.
 
@@ -35,13 +36,15 @@ class Packet_parser:
 
         self.move_byte_pointer = offset ### Moving byte pointer to the next offset internally doing +=
         self.total_bytes_read = offset ###  += under the hood in the setter
-        self.packet_data_bytes = all_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
-        self.packet_data_np_arr = self.packet_data_bytes
+
+        if is_eth:
+            self.packet_data_bytes = all_bytes ### Adding bytes to the entire byte array .append under the hood in the setter
+            self.packet_data_np_arr = self.packet_data_bytes
    
     def check_if_finished_parsing(self)-> bool:
         """
         This function checks if the offset_pointer and total_bytes_read fields
-        match the length of all the bytes that need to be process.
+        match the length of all the bytes that need to be processe.
 
         Final state: total_bytes_read should equal the length of the packet_data_bytes
                      offset_pointer shoud equal the length of the pacaket_data_byes minus 1 (bc of list indexing)
@@ -49,7 +52,7 @@ class Packet_parser:
         Returns:
             bool: returns True if offset_pointer and total_bytes_read equal the length of packet_data_bytes
         """
-        if self.total_bytes_read == len(self.packet_data_bytes) and self.offset_pointer == (len(self.packet_data_bytes) - 1):
+        if self.total_bytes_read == len(self.packet_data_bytes) and self.offset_pointer == (len(self.packet_data_bytes) - 1): #### CAUTION with - 1 here
             
             return True
         else:

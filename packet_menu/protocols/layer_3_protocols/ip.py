@@ -38,6 +38,8 @@ class IP_Header():
 
     def parse_ip_header(self, remaining_bytes: bytearray, parser: Packet_parser) -> None:
 
+
+        
     def create_next_protocol(self, remaining_bytes: bytearray) -> Optional[]
     ### TO-DO ###
     # write logic that decides what protocol is created next based off of the next bytes.
