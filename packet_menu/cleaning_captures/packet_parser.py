@@ -7,6 +7,7 @@ from protocols.layer_4_protocols import tcp,udp
 from protocols.application_layer import http,dns, quic, tls
 from protocols.undefined_layer import undefined_protocol as undef
 
+import logging
 
 class Packet_parser:
     """
@@ -102,6 +103,9 @@ class Packet_parser:
             quic.QUIC,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]):
+        
+        ### keeps track of the changes in the packet type
+        logging.info(f"Transitioning from {self._packet_type} to {value}")
         self._packet_type = value
 
     @property

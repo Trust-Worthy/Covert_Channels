@@ -1,5 +1,8 @@
-@dataclass
-class HTTP_Packet(TCP_Packet):
+
+from layer_4_protocols.tcp import TCP_SEGMENT
+
+
+class HTTP_Packet(TCP_SEGMENT): ### This makes sense to use inheritance!!!
     def __init__(self, raw_data: bytes):
         super.__init__()
 

@@ -12,6 +12,7 @@ class OTHER_PROTOCOL:
         self._parser: Packet_parser = parser
         self._parser.packet_type = type(self)
         self._other_protocol_size: int = len(all_bytes)
+        
 
     @property
     def other_protocol_size(self) -> int:
