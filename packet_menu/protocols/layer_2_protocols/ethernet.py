@@ -72,7 +72,8 @@ class Ethernet_Frame:
         self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
         self._next_protocol: Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL] = None
         self._parser: Packet_parser = Packet_parser()
-
+        self._parser._packet_type = type(self)
+        
         self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(all_bytes,self.parser)
         remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes)

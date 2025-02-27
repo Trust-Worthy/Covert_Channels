@@ -7,6 +7,10 @@ class ARP_PACKET():
 
 
         def __init__(self, all_bytes: bytearray, parser: Packet_parser):
+            
+
+            self._parser = parser
+            self._parser._packet_type = type(self)
 
             self._hardware_type: bytes  # Bytes 14-15: Hardware type (2 bytes)
             self._protocol_type: bytes  # Bytes 16-17: Protocol type (2 bytes)
@@ -19,12 +23,14 @@ class ARP_PACKET():
             self._target_ip_address: bytes  # Bytes 38-41: Target IP address (4 bytes)
 
 
-
+            self.parse_arp_packet(all_bytes, self.parser)
+            if not self.parser.check_if_finished_parsing():
+                raise ValueError("There should be no bytes left bruh")  
 
         def parse_arp_packet(self, all_bytes: bytearray) -> None:
             
             self._hardware_type = all_bytes[0:2]
-            self._protocol_size = all_bytes[2:4]
+            self._protocol_type = all_bytes[2:4]
             self._hardware_size = all_bytes[4:5]
             self._protocol_size = all_bytes[5:6]
             self._op_code = all_bytes[6:8]
@@ -36,8 +42,6 @@ class ARP_PACKET():
             offset: int = 28
 
             self.parser.store_and_track_bytes(offset)
-
-
 
         # Getters and Setters for all fields
         

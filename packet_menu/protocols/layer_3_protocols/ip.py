@@ -26,6 +26,7 @@ class IP_HEADER():
         """
         ## Pass on the parser to the next protocol
         self._parser: Packet_parser = parser
+        self._parser._packet_type = type(self)
         
         self._version: int
         self._ihl: int

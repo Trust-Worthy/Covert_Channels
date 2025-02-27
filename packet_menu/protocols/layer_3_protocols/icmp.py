@@ -9,6 +9,7 @@ class ICMP_MESSAGE():
     def __init__(self, all_bytes: bytearray, parser: Packet_parser):
 
         self._parser: Packet_parser = parser
+        self._parser._packet_type = type(self) ### Update packet type
 
         self._type: bytes             # 1 byte (ICMP Type, e.g., 0x08 for Echo Request)
         self._code: bytes             # 1 byte (ICMP Code, typically 0x00 for Echo Request/Reply)
@@ -21,7 +22,7 @@ class ICMP_MESSAGE():
 
         self.parse_icmp_message(all_bytes)
 
-        if not self.parser.check_if_finished_parsing:
+        if not self.parser.check_if_finished_parsing():
             raise ValueError("There should be no bytes left bruh")
     
     def parse_icmp_message(self, all_bytes: bytearray) -> None:

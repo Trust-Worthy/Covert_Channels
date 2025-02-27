@@ -69,7 +69,7 @@ class Packet_parser:
         Returns:
             bool: returns True if offset_pointer and total_bytes_read equal the length of packet_data_bytes
         """
-        if self.total_bytes_read == len(self.packet_data_bytes) and self.offset_pointer == (len(self.packet_data_bytes) - 1): #### CAUTION with - 1 here
+        if self.total_bytes_read == len(self.packet_data_bytes) and self.offset_pointer == (len(self.packet_data_bytes)): #### CAUTION with - 1 here
             
             return True
         else:
@@ -89,6 +89,7 @@ class Packet_parser:
             undef.OTHER_PROTOCOL]:
 
         return self._packet_type
+    
     @packet_type.setter
     def packet_type(self, value:Union[
             arp.ARP_PACKET,
