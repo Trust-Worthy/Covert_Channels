@@ -13,6 +13,7 @@ class TCP_SEGMENT():
         self._sequence_number: bytes  # Offset: Bytes 24-27 (4 bytes)
         self._ack_number: bytes  # Offset: Bytes 28-31 (4 bytes)
         self._header_length: bytes  # Offset: Byte 32 (4 bits for data offset)
+        self._reserved_bits: bytes
         self._flags: bytes  # Offset: Byte 33 (1 byte, includes flags)
         self.window_size: bytes  # Offset: Bytes 34-35 (2 bytes)
         self._checksum: bytes  # Offset: Bytes 36-37 (2 bytes)
@@ -21,9 +22,17 @@ class TCP_SEGMENT():
 
     
     def parse_tcp_segment(self, all_bytes: bytes) -> None:
-        pass
 
-    # Getters and Setters for all fields
+        self._source_port = all_bytes[0:2]
+        self._dst_port = all_bytes[2:4]
+        self._sequence_number = all_bytes[4:8]
+        self._ack_number = all_bytes[8:12]
+        self._header_length = all_bytes[12:13]
+        self._flags = all_bytes[]
+
+    def extract_tcp_flags(self, flags: bytes) -> 
+
+# Getters and Setters for all fields
     
     @property
     def source_port(self) -> bytes:
