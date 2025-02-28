@@ -2,7 +2,7 @@ from cleaning_captures.packet_parser import Packet_parser
 
 
 
-class TCP_SEGMENT():
+class TCP_HEADER():
     def __init__(self,all_bytes: bytes, parser: Packet_parser):
 
         self._parser: Packet_parser = parser
@@ -20,8 +20,9 @@ class TCP_SEGMENT():
         self._urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
         self._options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
 
+        
     
-    def parse_tcp_segment(self, all_bytes: bytes) -> None:
+    def parse_tcp_header(self, all_bytes: bytes) -> None:
 
         self._source_port = all_bytes[0:2]
         self._dst_port = all_bytes[2:4]
@@ -34,14 +35,27 @@ class TCP_SEGMENT():
         self._checksum = all_bytes[16:18]
         self._urgent_pointer = all_bytes[18:20]
 
+        offset: int = 20
+
         # Calculate options based on header length
         header_length_bytes = self._header_length * 4  # Convert 4-bit value to bytes
         if header_length_bytes > 20:  # If options are present
             self._options = all_bytes[20:header_length_bytes]
+            offset = header_length_bytes
         else:
             self._options = None  # No options present
 
-        offset: int = 0
+        self._parser.store_and_track_bytes(offset)
+    def get_remaining_bytes_after_tcp_header(self, all_bytes: bytearray) -> bytearray:
+
+        if self._parser.check_if_finished_parsing():
+            remaining_bytes: bytearray = all_bytes[self._parser.offset_pointer:]
+            return remaining_bytes
+        else:
+            ### TO-DO log termination here (use logging)
+            raise ValueError("Error: Incomplete or invalid TCP header")
+
+
     def extract_tcp_flags(self) -> dict[str,bytes]:
         """
         0x01 (00000001)	FIN	Finish: Indicates the sender wants to terminate the connection.

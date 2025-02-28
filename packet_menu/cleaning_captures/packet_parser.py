@@ -52,7 +52,7 @@ class Packet_parser:
 
         """
 
-        self.move_byte_pointer = offset ### Moving byte pointer to the next offset internally doing +=
+        self.move_offset_pointer = offset ### Moving byte pointer to the next offset internally doing +=
         self.total_bytes_read = offset ###  += under the hood in the setter
 
         if is_eth:
@@ -113,7 +113,7 @@ class Packet_parser:
         return self._offset_pointer
     
     @offset_pointer.setter
-    def move_byte_pointer(self, value) -> None:
+    def move_offset_pointer(self, value) -> None:
         
         self._offset_pointer += value
 
