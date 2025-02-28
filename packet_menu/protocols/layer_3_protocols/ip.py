@@ -91,11 +91,11 @@ class IP_HEADER():
             ### TO-DO log termination here (use logging)
             raise ValueError("Error: Incomplete or invalid IP header")
 
-    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_SEGMENT, UDP_DATAGRAM, ICMP_MESSAGE]:
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_HEADER, UDP_DATAGRAM, ICMP_MESSAGE]:
         
         protocol_handlers = {
             0x01: ICMP_MESSAGE,
-            0x06: TCP_SEGMENT,
+            0x06: TCP_HEADER,
             0x11: UDP_DATAGRAM
         }
         
@@ -116,7 +116,7 @@ class IP_HEADER():
     def next_protocol(self) -> bytes:
         return self._next_protocol
     @next_protocol.setter
-    def next_protocol(self, value: Union[TCP_SEGMENT,UDP_DATAGRAM,ICMP_MESSAGE]):
+    def next_protocol(self, value: Union[TCP_HEADER,UDP_DATAGRAM,ICMP_MESSAGE]):
         self._next_protocol = value
 
     @property

@@ -1,3 +1,5 @@
+from typing import Union
+
 from cleaning_captures.packet_parser import Packet_parser
 
 
@@ -20,7 +22,7 @@ class TCP_HEADER():
         self._urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
         self._options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
 
-        
+
     
     def parse_tcp_header(self, all_bytes: bytes) -> None:
 
@@ -85,6 +87,8 @@ class TCP_HEADER():
 
         return flag_dict
 
+
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union
 # Getters and Setters for all fields
     
     @property

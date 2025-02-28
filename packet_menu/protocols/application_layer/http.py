@@ -18,6 +18,7 @@ class HTTP_Packet(TCP_SEGMENT): ### This makes sense to use inheritance!!!
         self.headers: Dict[bytes, bytes] = {}  # Headers dictionary
         self.body: Optional[bytes] = None  # Optional body
         
+        
         self.parse(raw_data)  # Parse the raw HTTP data when an instance is created
 
     def parse(self, raw_data: bytes):

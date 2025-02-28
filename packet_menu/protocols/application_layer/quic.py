@@ -1,5 +1,5 @@
 
 
 @dataclass
-class QUIC:
+class QUIC_PACKET:
     pass
