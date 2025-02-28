@@ -41,8 +41,7 @@ class TCP_HEADER():
         self._sequence_number = all_bytes[4:8]
         self._ack_number = all_bytes[8:12]
         self._header_length = (all_bytes[12] >> 4) & 0x0F 
-        self._header_length *= 4
-        self._reserved_bits = all_bytes[12] & 0x0F
+        self._reserved_bits = (all_bytes[12] >> 1) & 0x07
         self._flags = all_bytes[13]
         self._window_size = all_bytes[14:16]
         self._checksum = all_bytes[16:18]
@@ -51,7 +50,7 @@ class TCP_HEADER():
         offset: int = 20
 
         # Calculate options based on header length
-        header_length_bytes = self._header_length * 4  # Convert 4-bit value to bytes
+        header_length_bytes = self._header_length
         if header_length_bytes > 20:  # If options are present
             self._options = all_bytes[20:header_length_bytes]
             offset = header_length_bytes
@@ -61,12 +60,8 @@ class TCP_HEADER():
         self._parser.store_and_track_bytes(offset)
     def get_remaining_bytes_after_tcp_header(self, all_bytes: bytearray) -> bytearray:
 
-        if self._parser.check_if_finished_parsing():
-            remaining_bytes: bytearray = all_bytes[self._parser.offset_pointer:]
-            return remaining_bytes
-        else:
-            ### TO-DO log termination here (use logging)
-            raise ValueError("Error: Incomplete or invalid TCP header")
+        return all_bytes[self._parser.offset_pointer:]
+        
 
 
     def extract_tcp_flags(self) -> dict[str,int]:
@@ -98,11 +93,11 @@ class TCP_HEADER():
         dst_port: int = int.from_bytes(self._dst_port,byteorder='big')
         src_port: int = int.from_bytes(self._source_port,byteorder='big')
 
-        if self.is_tls(remaining_bytes):
+        if self.is_tls(self,remaining_bytes):
             self._next_protocol = TLS_Packet(remaining_bytes, parser)
             return self._next_protocol
 
-        handler = protocol_handlers.get(dst_port,OTHER_PROTOCOL) or protocol_handlers.get(src_port,OTHER_PROTOCOL)
+        handler = protocol_handlers.get(dst_port) or protocol_handlers.get(src_port) or OTHER_PROTOCOL
         self._next_protocol = handler(remaining_bytes,parser)
 
         return self._next_protocol
