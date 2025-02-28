@@ -41,31 +41,33 @@ class TCP_SEGMENT():
         else:
             self._options = None  # No options present
 
-
-        self._options = all_bytes[19:31]
-
         offset: int = 0
     def extract_tcp_flags(self) -> dict[str,bytes]:
+        """
+        0x01 (00000001)	FIN	Finish: Indicates the sender wants to terminate the connection.
+        0x02 (00000010)	SYN	Synchronize: Used to establish a connection (TCP 3-way handshake).
+        0x04 (00000100)	RST	Reset: Forces a connection reset (abrupt termination).
+        0x08 (00001000)	PSH	Push: Requests immediate delivery of data.
+        0x10 (00010000)	ACK	Acknowledgment: Indicates the acknowledgment number is valid.
+        0x20 (00100000)	URG	Urgent: Data should be prioritized (uses the Urgent Pointer field).
+        0x40 (01000000)	ECE	Explicit Congestion Notification Echo: Signals network congestion.
+        0x80 (10000000)	CWR	Congestion Window Reduced: Used with ECN to reduce congestion.
+
+        Returns:
+            dict[str,bytes]: _description_
+        """
 
         flag_dict = {
-            "FIN": bytes,
-            "SYN": SYN,
-            "RST": RST,
-            "PSH": PSH,
-            "ACK": ACK,
-            "URG": URG,
-            "ECE": ECE,
-            "CWR": CWR
+            "FIN": self._flags & 0x01,
+            "SYN": (self._flags & 0x02) >> 1,
+            "RST": (self._flags & 0x04) >> 2,
+            "PSH": (self._flags & 0x08) >> 3,
+            "ACK": (self._flags & 0x10) >> 4,
+            "URG": (self._flags & 0x20) >> 5,
+            "ECE": (self._flags & 0x40) >> 6,
+            "CWR": (self._flags & 0x80) >> 7
         }
 
-        flag_dict["FIN"] = self._flags & 0x01
-        SYN = (self._flags & 0x02) >> 1
-        RST = (self._flags & 0x04) >> 2
-        PSH = (self._flags & 0x08) >> 3
-        ACK = (self._flags & 0x10) >> 4
-        URG = (self._flags & 0x20) >> 5
-        ECE = (self._flags & 0x40) >> 6
-        CWR = (self._flags & 0x80) >> 7
 
         return flag_dict
 
