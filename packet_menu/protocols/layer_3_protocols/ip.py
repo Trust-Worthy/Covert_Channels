@@ -80,11 +80,11 @@ class IP_HEADER():
         self._source_address: bytes = all_bytes[12:16]  # 4 bytes (IPv4 address)
         self._dst_address: bytes = all_bytes[16:20]  # 4 bytes (IPv4 address)
 
-        self.parser.store_and_track_bytes(offset)
+        self._parser.store_and_track_bytes(offset)
 
     def get_remaining_bytes_after_ip_header(self, all_bytes: bytearray) -> bytearray:
         
-        if self.parser.check_if_finished_parsing():
+        if self._parser.check_if_finished_parsing():
             remaining_bytes: bytearray = all_bytes[self._parser.offset_pointer:]
             return remaining_bytes
         else:
