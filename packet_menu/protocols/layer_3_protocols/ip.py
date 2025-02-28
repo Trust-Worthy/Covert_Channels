@@ -4,7 +4,7 @@ import sys
 
 from cleaning_captures.packet_parser import Packet_parser
 from layer_4_protocols.tcp import TCP_HEADER
-from layer_4_protocols.udp import UDP_DATAGRAM
+from layer_4_protocols.udp import UDP_HEADER
 from layer_3_protocols.icmp import ICMP_MESSAGE
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
@@ -40,12 +40,12 @@ class IP_HEADER():
         self._source_address: bytes 
         self._dst_address: bytes
         self._next_protocol_type: bytes 
-        self._next_protocol: Union[TCP_HEADER,UDP_DATAGRAM,ICMP_MESSAGE,OTHER_PROTOCOL]
+        self._next_protocol: Union[TCP_HEADER,UDP_HEADER,ICMP_MESSAGE,OTHER_PROTOCOL]
 
-        self.parse_ip_header(all_bytes, self.parser)
+        self.parse_ip_header(all_bytes)
         remaining_bytes: bytearray = self.get_remaining_bytes_after_ip_header(all_bytes)
         if not self._parser.check_if_finished_parsing():
-            self.create_next_protocol(remaining_bytes,self.parser)
+            self.create_next_protocol(remaining_bytes,self._parser)
 
     def parse_ip_header(self, all_bytes: bytearray) -> None:
         """
@@ -91,19 +91,19 @@ class IP_HEADER():
             ### TO-DO log termination here (use logging)
             raise ValueError("Error: Incomplete or invalid IP header")
 
-    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_HEADER, UDP_DATAGRAM, ICMP_MESSAGE]:
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[TCP_HEADER, UDP_HEADER, ICMP_MESSAGE]:
         
         protocol_handlers = {
             0x01: ICMP_MESSAGE,
             0x06: TCP_HEADER,
-            0x11: UDP_DATAGRAM
+            0x11: UDP_HEADER
         }
         
-
         handler = protocol_handlers.get(self._next_protocol_type, OTHER_PROTOCOL)
+       
         self._next_protocol = handler(remaining_bytes,parser) ### Instantiate the class
 
-        return self.next_protocol
+        return self._next_protocol
     
     @property
     def ip_options(self) -> bytes:

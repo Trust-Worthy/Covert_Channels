@@ -12,7 +12,7 @@ class TCP_HEADER():
     def __init__(self,all_bytes: bytes, parser: Packet_parser):
 
         self._parser: Packet_parser = parser
-        self._parser.packet_type = type(self)
+        self._parser.packet_type = type(self) ### tracks the current type of protocol that's being processed
 
         self._source_port: bytes  # Offset: Bytes 20-21 (2 bytes)
         self._dst_port: bytes  # Offset: Bytes 22-23 (2 bytes)
@@ -26,7 +26,7 @@ class TCP_HEADER():
         self._urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
         self._options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
 
-        self._next_protocol_type: bytes = self._dst_port
+        self._next_protocol_type: bytes
         self._next_protocol: Union[TLS_Packet,DNS,HTTP,HTTPS] ### Protocols I'm choosing to capture.
 
         self.parse_tcp_header(all_bytes, self._parser)
