@@ -52,7 +52,7 @@ class UDP_HEADER():
             ### TO-DO log termination here (use logging)
             raise ValueError("Error: Incomplete or invalid IP header")
     
-    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[]
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[DNS,QUIC_PACKET,OTHER_PROTOCOL]:
 
         protocol_handlers = {
             54:DNS,
