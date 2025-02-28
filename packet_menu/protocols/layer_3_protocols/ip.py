@@ -44,7 +44,7 @@ class IP_HEADER():
 
         self.parse_ip_header(all_bytes, self.parser)
         remaining_bytes: bytearray = self.get_remaining_bytes_after_ip_header(all_bytes)
-        if not self.parser.check_if_finished_parsing:
+        if not self._parser.check_if_finished_parsing():
             self.create_next_protocol(remaining_bytes,self.parser)
 
     def parse_ip_header(self, all_bytes: bytearray) -> None:

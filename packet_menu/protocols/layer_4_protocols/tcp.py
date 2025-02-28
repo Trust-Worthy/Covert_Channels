@@ -2,7 +2,11 @@ from typing import Union
 
 from cleaning_captures.packet_parser import Packet_parser
 
-
+from application_layer.tls import TLS_Packet
+from application_layer.dns import DNS
+from application_layer.http import HTTP
+from application_layer.https import HTTPS
+from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 class TCP_HEADER():
     def __init__(self,all_bytes: bytes, parser: Packet_parser):
@@ -22,8 +26,14 @@ class TCP_HEADER():
         self._urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
         self._options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
 
+        self._next_protocol_type: bytes = self._dst_port
+        self._next_protocol: Union[TLS_Packet,DNS,HTTP,HTTPS] ### Protocols I'm choosing to capture.
 
-    
+        self.parse_tcp_header(all_bytes, self._parser)
+        remaining_bytes: bytearray = self.get_remaining_bytes_after_tcp_header(all_bytes)
+        if not self._parser.check_if_finished_parsing():
+            self.create_next_protocol(remaining_bytes,self._parser)
+            
     def parse_tcp_header(self, all_bytes: bytes) -> None:
 
         self._source_port = all_bytes[0:2]
@@ -88,9 +98,47 @@ class TCP_HEADER():
         return flag_dict
 
 
-    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union
-# Getters and Setters for all fields
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[HTTP,DNS,TLS_Packet]:
+
+        protocol_handlers = {
+            80: HTTP,
+            443:TLS_Packet,
+            53: DNS,
+        }
     
+
+        dst_port: int = int.from_bytes(self._dst_port,byteorder='big')
+        handler = protocol_handlers.get(dst_port,OTHER_PROTOCOL) ### default to OTHER_PROTOCOL if it's not recognized
+        self._next_protocol = handler(remaining_bytes,parser)
+
+        return self._next_protocol
+    
+
+    # Getters and Setters for all fields
+
+    @property
+    def parser(self) -> Packet_parser:
+        return self._parser
+    @parser.setter
+    def parser(self, value: Packet_parser) -> None:
+        self._parser = value
+
+    @property
+    def next_protocol(self) -> Union[HTTP,DNS,TLS_Packet]:
+        return self._next_protocol
+    
+    @next_protocol.setter
+    def next_protocol(self, value: Union[HTTP,DNS,TLS_Packet]):
+        self._next_protocol = value    
+    
+    @property
+    def next_protocol_type(self) -> bytes:
+        return self._next_protocol_type
+    
+    @next_protocol_type.setter
+    def next_protocol_type(self, value: bytes) -> None:
+        self._next_protocol_type = value
+
     @property
     def source_port(self) -> bytes:
         return self._source_port
