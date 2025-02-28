@@ -22,7 +22,7 @@ unit8 to byte array
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
-import sys
+import time
 
 from packet_menu.cleaning_captures.packet_parser import Packet_parser
 from layer_3_protocols.arp import ARP_PACKET
@@ -55,6 +55,9 @@ class Ethernet_Frame:
     """
     Simple Ethernet Frame class for tracking the ethernet frame data.
     """
+    
+    
+
 
     def __init__(self, timestamp_data: str, all_bytes: bytes):
         """
@@ -64,7 +67,7 @@ class Ethernet_Frame:
             timestamp_data (str): This is the timestamp data from when the packet was captured.
             all_bytes (bytes): All the bytes from the packet capture in hex format following the timestamp in the capture file.
         """
-        
+        self._packet_id: int # way to identify the specific packet
         self._destination_mac: bytes  # Offset: Bytes 0-5 (6 bytes)
         self._source_mac: bytes  # Offset: Bytes 6-11 (6 bytes)
         self._ethernet_type: bytes  # Offset: Bytes 12-13 (2 bytes)
@@ -73,7 +76,7 @@ class Ethernet_Frame:
         self._next_protocol: Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL] = None
         self._parser: Packet_parser = Packet_parser()
         self._parser._packet_type = type(self)
-        
+
         self.parse_str_to_datetime_obj(timestamp_data)
         self.parse_ethernet_frame(all_bytes,self.parser)
         remaining_bytes: bytearray = self.get_remaining_bytes_after_ethernet_frame(all_bytes)
@@ -102,7 +105,7 @@ class Ethernet_Frame:
             to the ethernet framee. 
             parser (Packet_parser): is used to track the offset using its offset "pointer".
         """
-        
+        self._packet_id = self.generate_unique_packet_id()
         self._destination_mac = all_bytes[0:6] ### Set field first! This a very important step.
         self._source_mac = all_bytes[6:12]
         self._ethernet_type = all_bytes[12:14]
@@ -133,7 +136,24 @@ class Ethernet_Frame:
         else:
             self.other_protocol = OTHER_PROTOCOL(remaining_bytes,parser)
 
-    # Getter and setter for next protocol        
+
+    def generate_unique_packet_id() -> int:
+            # Get the current timestamp in seconds
+        timestamp = int(time.time())
+        
+        # Use modulo to ensure it is an 8-digit number
+        packet_id = timestamp % 100000000  # 8 digits
+
+        return packet_id
+    
+
+    # Getter and setter for next protocol    
+    @property
+    def packet_id(self) -> int:
+        return self._packet_id
+    @packet_id.setter
+    def packet_id(self, value: int):
+        self._packet_id = value    
     @property
     def next_protocol(self) -> Union[IP_HEADER,ARP_PACKET,OTHER_PROTOCOL]:
         return self._other_protocol
@@ -192,6 +212,7 @@ class Ethernet_Frame:
 
 
 if __name__ == "__main__":
+    
     eth_frame = Ethernet_Frame()
 
 
