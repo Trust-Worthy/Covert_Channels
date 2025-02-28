@@ -212,7 +212,7 @@ class Ethernet_Frame:
 
 
 if __name__ == "__main__":
-    
+
     eth_frame = Ethernet_Frame()
 
 
