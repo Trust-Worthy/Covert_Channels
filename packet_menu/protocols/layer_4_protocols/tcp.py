@@ -98,8 +98,11 @@ class TCP_HEADER():
             return self._next_protocol
 
         handler = protocol_handlers.get(dst_port) or protocol_handlers.get(src_port) or OTHER_PROTOCOL
+        if type(handler) == DNS:
+            self._next_protocol = handler(remaining_bytes,parser,True)
+            return self._next_protocol
+        
         self._next_protocol = handler(remaining_bytes,parser)
-
         return self._next_protocol
     
     def is_tls(tcp_payload: bytes) -> bool:

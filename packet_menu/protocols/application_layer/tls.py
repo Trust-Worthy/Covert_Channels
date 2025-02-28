@@ -1,6 +1,6 @@
 
 
-class TLS_Packet(TCP_Packet):
+class TLS_Packet():
 
 
     def __init__():
