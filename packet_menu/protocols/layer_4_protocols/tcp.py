@@ -15,7 +15,7 @@ class TCP_SEGMENT():
         self._header_length: bytes  # Offset: Byte 32 (4 bits for data offset)
         self._reserved_bits: bytes
         self._flags: bytes  # Offset: Byte 33 (1 byte, includes flags)
-        self.window_size: bytes  # Offset: Bytes 34-35 (2 bytes)
+        self._window_size: bytes  # Offset: Bytes 34-35 (2 bytes)
         self._checksum: bytes  # Offset: Bytes 36-37 (2 bytes)
         self._urgent_pointer: bytes  # Offset: Bytes 38-39 (2 bytes)
         self._options: bytes  # Offset: Bytes 40-51 (12 bytes, optional)
@@ -27,10 +27,47 @@ class TCP_SEGMENT():
         self._dst_port = all_bytes[2:4]
         self._sequence_number = all_bytes[4:8]
         self._ack_number = all_bytes[8:12]
-        self._header_length = all_bytes[12:13]
-        self._flags = all_bytes[]
+        self._header_length = (all_bytes[12] >> 4) & 0x0F 
+        self._reserved_bits = all_bytes[12] & 0x0F
+        self._flags = all_bytes[13]
+        self._window_size = all_bytes[14:16]
+        self._checksum = all_bytes[16:18]
+        self._urgent_pointer = all_bytes[18:20]
 
-    def extract_tcp_flags(self, flags: bytes) -> 
+        # Calculate options based on header length
+        header_length_bytes = self._header_length * 4  # Convert 4-bit value to bytes
+        if header_length_bytes > 20:  # If options are present
+            self._options = all_bytes[20:header_length_bytes]
+        else:
+            self._options = None  # No options present
+
+
+        self._options = all_bytes[19:31]
+
+        offset: int = 0
+    def extract_tcp_flags(self) -> dict[str,bytes]:
+
+        flag_dict = {
+            "FIN": bytes,
+            "SYN": SYN,
+            "RST": RST,
+            "PSH": PSH,
+            "ACK": ACK,
+            "URG": URG,
+            "ECE": ECE,
+            "CWR": CWR
+        }
+
+        flag_dict["FIN"] = self._flags & 0x01
+        SYN = (self._flags & 0x02) >> 1
+        RST = (self._flags & 0x04) >> 2
+        PSH = (self._flags & 0x08) >> 3
+        ACK = (self._flags & 0x10) >> 4
+        URG = (self._flags & 0x20) >> 5
+        ECE = (self._flags & 0x40) >> 6
+        CWR = (self._flags & 0x80) >> 7
+
+        return flag_dict
 
 # Getters and Setters for all fields
     
