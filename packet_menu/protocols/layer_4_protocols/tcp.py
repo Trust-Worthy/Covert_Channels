@@ -18,7 +18,7 @@ class TCP_HEADER():
         self._dst_port: bytes  # Offset: Bytes 22-23 (2 bytes)
         self._sequence_number: bytes  # Offset: Bytes 24-27 (4 bytes)
         self._ack_number: bytes  # Offset: Bytes 28-31 (4 bytes)
-        self._header_length: bytes  # Offset: Byte 32 (4 bits for data offset)
+        self._header_length: int  # Offset: Byte 32 (4 bits for data offset)
         self._reserved_bits: bytes
         self._flags: bytes  # Offset: Byte 33 (1 byte, includes flags)
         self._window_size: bytes  # Offset: Bytes 34-35 (2 bytes)
@@ -33,7 +33,7 @@ class TCP_HEADER():
         remaining_bytes: bytearray = self.get_remaining_bytes_after_tcp_header(all_bytes)
         if not self._parser.check_if_finished_parsing():
             self.create_next_protocol(remaining_bytes,self._parser)
-            
+
     def parse_tcp_header(self, all_bytes: bytes) -> None:
 
         self._source_port = all_bytes[0:2]
@@ -41,6 +41,7 @@ class TCP_HEADER():
         self._sequence_number = all_bytes[4:8]
         self._ack_number = all_bytes[8:12]
         self._header_length = (all_bytes[12] >> 4) & 0x0F 
+        self._header_length *= 4
         self._reserved_bits = all_bytes[12] & 0x0F
         self._flags = all_bytes[13]
         self._window_size = all_bytes[14:16]
@@ -55,7 +56,7 @@ class TCP_HEADER():
             self._options = all_bytes[20:header_length_bytes]
             offset = header_length_bytes
         else:
-            self._options = None  # No options present
+            self._options = b''  # No options present
 
         self._parser.store_and_track_bytes(offset)
     def get_remaining_bytes_after_tcp_header(self, all_bytes: bytearray) -> bytearray:
@@ -68,7 +69,7 @@ class TCP_HEADER():
             raise ValueError("Error: Incomplete or invalid TCP header")
 
 
-    def extract_tcp_flags(self) -> dict[str,bytes]:
+    def extract_tcp_flags(self) -> dict[str,int]:
         """
         0x01 (00000001)	FIN	Finish: Indicates the sender wants to terminate the connection.
         0x02 (00000010)	SYN	Synchronize: Used to establish a connection (TCP 3-way handshake).
@@ -82,37 +83,46 @@ class TCP_HEADER():
         Returns:
             dict[str,bytes]: _description_
         """
-
-        flag_dict = {
-            "FIN": self._flags & 0x01,
-            "SYN": (self._flags & 0x02) >> 1,
-            "RST": (self._flags & 0x04) >> 2,
-            "PSH": (self._flags & 0x08) >> 3,
-            "ACK": (self._flags & 0x10) >> 4,
-            "URG": (self._flags & 0x20) >> 5,
-            "ECE": (self._flags & 0x40) >> 6,
-            "CWR": (self._flags & 0x80) >> 7
-        }
-
-
-        return flag_dict
+        flag_names = ["FIN", "SYN", "RST", "PSH", "ACK", "URG", "ECE", "CWR"]
+        return {name: (self._flags >> i) & 1 for i, name in enumerate(flag_names)}
 
 
     def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[HTTP,DNS,TLS_Packet]:
 
         protocol_handlers = {
             80: HTTP,
-            443:TLS_Packet,
-            53: DNS,
+            53: DNS
         }
     
 
         dst_port: int = int.from_bytes(self._dst_port,byteorder='big')
-        handler = protocol_handlers.get(dst_port,OTHER_PROTOCOL) ### default to OTHER_PROTOCOL if it's not recognized
+        src_port: int = int.from_bytes(self._source_port,byteorder='big')
+
+        if self.is_tls(remaining_bytes):
+            self._next_protocol = TLS_Packet(remaining_bytes, parser)
+            return self._next_protocol
+
+        handler = protocol_handlers.get(dst_port,OTHER_PROTOCOL) or protocol_handlers.get(src_port,OTHER_PROTOCOL)
         self._next_protocol = handler(remaining_bytes,parser)
 
         return self._next_protocol
     
+    def is_tls(tcp_payload: bytes) -> bool:
+        if len(tcp_payload) < 3:
+            return False  # Not enough bytes for TLS
+
+        content_type = tcp_payload[0]
+        version_major = tcp_payload[1]
+        version_minor = tcp_payload[2]
+
+        VALID_TLS_CONTENT_TYPES = {0x14, 0x15, 0x16, 0x17}
+        VALID_TLS_VERSIONS = {0x01, 0x02, 0x03, 0x04}
+
+        return (
+            content_type in VALID_TLS_CONTENT_TYPES and
+            version_major == 0x03 and
+            version_minor in VALID_TLS_VERSIONS
+        )
 
     # Getters and Setters for all fields
 
@@ -189,11 +199,11 @@ class TCP_HEADER():
 
     @property
     def window_size(self) -> bytes:
-        return self.window_size
+        return self._window_size
     
     @window_size.setter
     def window_size(self, value: bytes):
-        self.window_size = value
+        self._window_size = value
 
     @property
     def checksum(self) -> bytes:
