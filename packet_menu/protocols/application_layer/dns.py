@@ -71,6 +71,10 @@ class DNS:
         ### Transport (not part of DNS spec, but necessary for parsing context)
         self._over_tcp: bool = over_tcp # Indicates if the DNS packet was received over TCP instead of UDP
         self._has_extra_bytes:bool = False
+        self._remaining_bytes: bytearray
+
+        self.parse_dns_message(all_bytes)
+
 
     def parse_dns_message(self,all_bytes:bytearray) -> None:
         """
@@ -107,6 +111,9 @@ class DNS:
 
 
         self._parser.store_and_track_bytes(offset)
+        if not self._parser.check_if_finished_parsing():
+            self._has_extra_bytes = True
+            self.get_remaining_bytes_after_dns()
 
     def parse_dns_questions_section(self, all_bytes: bytearray, offset:int) -> int:
         # Question Section
@@ -169,14 +176,11 @@ class DNS:
     def get_remaining_bytes_after_dns(self, all_bytes:bytearray, offset) -> bytearray:
 
         
-        if self._parser.check_if_finished_parsing:
-            remaining_bytes: bytearray = all_bytes[self._parser.offset_pointer:]
-            self._has_extra_bytes = True
-            return remaining_bytes
-        else:
-            ### TO-DO log termination here (use logging)
-            return 0
 
+        remaining_bytes: bytearray = all_bytes[self._parser.offset_pointer:]
+        
+        return remaining_bytes
+        
     def is_over_tcp(dns_packet_bytes: bytes) -> bool:
         # Check for a 2-byte length prefix (common in TCP DNS)
         return len(dns_packet_bytes) >= 2 and int.from_bytes(dns_packet_bytes[:2], 'big') == len(dns_packet_bytes[2:])
