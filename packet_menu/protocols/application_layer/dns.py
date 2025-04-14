@@ -23,6 +23,7 @@ class DNSResourceRecord:
     class_: int
     ttl: int
     data: bytes 
+
 class DNS:  
     def __init__(self, all_bytes: bytes, parser:Packet_parser, over_tcp: bool = False):
         
@@ -118,7 +119,7 @@ class DNS:
         for _ in range(self._qdcount):
             domain_name, qtype, qclass = self._parse_question(all_bytes[offset:])
             self._queries.append(DNSQuery(domain_name, qtype, qclass))
-            domain_len, _ = self._parse_domain_name(all_bytes[offset:])
+            _, domain_len = self._parse_domain_name(all_bytes[offset:])
             offset += domain_len + 4  # domain name + type (2) + class (2)
            
         return offset
@@ -130,11 +131,13 @@ class DNS:
         self._answers = []
 
         '''CONTINUE HERE'''
-         # Parse answer section
+            # Parse answer section
         for _ in range(self._ancount):
             rr_name, rr_type, rr_class, rr_ttl,rdlength, rr_data = self._parse_resource_record(all_bytes[offset:])
             self._answers.append(DNSResourceRecord(rr_name, rr_type, rr_class, rr_ttl, rr_data))
-            offset += len(rr_name) + 10 + rdlength # move past the name (variable length) + type (2 bytes) + class (2 bytes) + TTL (4 bytes) + data
+            _, consumed = self._parse_domain_name(all_bytes[offset:])
+            offset += consumed + 10 + rdlength
+            
         
         return offset
     def parse_dns_authority_section(self, all_bytes:bytearray, offset) -> int:
@@ -146,20 +149,22 @@ class DNS:
         for _ in range(self._nscount):
             ns_name, ns_type, ns_class, ns_ttl, rdlength, ns_data = self._parse_resource_record(all_bytes[offset:])
             self._authoritative_nameservers.append(DNSResourceRecord(ns_name, ns_type, ns_class, ns_ttl, ns_data))
-            offset += len(ns_name) + 10 + rdlength
+            _, consumed = self._parse_domain_name(all_bytes[offset:])
+            offset += consumed + 10 + rdlength
 
         return offset
     def parse_dns_additional_section(self, all_bytes:bytearray, offset) -> int:
 
         # Additional Section
-        self._additional_rr = all_bytes[offset: offset + self._arcount * 12]  # Additional section bytes
+        #self._additional_rr = all_bytes[offset: offset + self._arcount * 12]  # Additional section bytes
         self._additional_records = []
 
         # Parse additional section (records like A, AAAA, OPT)
         for _ in range(self._arcount):
             add_name, add_type, add_class, add_ttl, rdlength, add_data = self._parse_resource_record(all_bytes[offset:])
             self._additional_records.append(DNSResourceRecord(add_name, add_type, add_class, add_ttl, add_data))
-            offset += len(add_name) + 10 + rdlength
+            _, consumed = self._parse_domain_name(all_bytes[offset:])
+            offset += consumed + 10 + rdlength
         return offset
     def get_remaining_bytes_after_dns(self, all_bytes:bytearray, offset) -> int:
         pass
