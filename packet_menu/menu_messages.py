@@ -71,11 +71,12 @@ def get_name_of_capture() -> str:
     capture_main(capture_name, desired_interface,num_packets)
 
 def print_help_message()->None:
-    print("You asked for help")
-    print("The viable options are listed below")
+    print("You asked for help.")
+    print("The viable options are listed below.")
     print_menu_options()
 
-
+def print_clean_packets_options()->None:
+    pass
 
 def exit_program()->None:
     print("exiting program...")
