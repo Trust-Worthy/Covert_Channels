@@ -25,15 +25,16 @@ class Packet_parser:
         self._packet_data_bytes: bytearray  # Full packet data in bytes
         self._packet_data_np_arr: np.ndarray  # Full packet data as a NumPy array
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
+        
         self._packet_type: Union[
             arp.ARP_PACKET,
             icmp.ICMP_MESSAGE,
             ip.IP_HEADER,
-            tcp.TCP_SEGMENT,
-            udp.UDP_DATAGRAM,
-            http.HTTP_Packet,
+            tcp.TCP_HEADER,
+            udp.UDP_HEADER,
+            http.HTTP,
             dns.DNS,
-            quic.QUIC,
+            quic.QUIC_PACKET,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]
 
@@ -81,11 +82,11 @@ class Packet_parser:
             arp.ARP_PACKET,
             icmp.ICMP_MESSAGE,
             ip.IP_HEADER,
-            tcp.TCP_SEGMENT,
-            udp.UDP_DATAGRAM,
-            http.HTTP_Packet,
+            tcp.TCP_HEADER,
+            udp.UDP_HEADER,
+            http.HTTP,
             dns.DNS,
-            quic.QUIC,
+            quic.QUIC_PACKET,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]:
 
@@ -96,15 +97,16 @@ class Packet_parser:
             arp.ARP_PACKET,
             icmp.ICMP_MESSAGE,
             ip.IP_HEADER,
-            tcp.TCP_SEGMENT,
-            udp.UDP_DATAGRAM,
-            http.HTTP_Packet,
+            tcp.TCP_HEADER,
+            udp.UDP_HEADER,
+            http.HTTP,
             dns.DNS,
-            quic.QUIC,
+            quic.QUIC_PACKET,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]):
         
         ### keeps track of the changes in the packet type
+        ### This is really smart actually. Forgot I did this.
         logging.info(f"Transitioning from {self._packet_type} to {value}")
         self._packet_type = value
 

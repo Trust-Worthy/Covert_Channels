@@ -1,9 +1,12 @@
 
-
+from cleaning_captures.packet_parser import Packet_parser
 
 class DNS:  
-    def __init__(self, all_bytes: bytes, over_tcp: bool = False):
+    def __init__(self, all_bytes: bytes, parser:Packet_parser, over_tcp: bool = False):
         
+        ## Pass on the parser to the next protocol
+        self._parser: Packet_parser = parser
+        self._parser._packet_type = type(self)
         
         ### depending on the size 
         self._over_tcp: bool = over_tcp
