@@ -71,9 +71,13 @@ class UDP_HEADER():
 
         if dst_port == 443 and self.is_quic(remaining_bytes):
             self._next_protocol = QUIC_PACKET(remaining_bytes, parser)
+            return self._next_protocol
         else:
             handler = protocol_handlers.get(dst_port) or protocol_handlers.get(src_port) or OTHER_PROTOCOL
-            self._next_protocol = handler(remaining_bytes, parser)
+
+            if type(handler) == DNS:
+                self._next_protocol = handler(remaining_bytes,parser,False)
+                return self._next_protocol
 
 
         handler = protocol_handlers.get(dst_port) or protocol_handlers.get(src_port) or OTHER_PROTOCOL

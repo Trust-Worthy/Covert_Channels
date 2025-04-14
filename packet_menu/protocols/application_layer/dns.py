@@ -57,7 +57,7 @@ class DNS:
 
         ### Answer Section (variable length, repeats ancount times)
         self._answer_rr: bytes   # Raw bytes of answer section
-        self._answers: list[d# Parsed list of resource records
+        self._answers: list[DNSResourceRecord]    # Parsed list of resource records
 
         ### Authority Section (variable length, repeats nscount times)
         self._authority_rr: bytes                    # Raw authority section bytes
@@ -68,13 +68,20 @@ class DNS:
         self._additional_records: bytes  # Parsed list of additional records (OPT, A, etc.)
 
         ### Transport (not part of DNS spec, but necessary for parsing context)
-        self._over_tcp: bool  # Indicates if the DNS packet was received over TCP instead of UDP
+        self._over_tcp: bool = over_tcp # Indicates if the DNS packet was received over TCP instead of UDP
 
 
-    def parse_dns_query():
-        pass
+    def parse_dns_packet():
+        """
+        DNS has a variable number of bytes. This function accurately parses the DNS info according to 
+        """
     def get_remaining_bytes_after_dns():
         pass
+
+    def is_over_tcp(dns_packet_bytes: bytes) -> bool:
+        # Check for a 2-byte length prefix (common in TCP DNS)
+        return len(dns_packet_bytes) >= 2 and int.from_bytes(dns_packet_bytes[:2], 'big') == len(dns_packet_bytes[2:])
+
 
 
 
