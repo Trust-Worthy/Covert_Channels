@@ -226,98 +226,130 @@ class DNS:
         return '.'.join(labels), (jump_offset if jumped else offset)
 
 
-    @property
-    def over_tcp(self) -> bool:
-        return self._over_tcp
-
-    @over_tcp.setter
-    def over_tcp(self, value: bool):
-        self._over_tcp = value
+     # --- Flags ---
 
     @property
-    def is_query(self) -> bool:
-        return self._is_query
-
-    @is_query.setter
-    def is_query(self, value: bool):
-        self._is_query = value
-
-    @property
-    def transaction_id(self) -> bytes:
-        return self._transaction_id
-
-    @transaction_id.setter
-    def transaction_id(self, value: bytes):
-        self._transaction_id = value
-
-    @property
-    def flags(self) -> bytes:
-        return self._flags
-
+    def flags(self) -> bytes: return self._flags
     @flags.setter
-    def flags(self, value: bytes):
-        self._flags = value
+    def flags(self, value: bytes) -> None: self._flags = value
 
     @property
-    def questions(self) -> bytes:
-        return self._questions
+    def is_query(self) -> bool: return self._is_query
+    @is_query.setter
+    def is_query(self, value: bool) -> None: self._is_query = value
 
+    @property
+    def opcode(self) -> int: return self._opcode
+    @opcode.setter
+    def opcode(self, value: int) -> None: self._opcode = value
+
+    @property
+    def aa(self) -> bool: return self._aa
+    @aa.setter
+    def aa(self, value: bool) -> None: self._aa = value
+
+    @property
+    def tc(self) -> bool: return self._tc
+    @tc.setter
+    def tc(self, value: bool) -> None: self._tc = value
+
+    @property
+    def rd(self) -> bool: return self._rd
+    @rd.setter
+    def rd(self, value: bool) -> None: self._rd = value
+
+    @property
+    def ra(self) -> bool: return self._ra
+    @ra.setter
+    def ra(self, value: bool) -> None: self._ra = value
+
+    @property
+    def rcode(self) -> int: return self._rcode
+    @rcode.setter
+    def rcode(self, value: int) -> None: self._rcode = value
+
+    # --- Counts ---
+
+    @property
+    def qdcount(self) -> int: return self._qdcount
+    @qdcount.setter
+    def qdcount(self, value: int) -> None: self._qdcount = value
+
+    @property
+    def ancount(self) -> int: return self._ancount
+    @ancount.setter
+    def ancount(self, value: int) -> None: self._ancount = value
+
+    @property
+    def nscount(self) -> int: return self._nscount
+    @nscount.setter
+    def nscount(self, value: int) -> None: self._nscount = value
+
+    @property
+    def arcount(self) -> int: return self._arcount
+    @arcount.setter
+    def arcount(self, value: int) -> None: self._arcount = value
+
+    # --- Question Section ---
+
+    @property
+    def questions(self) -> bytes: return self._questions
     @questions.setter
-    def questions(self, value: bytes):
-        self._questions = value
+    def questions(self, value: bytes) -> None: self._questions = value
 
     @property
-    def answer_rr(self) -> bytes:
-        return self._answer_rr
-
-    @answer_rr.setter
-    def answer_rr(self, value: bytes):
-        self._answer_rr = value
-
-    @property
-    def authority_rr(self) -> bytes:
-        return self._authority_rr
-
-    @authority_rr.setter
-    def authority_rr(self, value: bytes):
-        self._authority_rr = value
-
-    @property
-    def additional_rr(self) -> bytes:
-        return self._additional_rr
-
-    @additional_rr.setter
-    def additional_rr(self, value: bytes):
-        self._additional_rr = value
-
-    @property
-    def queries(self) -> bytes:
-        return self._queries
-
+    def queries(self) -> list['DNSQuery']: return self._queries
     @queries.setter
-    def queries(self, value: bytes):
-        self._queries = value
+    def queries(self, value: list['DNSQuery']) -> None: self._queries = value
+
+    # --- Answer Section ---
 
     @property
-    def answers(self) -> bytes:
-        return self._answers
+    def answer_rr(self) -> bytes: return self._answer_rr
+    @answer_rr.setter
+    def answer_rr(self, value: bytes) -> None: self._answer_rr = value
 
+    @property
+    def answers(self) -> list['DNSResourceRecord']: return self._answers
     @answers.setter
-    def answers(self, value: bytes):
-        self._answers = value
+    def answers(self, value: list['DNSResourceRecord']) -> None: self._answers = value
+
+    # --- Authority Section ---
 
     @property
-    def authoritative_nameservers(self) -> bytes:
-        return self._authoritative_nameservers
+    def authority_rr(self) -> bytes: return self._authority_rr
+    @authority_rr.setter
+    def authority_rr(self, value: bytes) -> None: self._authority_rr = value
 
+    @property
+    def authoritative_nameservers(self) -> list['DNSResourceRecord']:
+        return self._authoritative_nameservers
     @authoritative_nameservers.setter
-    def authoritative_nameservers(self, value: bytes):
+    def authoritative_nameservers(self, value: list['DNSResourceRecord']) -> None:
         self._authoritative_nameservers = value
 
-    @property
-    def additional_records(self) -> bytes:
-        return self._additional_records
+    # --- Additional Section ---
 
+    @property
+    def additional_rr(self) -> bytes: return self._additional_rr
+    @additional_rr.setter
+    def additional_rr(self, value: bytes) -> None: self._additional_rr = value
+
+    @property
+    def additional_records(self) -> list['DNSResourceRecord']:
+        return self._additional_records
     @additional_records.setter
-    def additional_records(self, value: bytes):
+    def additional_records(self, value: list['DNSResourceRecord']) -> None:
         self._additional_records = value
+
+    # --- Transport Info ---
+
+    @property
+    def over_tcp(self) -> bool: return self._over_tcp
+    @over_tcp.setter
+    def over_tcp(self, value: bool) -> None: self._over_tcp = value
+
+    @property
+    def has_extra_bytes(self) -> bool: return self._has_extra_bytes
+    @has_extra_bytes.setter
+    def has_extra_bytes(self, value: bool) -> None: self._has_extra_bytes = value

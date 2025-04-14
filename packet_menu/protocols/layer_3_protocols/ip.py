@@ -117,7 +117,7 @@ class IP_HEADER():
     def next_protocol(self) -> bytes:
         return self._next_protocol
     @next_protocol.setter
-    def next_protocol(self, value: Union[TCP_HEADER,UDP_DATAGRAM,ICMP_MESSAGE]):
+    def next_protocol(self, value: Union[TCP_HEADER,UDP_HEADER,ICMP_MESSAGE]):
         self._next_protocol = value
 
     @property
