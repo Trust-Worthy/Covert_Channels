@@ -63,7 +63,7 @@ class Packet_parser:
     def check_if_finished_parsing(self)-> bool:
         """
         This function checks if the offset_pointer and total_bytes_read fields
-        match the length of all the bytes that need to be processe.
+        match the length of all the bytes that need to be processed.
 
         Final state: total_bytes_read should equal the length of the packet_data_bytes
                      offset_pointer shoud equal the length of the pacaket_data_byes minus 1 (bc of list indexing)
