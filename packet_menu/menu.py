@@ -21,8 +21,6 @@ other
 Author: Trust-Worthy
 
 """
-import os
-
 
 
 from typing import Tuple, Union
@@ -30,14 +28,11 @@ from typing import Tuple, Union
 from pathlib import Path
 from capture_data.capture import capture_packets
 
-PREV_CAPTURES = set()
+def get_existing_captures() -> set[str]:
+    directory_path = Path("../captured_packets")
+    file_names = {f.name for f in directory_path.iterdir() if f.is_file()}
 
-
-
-
-
-
-    
+    return file_names
 
     
    

@@ -5,24 +5,23 @@ from configuration.system_config import print_interfaces
 
 def welcome_message()-> None:
     print("_____________________________")
-    print("_____________________________")
-    print("_____________________________")
-    print("Welcome to the Packet Menu. Select an option to get started or type Help")
+    print("Welcome to C^3 (Covert Channel Capture).\nSelect an option to get started or type Help.")
     print("")
 
 
-def print_capture_options() -> dict[str,str]:
+def print_interface_options() -> dict[str,str]:
+    print("_____________________________")
     print("Capture Options")
-    print("Please select an interface to capture network traffic on")
-    print("_____________________________")
-    print("_____________________________")
+    print("Please select an interface to capture network traffic on.")
 
+    
     user_interfaces: dict = get_network_interfaces()
+    print("_____________________________")
     print_interfaces(user_interfaces)
 
     return user_interfaces
 
-def get_user_interface_choice(user_interfaces: dict[str,str]) -> None:
+def get_user_interface_choice(user_interfaces: dict[str,str]) -> str:
     
    
     while True:
@@ -38,7 +37,7 @@ def get_user_interface_choice(user_interfaces: dict[str,str]) -> None:
     
     return desired_interface
 
-def get_num_user_packets()->int:
+def get_num_packets_to_capture()->int:
 
     while True:
         try:
@@ -59,10 +58,10 @@ def get_num_user_packets()->int:
             print("Incorrect type entered. Please enter integer number of packets.\n")
              # Use continue to retry the loop without returning to the function
             continue
+
 def get_name_of_capture() -> str:
     message: str = "Please give a name for your capture."
     capture_name: str = input(f"{message}\n==> ")
-    num_packets: int = get_num_user_packets()
     
     while capture_name in PREV_CAPTURES:
         print("Name of capture has already been used. Please enter a different name.")
