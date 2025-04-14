@@ -34,7 +34,7 @@ class Packet_parser:
             udp.UDP_HEADER,
             http.HTTP,
             dns.DNS,
-            quic.QUIC_PACKET,
+            quic.QUIC_HEADER,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]
 

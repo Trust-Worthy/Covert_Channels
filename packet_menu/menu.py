@@ -23,12 +23,12 @@ Author: Trust-Worthy
 """
 import os
 
-from packet_menu.configuration.system_config import get_network_interfaces
-from packet_menu.configuration.system_config import print_interfaces
+from configuration.system_config import get_network_interfaces
+from configuration.system_config import print_interfaces
 from typing import Tuple, Union
-from packet_menu.metrics.packet_stats import parse_packet_file
+
 from pathlib import Path
-from packet_menu.capture_data.capture import capture_main
+from capture_data.capture import capture_main
 
 PREV_CAPTURES = set()
 
@@ -138,10 +138,10 @@ def print_menu_options()->str:
     #capture
         # What type of packet do you want to capture?
     print("Menu Options")
-    print("Option A: Capture -> Displays options for capturing packets")
-    print("Option B: Clean Packets -> Displays options for cleaning a file with packets previously captured")
-    print("Option C: Packet Stats -> Displays options for doing statistics on packets previously captured")
-    print("Option D: Full Analysis -> Displays options for Capturing packet, cleaning the packets, and then doing statistics on the packets")
+    print("1: Capture -> Displays options for capturing packets")
+    print("2: Clean Packets -> Displays options for cleaning a file with packets previously captured")
+    print("3: Packet Stats -> Displays options for doing statistics on packets previously captured")
+    print("4: Full Analysis -> Displays options for Capturing packet, cleaning the packets, and then doing statistics on the packets")
     print("Help: Displays the help menu")
     print("Exit: Exit program and terminate.\n")
     
@@ -150,12 +150,13 @@ def print_menu_options()->str:
     process_user_input(option=user_option)
 
 def process_user_input(*,option: str)->None:
-    option = option.lower()
+    
+    option = option.strip().lower()
     option_dict = {
-        "option a":capture_options, # returns a tuple
-        "option b":print_clean_packets_options,
-        "option c":print_packet_stats_options,
-        "option d":print_full_analysis_options,
+        "1":capture_options, # returns a tuple
+        "2":print_clean_packets_options,
+        "3":print_packet_stats_options,
+        "4":print_full_analysis_options,
         "help":print_help_message,
         "exit":exit_program,
     }

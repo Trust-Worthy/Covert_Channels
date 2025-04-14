@@ -39,19 +39,13 @@ def get_network_interfaces() -> dict[str,str]:
 
 def format_interfaces(interfaces: list[str]) -> dict[str,str]:
     interface_dict = {} 
-    print()
+    
+    
     
     # Loop through the list and process each entry
-    for interface in interfaces:
-        # Use regex to capture the interface number, name, and status
-        match = re.match(r'(\d+)\.(\S+) \[(.*)\]', interface)
-        if match:
-            name = match.group(2)
-            status = match.group(3)
-
-            # Add the interface name as the key and the status as the value in the dictionary
-            interface_dict[name] = status
-
+    for i, interface in enumerate(interfaces):
+        stripped_interface = re.sub(r'^[^.]*\.', '', interface)
+        interface_dict[str(i)] = stripped_interface
    
     return interface_dict
     
