@@ -71,11 +71,88 @@ class DNS:
         self._over_tcp: bool = over_tcp # Indicates if the DNS packet was received over TCP instead of UDP
 
 
-    def parse_dns_packet():
+    def parse_dns_message(self,all_bytes:bytearray) -> None:
         """
         DNS has a variable number of bytes. This function accurately parses the DNS info according to 
         """
-    def get_remaining_bytes_after_dns():
+
+        self._transaction_id = all_bytes[:2]
+        self._flags = all_bytes[2:4]
+        flags_hi = self._flags[0]  # high byte
+        flags_lo = self._flags[1]  # low byte
+
+        self._is_query = bool(flags_hi & 0b10000000)  # 1st bit: QR
+        self._opcode = (flags_hi & 0b01111000) >> 3
+        self._aa = bool(flags_hi & 0b00000100)           # Bit 2
+        self._tc = bool(flags_hi & 0b00000010)           # Bit 1
+        self._rd = bool(flags_hi & 0b00000001)           # Bit 0
+
+        self._ra = bool(flags_lo & 0b10000000)           # Bit 7
+        self._rcode = flags_lo & 0b00001111              # Bits 3-0
+        
+        self._qdcount = int.from_bytes(all_bytes[4:6], 'big')
+        self._ancount = int.from_bytes(all_bytes[6:8], 'big')
+        self._nscount = int.from_bytes(all_bytes[8:10], 'big')
+        self._arcount = int.from_bytes(all_bytes[10:12], 'big')
+
+        ### guaranteed to be 12 bytes before question section.
+
+        offset: int = 12 
+
+        offset = self.parse_dns_questions_section(all_bytes, offset)
+        self.parse_dns_answer_section(all_bytes,offset)
+
+
+        self._parser.store_and_track_bytes(offset)
+    def parse_dns_questions_section(self, all_bytes: bytearray, offset:int) -> int:
+        # Question Section
+
+        self._questions = all_bytes[12:12 + self._qdcount * 4]  # Question section bytes (each question is at least 4 bytes)
+        self._queries = []
+        
+        # Example parsing of domain name, type, and class for each question
+
+        for _ in range(self._qdcount):
+            domain_name, qtype, qclass = self._parse_question(all_bytes[offset:])
+            self._queries.append(DNSQuery(domain_name, qtype, qclass))
+            offset += len(domain_name) + 4  # move past domain name (variable length) + type (2 bytes) + class (2 bytes)
+        return offset
+
+    def parse_dns_answer_section(self, all_bytes:bytearray, offset) -> int:
+         # Answer Section
+        self._answer_rr = all_bytes[12 + self._qdcount * 4: 12 + self._qdcount * 4 + self._ancount * 12]  # Answer section bytes
+        self._answers = []
+
+         # Parse answer section
+        pos = 12 + self._qdcount * 4
+        for _ in range(self._ancount):
+            rr_name, rr_type, rr_class, rr_ttl, rr_data = self._parse_resource_record(all_bytes[pos:])
+            self._answers.append(DNSResourceRecord(rr_name, rr_type, rr_class, rr_ttl, rr_data))
+            pos += len(rr_name) + 10  # move past the name (variable length) + type (2 bytes) + class (2 bytes) + TTL (4 bytes) + data
+        
+    def parse_dns_authority_section(self, all_bytes:bytearray, offset) -> int:
+        # Authority Section
+        self._authority_rr = all_bytes[pos: pos + self._nscount * 12]  # Authority section bytes
+        self._authoritative_nameservers = []
+
+        # Parse authority section (NS records)
+        for _ in range(self._nscount):
+            ns_name, ns_type, ns_class, ns_ttl, ns_data = self._parse_resource_record(all_bytes[pos:])
+            self._authoritative_nameservers.append(DNSResourceRecord(ns_name, ns_type, ns_class, ns_ttl, ns_data))
+            pos += len(ns_name) + 10
+    def parse_dns_additional_section(self, all_bytes:bytearray, offset) -> int:
+
+        # Additional Section
+        self._additional_rr = all_bytes[pos: pos + self._arcount * 12]  # Additional section bytes
+        self._additional_records = []
+
+        # Parse additional section (records like A, AAAA, OPT)
+        for _ in range(self._arcount):
+            add_name, add_type, add_class, add_ttl, add_data = self._parse_resource_record(all_bytes[pos:])
+            self._additional_records.append(DNSResourceRecord(add_name, add_type, add_class, add_ttl, add_data))
+            pos += len(add_name) + 10
+            
+    def get_remaining_bytes_after_dns(self, all_bytes:bytearray, offset) -> int:
         pass
 
     def is_over_tcp(dns_packet_bytes: bytes) -> bool:
