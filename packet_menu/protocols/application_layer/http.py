@@ -1,5 +1,6 @@
 
 from layer_4_protocols.tcp import TCP_SEGMENT
+from typing import Optional, Dict
 
 
 class HTTP(TCP_SEGMENT): ### This makes sense to use inheritance!!!
