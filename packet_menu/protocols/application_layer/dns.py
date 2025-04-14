@@ -17,6 +17,12 @@ class DNSQuery(NamedTuple):
     qtype: int     # 1 = A, 28 = AAAA, etc.
     qclass: int    # 1 = IN (Internet)
 
+class DNSResourceRecord:
+    name: str
+    type: int
+    class_: int
+    ttl: int
+    data: bytes 
 class DNS:  
     def __init__(self, all_bytes: bytes, parser:Packet_parser, over_tcp: bool = False):
         
@@ -51,7 +57,7 @@ class DNS:
 
         ### Answer Section (variable length, repeats ancount times)
         self._answer_rr: bytes   # Raw bytes of answer section
-        self._answers: bytes     # Parsed list of resource records
+        self._answers: list[d# Parsed list of resource records
 
         ### Authority Section (variable length, repeats nscount times)
         self._authority_rr: bytes                    # Raw authority section bytes
