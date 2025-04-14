@@ -3,11 +3,10 @@ from layer_4_protocols.tcp import TCP_SEGMENT
 from typing import Optional, Dict
 
 
-class HTTP(TCP_SEGMENT): ### This makes sense to use inheritance!!!
+from typing import Optional, Dict
+
+class HTTP:
     def __init__(self, raw_data: bytes):
-        super.__init__()
-
-
         self.is_request: Optional[bool] = None  # True if request, False if response
         self.method: Optional[bytes] = None  # Only for requests
         self.request_uri: Optional[bytes] = None  # Only for requests
@@ -18,7 +17,6 @@ class HTTP(TCP_SEGMENT): ### This makes sense to use inheritance!!!
         
         self.headers: Dict[bytes, bytes] = {}  # Headers dictionary
         self.body: Optional[bytes] = None  # Optional body
-        
         
         self.parse(raw_data)  # Parse the raw HTTP data when an instance is created
 
@@ -56,3 +54,29 @@ class HTTP(TCP_SEGMENT): ### This makes sense to use inheritance!!!
         
         # Store body
         self.body = body_section
+
+    @property
+    def get_method(self) -> Optional[bytes]:
+        return self.method
+
+    @property
+    def get_request_uri(self) -> Optional[bytes]:
+        return self.request_uri
+
+    @property
+    def get_status_code(self) -> Optional[bytes]:
+        return self.status_code
+
+    @property
+    def get_status_message(self) -> Optional[bytes]:
+        return self.status_message
+
+    @property
+    def get_headers(self) -> Dict[bytes, bytes]:
+        return self.headers
+
+    @property
+    def get_body(self) -> Optional[bytes]:
+        return self.body
+
+

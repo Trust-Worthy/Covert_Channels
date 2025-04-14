@@ -1,36 +1,32 @@
 from typing import Optional
 import numpy as np
 
-class TLS_Packet():
+from typing import Optional
+import numpy as np
 
-
-    def __init__():
-        tls_record_data: Optional[bytes] = None
-        handshake_type: Optional[bytes] = None  # Offset: Byte 5 (1 byte)
-        handshake_length: Optional[bytes] = None  # Offset: Bytes 6-9 (4 bytes)
+class TLS_Packet:
+    def __init__(self):
+        self.tls_record_data: Optional[bytes] = None
+        self.handshake_type: Optional[bytes] = None  # Offset: Byte 5 (1 byte)
+        self.handshake_length: Optional[bytes] = None  # Offset: Bytes 6-9 (4 bytes)
         
-        client_hello_version: Optional[bytes] = None  # Offset: Bytes 10-11 (2 bytes, TLS 1.2 only)
-        random_bytes: Optional[bytes] = None  # Offset: Bytes 12-43 (32 bytes, TLS 1.2 only)
-        session_id_length: Optional[bytes] = None  # Offset: Byte 44 (1 byte, TLS 1.2 only)
-        session_id: Optional[bytes] = None
-        cipher_suites_length: Optional[bytes] = None
-        cipher_suites: Optional[bytes] = None
-        compression_methods_length: Optional[bytes] = None
-        compression_methods: Optional[bytes] = None
-        extensions_length: Optional[bytes] = None
-        extensions: Optional[bytes] = None
+        self.client_hello_version: Optional[bytes] = None  # Offset: Bytes 10-11 (2 bytes, TLS 1.2 only)
+        self.random_bytes: Optional[bytes] = None  # Offset: Bytes 12-43 (32 bytes, TLS 1.2 only)
+        self.session_id_length: Optional[bytes] = None  # Offset: Byte 44 (1 byte, TLS 1.2 only)
+        self.session_id: Optional[bytes] = None
+        self.cipher_suites_length: Optional[bytes] = None
+        self.cipher_suites: Optional[bytes] = None
+        self.compression_methods_length: Optional[bytes] = None
+        self.compression_methods: Optional[bytes] = None
+        self.extensions_length: Optional[bytes] = None
+        self.extensions: Optional[bytes] = None
         
-        tls_13_record_data: Optional[bytes] = None
-        encrypted_application_data: Optional[bytes] = None
+        self.tls_13_record_data: Optional[bytes] = None
+        self.encrypted_application_data: Optional[bytes] = None
 
-    
-
-   
+    @classmethod
     def from_bytes(cls, data: bytes) -> "TLS_Packet":
-        tls_packet = cls(
-            packet_data_byte=data,
-            packet_data_np_arr=np.frombuffer(data, dtype=np.uint8)
-        )
+        tls_packet = cls()
         tls_packet.parse_tls(data)
         return tls_packet
 
@@ -64,3 +60,15 @@ class TLS_Packet():
     def _parse_tls_1_3(self, data: bytes):
         self.tls_13_record_data = data[5:]  # Capture full record data for TLS 1.3
         self.encrypted_application_data = data[5:]  # Since everything after handshake is encrypted
+
+    @property
+    def get_tls_record_data(self) -> Optional[bytes]:
+        return self.tls_record_data
+
+    @property
+    def get_handshake_type(self) -> Optional[bytes]:
+        return self.handshake_type
+
+    @property
+    def get_encrypted_application_data(self) -> Optional[bytes]:
+        return self.encrypted_application_data
