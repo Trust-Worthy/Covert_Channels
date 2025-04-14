@@ -28,7 +28,7 @@ import os
 from typing import Tuple, Union
 
 from pathlib import Path
-from capture_data.capture import capture_main
+from capture_data.capture import capture_packets
 
 PREV_CAPTURES = set()
 
@@ -36,36 +36,20 @@ PREV_CAPTURES = set()
 
 
 
-def capture_options()->Tuple[str,int]: 
-    
 
     
-    p
-def get_num_user_packets()->int:
-    print("Please specify a certian number of packets to capture\n")
 
-    while True:
-        try:
-            # Prompt the user for input
-            # Edit: I am only supposed to be getting the number of packets. Not a specific type of packet.
-            quantity:int = int(input("Format: -->'# of packets' ex. -->10\n--> "))
+    
+   
 
-            if quantity <= 0:
-                print("The number of packets must be a positive integer.\n")
-                continue  # Retry the loop if the number is not positive
-
-            return quantity
-        except ValueError:
-            # If an error occurs (e.g., wrong format or non-integer input)
-            print("Incorrect type entered. Please enter integer number of packets.\n")
-             # Use continue to retry the loop without returning to the function
-            continue
 
 def print_clean_packets_options()->None:
     return None
-def exit_program()->None:
-    print("exiting program...")
-    exit()
+
+
+
+
+
 def print_packet_stats_options()->None:
     path = Path('captured_packets')
 

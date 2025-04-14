@@ -97,14 +97,10 @@ def execute_commands(command_1:list[str],command_2:list[str],pcap_file:str,outpu
             print(f"An error occurred: {e}")
 
         
-def capture_main(capture_name:str,desired_interface:str,num_packets:int)->None:
-    from menu import print_menu_options
+def capture_packets(capture_name:str,desired_interface:str,num_packets:int)->None:
     command_1,command_2,pcap_file,output_txt = construct_commands(capture_name,desired_interface,num_packets)
 
     execute_commands(command_1,command_2,pcap_file,output_txt)
-    print()
-    print()
-    print_menu_options()
 
 
 def main()->None:
