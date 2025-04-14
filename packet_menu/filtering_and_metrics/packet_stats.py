@@ -11,7 +11,7 @@ packet_patterns = {
 }
 
 def parse_packet_file(file_path):
-    from menu import print_menu_options
+    from packet_menu.menu_input import print_menu_options
     packet_counts = defaultdict(int)
     total_packets = 0
 

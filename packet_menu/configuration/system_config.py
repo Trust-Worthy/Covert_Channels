@@ -36,14 +36,11 @@ def format_interfaces(interfaces: list[str]) -> dict[str,str]:
    
     return interface_dict
     
-def print_interfaces(interfaces: dict[str,str])->None:
-   # Print the resulting dictionary in the format: key: value
-    for key, value in interfaces.items():
-        print(f'{key}: {value}')
+
 
 
 
 if __name__ == "__main__":
-   print_interfaces(get_network_interfaces())
+   print_available_interfaces(get_network_interfaces())
 
 

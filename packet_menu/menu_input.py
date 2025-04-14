@@ -27,7 +27,7 @@ from typing import Tuple, Union
 
 from pathlib import Path
 from capture_data.capture import capture_packets
-from menu_messages import get_user_interface_choice, get_num_packets_to_capture, get_name_of_capture, print_interface_options
+from packet_menu.menu_output import print_available_interfaces
 
 def get_existing_captures() -> set[str]:
     print("Finding existing captures...")
@@ -49,44 +49,57 @@ def run_capture():
 
     capture_packets(name_of_capture,user_interface_choice,num_packets_to_capture)
 
-def print_packet_stats_options()->None:
-    path = Path('captured_packets')
+def get_user_interface_choice(user_interfaces: dict[str,str]) -> str:
+    
+   
+    while True:
+        desired_interface: str = input("==> ")
 
-    # Gather all .txt files in the directory
-    txt_files = list(path.glob('*.txt'))
+        if desired_interface in user_interfaces:
+            break
+            
+        else:
+            print(f" {desired_interface} is invalid. Try again")
+            print_available_interfaces(user_interfaces)
+            continue
+    
+    return desired_interface
 
-    # If no files are found, inform the user and exit
-    if not txt_files:
-        print("No .txt files found in the directory.")
-        return
-
-    file_options = [file.name for file in txt_files]
-    file_options_set = set(file_options)
-
-    print("Please select a file to be analyzed:")
-    for i, file_name in enumerate(file_options, 1):
-        print(f"{i}. {file_name}")
+def get_num_packets_to_capture()->int:
 
     while True:
-        user_file_opt = input("Enter the name corresponding to your file option: ").strip()
-        
-        if user_file_opt in file_options_set:
-            break
-        else:
-            print("That is not a valid file option. Please try again!")
+        try:
+            # Prompt the user for input
+            # Edit: I am only supposed to be getting the number of packets. Not a specific type of packet.
+            message: str = "Please specify the # of packets to capture:"
+            quantity:int = int(input(f"{message}\n--> "))
 
-    file_path = path / user_file_opt
-    parse_packet_file(file_path)
+            if check_if_exit(quantity):
+                exit_program()
+            elif quantity <= 0:
+                print("The number of packets must be a positive integer.\n")
+                continue  # Retry the loop if the number is not positive
+                
+            return quantity
+        except ValueError:
+            # If an error occurs (e.g., wrong format or non-integer input)
+            print("Incorrect type entered. Please enter integer number of packets.\n")
+             # Use continue to retry the loop without returning to the function
+            continue
+
+def get_name_of_capture() -> str:
+    message: str = "Please give a name for your capture."
+    capture_name: str = input(f"{message}\n==> ")
+    
+    while capture_name in PREV_CAPTURES:
+        print("Name of capture has already been used. Please enter a different name.")
+        capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
+
+    print("Capturing {} packets on {}".format(num_packets,desired_interface))
+    capture_main(capture_name, desired_interface,num_packets)
 
 
-def print_menu_options()->str:
 
-    print("Menu Options")
-    print("1: Capture ==> capture new packets.")
-    print("2: Clean Packets ==> clean previously captured packets.")
-    print("3: Packet Stats ==>  perform statistics on previously cleaned packets.")
-    print("Help: Displays the help menu")
-    print("Exit: Exit program and terminate.\n")
 
 def get_user_main_menu_selection() -> str:
     user_option: str = input("Select Menu Option\n==> ")

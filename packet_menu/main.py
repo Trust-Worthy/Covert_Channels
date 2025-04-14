@@ -4,7 +4,7 @@
 """
 
 
-from menu import display_menu, execute_option
+from packet_menu.menu_input import display_menu, execute_option
 import packet_menu.configuration.system_config as system_config 
 
 
