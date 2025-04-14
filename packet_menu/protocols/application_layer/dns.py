@@ -1,6 +1,22 @@
 
 from cleaning_captures.packet_parser import Packet_parser
 
+from typing import NamedTuple
+
+class DNSQuery(NamedTuple):
+    """
+    Mini-class to capture the type of the dns query.
+
+    Args:
+        NamedTuple (_type_): inheriting namedTuple and implementing it for my dns class
+
+    Returns:
+        _type_: filled in dns query with the qname, qtype, and qclass filled in
+    """
+    qname: str     # e.g., "www.example.com"
+    qtype: int     # 1 = A, 28 = AAAA, etc.
+    qclass: int    # 1 = IN (Internet)
+
 class DNS:  
     def __init__(self, all_bytes: bytes, parser:Packet_parser, over_tcp: bool = False):
         
@@ -8,37 +24,47 @@ class DNS:
         self._parser: Packet_parser = parser
         self._parser._packet_type = type(self) ## log the packet type for logging / debugging
         
-        ### depending on the size 
-        self._over_tcp: bool = over_tcp
+        ## Transaction ID — 16 bits (2 bytes)
+        self._transaction_id: bytes  # A unique identifier for matching queries and responses (2 bytes)
 
-        ### query of response
-        self._is_query: bool
+        ### Flags — 16 bits (2 bytes total), broken down into several subfields
+        self._flags: bytes  # The raw 2-byte flags field
 
-        self._transaction_id: bytes
-        self._flags: bytes
-        self._questions: bytes
-        self._answer_rr: bytes
-        self._authority_rr: bytes
-        self._additional_rr: bytes
-        self._queries: bytes
-        self._answers: bytes
-        self._authoritative_nameservers: bytes
-        self._additional_records: bytes
+        # Parsed flags from `_flags` (optional but useful to break out):
+        self._is_query: bool         # 1 bit: 0 = query, 1 = response (QR flag)
+        self._opcode: int            # 4 bits: Operation code (0 = standard query, 1 = inverse, etc.)
+        self._aa: bool               # 1 bit: Authoritative Answer
+        self._tc: bool               # 1 bit: Truncated message
+        self._rd: bool               # 1 bit: Recursion Desired
+        self._ra: bool               # 1 bit: Recursion Available
+        self._rcode: int             # 4 bits: Response code (e.g., 0 = No error, 3 = NXDOMAIN)
+
+        ### Counts (each 16 bits = 2 bytes)
+        self._qdcount: int  # Number of entries in the question section
+        self._ancount: int  # Number of resource records in the answer section
+        self._nscount: int  # Number of name server authority records
+        self._arcount: int  # Number of additional resource records
+
+        ### Question Section (variable length, repeats qdcount times)
+        self._questions: bytes   # Raw bytes of question section (used during initial parsing)
+        self._queries: list[DNSQuery]  # Parsed version (e.g.,  (name, type, class))
+
+        ### Answer Section (variable length, repeats ancount times)
+        self._answer_rr: bytes   # Raw bytes of answer section
+        self._answers: bytes     # Parsed list of resource records
+
+        ### Authority Section (variable length, repeats nscount times)
+        self._authority_rr: bytes                    # Raw authority section bytes
+        self._authoritative_nameservers: bytes       # Parsed list of NS records
+
+        ### Additional Section (variable length, repeats arcount times)
+        self._additional_rr: bytes     # Raw bytes of additional section
+        self._additional_records: bytes  # Parsed list of additional records (OPT, A, etc.)
+
+        ### Transport (not part of DNS spec, but necessary for parsing context)
+        self._over_tcp: bool  # Indicates if the DNS packet was received over TCP instead of UDP
 
 
-        self._qdcount: int  # number of questions
-        self._ancount: int  # number of answers
-        self._nscount: int  # number of authority records
-        self._arcount: int  # number of additional records
-
-        # Optional: parsed flags
-        self._opcode: int
-        self._aa: bool
-        self._tc: bool
-        self._rd: bool
-        self._ra: bool
-        self._rcode: int
-            
     def parse_dns_query():
         pass
     def get_remaining_bytes_after_dns():
