@@ -3,7 +3,7 @@
 from typing import Union
 
 
-from application_layer.quic import QUIC_PACKET
+from application_layer.quic import QUIC_HEADER
 from application_layer.dns import DNS
 from cleaning_captures.packet_parser import Packet_parser
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
@@ -23,7 +23,7 @@ class UDP_HEADER():
         self._payload: bytes  # Bytes 8+: UDP Payload (e.g., DHCP, DNS, etc.)
 
         self._next_protocol_type: bytes
-        self._next_protocol: Union[QUIC_PACKET,DNS,OTHER_PROTOCOL]
+        self._next_protocol: Union[QUIC_HEADER,DNS,OTHER_PROTOCOL]
 
 
         self.parse_udp_header(all_bytes)
@@ -58,11 +58,11 @@ class UDP_HEADER():
         return remaining_bytes
           
     
-    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[DNS,QUIC_PACKET,OTHER_PROTOCOL]:
+    def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser) -> Union[DNS,QUIC_HEADER,OTHER_PROTOCOL]:
 
         protocol_handlers = {
             54:DNS,
-            443:QUIC_PACKET ### Port 443 like TLS but over UDP
+            443:QUIC_HEADER ### Port 443 like TLS but over UDP
         }
 
 
@@ -70,7 +70,7 @@ class UDP_HEADER():
         src_port: int = int.from_bytes(self._source_port,byteorder='big')
 
         if dst_port == 443 and self.is_quic(remaining_bytes):
-            self._next_protocol = QUIC_PACKET(remaining_bytes, parser)
+            self._next_protocol = QUIC_HEADER(remaining_bytes, parser)
             return self._next_protocol
         else:
             handler = protocol_handlers.get(dst_port) or protocol_handlers.get(src_port) or OTHER_PROTOCOL
