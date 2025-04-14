@@ -39,6 +39,7 @@ class IP_HEADER():
         self._header_checksum: bytes 
         self._source_address: bytes 
         self._dst_address: bytes
+        
         self._next_protocol_type: bytes 
         self._next_protocol: Union[TCP_HEADER,UDP_HEADER,ICMP_MESSAGE,OTHER_PROTOCOL]
 
