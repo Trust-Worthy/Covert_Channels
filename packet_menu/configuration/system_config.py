@@ -1,15 +1,6 @@
 """
  System Configuration
 
- Date: 11-18-2024
-
-
- Main Function:
-
-
- Dependencies:
-
-
 
  Author: Trust-Worthy
     
@@ -17,10 +8,6 @@
 """
 import subprocess
 import re
-
-
-interface_width = 15  # Adjust the number based on the longest interface name
-status_width = 40
 
 
 def get_network_interfaces() -> dict[str,str]:

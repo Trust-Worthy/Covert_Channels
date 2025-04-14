@@ -23,8 +23,8 @@ Author: Trust-Worthy
 """
 import os
 
-from configuration.system_config import get_network_interfaces
-from configuration.system_config import print_interfaces
+
+
 from typing import Tuple, Union
 
 from pathlib import Path
@@ -32,44 +32,15 @@ from capture_data.capture import capture_main
 
 PREV_CAPTURES = set()
 
-def print_help_message()->None:
-    print("You asked for help")
-    print("The viable options are listed below")
-    print_menu_options()
 
 
-def welcome_message()-> None:
-    print("_____________________________")
-    print("_____________________________")
-    print("_____________________________")
-    print("Welcome to the Packet Menu. Select an option to get started or type Help")
-    print("")
-
-def capture_options()->Tuple[str,int]:
-    print("Capture Options")
-    print("Please select an interface to capture network traffic on")
-    print("_____________________________")
-    print("_____________________________")
-
-    user_interfaces: dict = get_network_interfaces()
-    print_interfaces(user_interfaces)
 
 
-    desired_interface: str = input("Format: 'interface name' ex. -->en0:\n-->")
-    while desired_interface not in user_interfaces:
-        print(f" {desired_interface} is invalid. Try again")
-        print_interfaces(user_interfaces)
-        desired_interface: str = input("Format: 'interface name' ex. -->en0:\n-->")
+def capture_options()->Tuple[str,int]: 
+    
 
     
-    num_packets: int = get_num_user_packets()
-    capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
-    while capture_name in PREV_CAPTURES:
-        print("Name of capture has already been used. Please enter a different name.")
-        capture_name: str = input("Please give a name for your capture. Name will be used to name the pcap and .txt file\n-->")
-
-    print("Capturing {} packets on {}".format(num_packets,desired_interface))
-    capture_main(capture_name, desired_interface,num_packets)
+    p
 def get_num_user_packets()->int:
     print("Please specify a certian number of packets to capture\n")
 
@@ -77,7 +48,7 @@ def get_num_user_packets()->int:
         try:
             # Prompt the user for input
             # Edit: I am only supposed to be getting the number of packets. Not a specific type of packet.
-            quantity:int = int(input("Format: -->'# of packets' ex. -->10\n-->"))
+            quantity:int = int(input("Format: -->'# of packets' ex. -->10\n--> "))
 
             if quantity <= 0:
                 print("The number of packets must be a positive integer.\n")
