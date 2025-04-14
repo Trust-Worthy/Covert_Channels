@@ -6,7 +6,7 @@ from cleaning_captures.packet_parser import Packet_parser
 
 class QUIC_HEADER:
     """
-    Simple QUIC header class that parses and stores the contents of an initial QUIC packet header.
+    Detailed QUIC header class that parses and stores the contents of an Initial/Handshake/0-RTT/Retry QUIC packet.
     
     Args:
         Packet_parser (_type_): Used to track parsing state and metadata across protocols.
@@ -16,18 +16,27 @@ class QUIC_HEADER:
         self._parser: Packet_parser = parser
         self._parser.packet_type = type(self)
 
-        # Long or Short header?
+        # Header type
         self._is_long_header: bool = bool(all_bytes[0] & 0x80)
+        self._first_byte: int = all_bytes[0]
 
         # Common fields
-        self._first_byte: int = all_bytes[0]
         self._version: Optional[bytes] = None
         self._dcid_length: Optional[int] = None
         self._scid_length: Optional[int] = None
         self._dcid: Optional[bytes] = None
         self._scid: Optional[bytes] = None
 
-        # Next Protocol Placeholder
+        # Long header-specific
+        self._packet_type_str: Optional[str] = None
+        self._token_length: Optional[int] = None
+        self._token: Optional[bytes] = None
+        self._length: Optional[int] = None
+        self._packet_number: Optional[bytes] = None
+        self._payload: Optional[bytes] = None
+        self._retry_token: Optional[bytes] = None
+        self._retry_integrity_tag: Optional[bytes] = None
+
         self._next_protocol: Optional[None] = None  # Placeholder for future protocol chaining
 
         self.parse_quic_header(all_bytes)
@@ -40,8 +49,11 @@ class QUIC_HEADER:
         offset = 1  # Already read the first byte
 
         if self._is_long_header:
-            self._version = all_bytes[offset:offset+4]
+            self._version = all_bytes[offset:offset + 4]
+            version_int = int.from_bytes(self._version, 'big')
             offset += 4
+
+            self._packet_type_str = get_packet_type_str(self._first_byte & 0x30 >> 4)
 
             self._dcid_length = all_bytes[offset]
             offset += 1
@@ -53,14 +65,69 @@ class QUIC_HEADER:
             self._scid = all_bytes[offset:offset + self._scid_length]
             offset += self._scid_length
 
-            # Note: This example assumes an Initial packet with crypto payload next (can be extended for other long types)
+            if self._packet_type_str == "Initial":
+                self._token_length, varint_len = self.parse_varint(all_bytes[offset:])
+                offset += varint_len
+
+                self._token = all_bytes[offset:offset + self._token_length]
+                offset += self._token_length
+
+                self._length, varint_len = self.parse_varint(all_bytes[offset:])
+                offset += varint_len
+
+                pn_length = (self._first_byte & 0x03) + 1
+                self._packet_number = all_bytes[offset:offset + pn_length]
+                offset += pn_length
+
+                self._payload = all_bytes[offset:offset + self._length - pn_length]
+                offset += len(self._payload)
+
+            elif self._packet_type_str == "0-RTT" or self._packet_type_str == "Handshake":
+                self._length, varint_len = self.parse_varint(all_bytes[offset:])
+                offset += varint_len
+
+                pn_length = (self._first_byte & 0x03) + 1
+                self._packet_number = all_bytes[offset:offset + pn_length]
+                offset += pn_length
+
+                self._payload = all_bytes[offset:offset + self._length - pn_length]
+                offset += len(self._payload)
+
+            elif self._packet_type_str == "Retry":
+                # Retry format: everything after SCID is retry_token + integrity tag (last 16 bytes)
+                retry_end = len(all_bytes) - 16
+                self._retry_token = all_bytes[offset:retry_end]
+                self._retry_integrity_tag = all_bytes[retry_end:]
+                offset = len(all_bytes)
 
         else:
-            # Short header (DCID implied, no version, less parsing here)
-            self._dcid = all_bytes[1:9]  # Example: 8-byte DCID
+            # Short header (DCID assumed to be known)
+            self._dcid = all_bytes[1:9]  # Example assumption
             offset = 9
 
         self._parser.store_and_track_bytes(offset)
+
+    def parse_varint(self, data: bytes) -> Tuple[int, int]:
+        """Parse QUIC variable-length integer and return (value, length in bytes)."""
+        first_byte = data[0]
+        if first_byte < 0x40:
+            return first_byte, 1
+        elif first_byte < 0x80:
+            return ((first_byte & 0x3F) << 8 | data[1]), 2
+        elif first_byte < 0xC0:
+            return ((first_byte & 0x3F) << 24 |
+                    data[1] << 16 |
+                    data[2] << 8 |
+                    data[3]), 4
+        else:
+            return ((first_byte & 0x3F) << 56 |
+                    data[1] << 48 |
+                    data[2] << 40 |
+                    data[3] << 32 |
+                    data[4] << 24 |
+                    data[5] << 16 |
+                    data[6] << 8 |
+                    data[7]), 8
 
     def get_remaining_bytes_after_header(self, all_bytes: bytes) -> bytearray:
         if self._parser.check_if_finished_parsing():
@@ -69,8 +136,7 @@ class QUIC_HEADER:
             raise ValueError("Incomplete or invalid QUIC header")
 
     def create_next_protocol(self, remaining_bytes: bytearray, parser: Packet_parser):
-        # Placeholder - depends on payload (e.g., CRYPTO, STREAM, etc.)
-        self._next_protocol = None
+        self._next_protocol = None  # Extend as needed
         return self._next_protocol
 
     @property
@@ -90,6 +156,38 @@ class QUIC_HEADER:
         return self._scid
 
     @property
+    def token_length(self) -> Optional[int]:
+        return self._token_length
+
+    @property
+    def token(self) -> Optional[bytes]:
+        return self._token
+
+    @property
+    def length(self) -> Optional[int]:
+        return self._length
+
+    @property
+    def packet_number(self) -> Optional[bytes]:
+        return self._packet_number
+
+    @property
+    def payload(self) -> Optional[bytes]:
+        return self._payload
+
+    @property
+    def retry_token(self) -> Optional[bytes]:
+        return self._retry_token
+
+    @property
+    def retry_integrity_tag(self) -> Optional[bytes]:
+        return self._retry_integrity_tag
+
+    @property
+    def packet_type_str(self) -> Optional[str]:
+        return self._packet_type_str
+
+    @property
     def next_protocol(self):
         return self._next_protocol
 
@@ -98,10 +196,13 @@ class QUIC_HEADER:
         return self._parser
 
 
-if __name__ == "__main__":
-    # Dummy for testing
-    example_bytes = b'\xc0\x00\x00\x00\x01\x08\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\x08\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8'
-    dummy_parser = Packet_parser()
-    quic_header = QUIC_HEADER(example_bytes, dummy_parser)
+def get_packet_type_str(type_bits: int) -> str:
+    return {
+        0x00: "Initial",
+        0x01: "0-RTT",
+        0x02: "Handshake",
+        0x03: "Retry"
+    }.get(type_bits, "Unknown")
+
 
     
