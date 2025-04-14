@@ -61,11 +61,11 @@ class DNS:
 
         ### Authority Section (variable length, repeats nscount times)
         self._authority_rr: bytes                    # Raw authority section bytes
-        self._authoritative_nameservers: bytes       # Parsed list of NS records
+        self._authoritative_nameservers: list[DNSResourceRecord]       # Parsed list of NS records
 
         ### Additional Section (variable length, repeats arcount times)
         self._additional_rr: bytes     # Raw bytes of additional section
-        self._additional_records: bytes  # Parsed list of additional records (OPT, A, etc.)
+        self._additional_records: list[DNSResourceRecord]  # Parsed list of additional records (OPT, A, etc.)
 
         ### Transport (not part of DNS spec, but necessary for parsing context)
         self._over_tcp: bool = over_tcp # Indicates if the DNS packet was received over TCP instead of UDP
@@ -100,14 +100,17 @@ class DNS:
         offset: int = 12 
 
         offset = self.parse_dns_questions_section(all_bytes, offset)
-        self.parse_dns_answer_section(all_bytes,offset)
+        offset = self.parse_dns_answer_section(all_bytes,offset)
+        offset = self.parse_dns_authority_section(all_bytes,offset)
+        offset = self.parse_dns_additional_section(all_bytes,offset)
 
 
         self._parser.store_and_track_bytes(offset)
+
     def parse_dns_questions_section(self, all_bytes: bytearray, offset:int) -> int:
         # Question Section
 
-        self._questions = all_bytes[12:12 + self._qdcount * 4]  # Question section bytes (each question is at least 4 bytes)
+        # self._questions = all_bytes[offset:offset + self._qdcount * 4]  # Question section bytes (each question is at least 4 bytes)
         self._queries = []
         
         # Example parsing of domain name, type, and class for each question
@@ -115,43 +118,49 @@ class DNS:
         for _ in range(self._qdcount):
             domain_name, qtype, qclass = self._parse_question(all_bytes[offset:])
             self._queries.append(DNSQuery(domain_name, qtype, qclass))
-            offset += len(domain_name) + 4  # move past domain name (variable length) + type (2 bytes) + class (2 bytes)
+            domain_len, _ = self._parse_domain_name(all_bytes[offset:])
+            offset += domain_len + 4  # domain name + type (2) + class (2)
+           
         return offset
 
     def parse_dns_answer_section(self, all_bytes:bytearray, offset) -> int:
-         # Answer Section
-        self._answer_rr = all_bytes[12 + self._qdcount * 4: 12 + self._qdcount * 4 + self._ancount * 12]  # Answer section bytes
+        # Answer Section
+        ### did I do this parsing correctly below?
+        # self._answer_rr = all_bytes[offset + self._qdcount * 4: offset + self._qdcount * 4 + self._ancount * 12]  # Answer section bytes
         self._answers = []
 
+        '''CONTINUE HERE'''
          # Parse answer section
-        pos = 12 + self._qdcount * 4
         for _ in range(self._ancount):
-            rr_name, rr_type, rr_class, rr_ttl, rr_data = self._parse_resource_record(all_bytes[pos:])
+            rr_name, rr_type, rr_class, rr_ttl,rdlength, rr_data = self._parse_resource_record(all_bytes[offset:])
             self._answers.append(DNSResourceRecord(rr_name, rr_type, rr_class, rr_ttl, rr_data))
-            pos += len(rr_name) + 10  # move past the name (variable length) + type (2 bytes) + class (2 bytes) + TTL (4 bytes) + data
+            offset += len(rr_name) + 10 + rdlength # move past the name (variable length) + type (2 bytes) + class (2 bytes) + TTL (4 bytes) + data
         
+        return offset
     def parse_dns_authority_section(self, all_bytes:bytearray, offset) -> int:
         # Authority Section
-        self._authority_rr = all_bytes[pos: pos + self._nscount * 12]  # Authority section bytes
+        # self._authority_rr = all_bytes[offset: offset + self._nscount * 12]  # Authority section bytes
         self._authoritative_nameservers = []
 
         # Parse authority section (NS records)
         for _ in range(self._nscount):
-            ns_name, ns_type, ns_class, ns_ttl, ns_data = self._parse_resource_record(all_bytes[pos:])
+            ns_name, ns_type, ns_class, ns_ttl, rdlength, ns_data = self._parse_resource_record(all_bytes[offset:])
             self._authoritative_nameservers.append(DNSResourceRecord(ns_name, ns_type, ns_class, ns_ttl, ns_data))
-            pos += len(ns_name) + 10
+            offset += len(ns_name) + 10 + rdlength
+
+        return offset
     def parse_dns_additional_section(self, all_bytes:bytearray, offset) -> int:
 
         # Additional Section
-        self._additional_rr = all_bytes[pos: pos + self._arcount * 12]  # Additional section bytes
+        self._additional_rr = all_bytes[offset: offset + self._arcount * 12]  # Additional section bytes
         self._additional_records = []
 
         # Parse additional section (records like A, AAAA, OPT)
         for _ in range(self._arcount):
-            add_name, add_type, add_class, add_ttl, add_data = self._parse_resource_record(all_bytes[pos:])
+            add_name, add_type, add_class, add_ttl, rdlength, add_data = self._parse_resource_record(all_bytes[offset:])
             self._additional_records.append(DNSResourceRecord(add_name, add_type, add_class, add_ttl, add_data))
-            pos += len(add_name) + 10
-            
+            offset += len(add_name) + 10 + rdlength
+        return offset
     def get_remaining_bytes_after_dns(self, all_bytes:bytearray, offset) -> int:
         pass
 
@@ -159,7 +168,49 @@ class DNS:
         # Check for a 2-byte length prefix (common in TCP DNS)
         return len(dns_packet_bytes) >= 2 and int.from_bytes(dns_packet_bytes[:2], 'big') == len(dns_packet_bytes[2:])
 
+    def _parse_question(self, data: bytearray) -> tuple[str, int, int]:
+        domain_name, consumed = self._parse_domain_name(data)
+        qtype = int.from_bytes(data[consumed:consumed + 2], 'big')
+        qclass = int.from_bytes(data[consumed + 2:consumed + 4], 'big')
+        return domain_name, qtype, qclass
 
+    def _parse_resource_record(self, data: bytearray) -> tuple[str, int, int, int, bytes]:
+        name, consumed = self._parse_domain_name(data)
+        rtype = int.from_bytes(data[consumed:consumed + 2], 'big')
+        rclass = int.from_bytes(data[consumed + 2:consumed + 4], 'big')
+        ttl = int.from_bytes(data[consumed + 4:consumed + 8], 'big')
+        rdlength = int.from_bytes(data[consumed + 8:consumed + 10], 'big')
+        rdata = data[consumed + 10:consumed + 10 + rdlength]
+        total_consumed = consumed + 10 + rdlength
+        return name, rtype, rclass, ttl, rdlength, rdata
+    
+    def _parse_domain_name(self, data: bytearray) -> tuple[str, int]:
+        labels = []
+        offset = 0
+        jumped = False
+        jump_offset = 0
+
+        while True:
+            length = data[offset]
+            if length == 0:
+                offset += 1
+                break
+            if (length & 0xC0) == 0xC0:
+                # Compression pointer
+                if not jumped:
+                    jump_offset = offset + 2
+                pointer = ((length & 0x3F) << 8) | data[offset + 1]
+                label, _ = self._parse_domain_name(data[pointer:])
+                labels.append(label)
+                offset += 2
+                jumped = True
+                break
+            else:
+                offset += 1
+                labels.append(data[offset:offset + length].decode())
+                offset += length
+
+        return '.'.join(labels), (jump_offset if jumped else offset)
 
 
     @property
