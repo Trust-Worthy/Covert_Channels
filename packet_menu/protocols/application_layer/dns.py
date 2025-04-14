@@ -4,9 +4,9 @@ from cleaning_captures.packet_parser import Packet_parser
 class DNS:  
     def __init__(self, all_bytes: bytes, parser:Packet_parser, over_tcp: bool = False):
         
-        ## Pass on the parser to the next protocol
+        ## Pass on the parser to the next protocol.
         self._parser: Packet_parser = parser
-        self._parser._packet_type = type(self)
+        self._parser._packet_type = type(self) ## log the packet type for logging / debugging
         
         ### depending on the size 
         self._over_tcp: bool = over_tcp
@@ -24,6 +24,25 @@ class DNS:
         self._answers: bytes
         self._authoritative_nameservers: bytes
         self._additional_records: bytes
+
+
+        self._qdcount: int  # number of questions
+        self._ancount: int  # number of answers
+        self._nscount: int  # number of authority records
+        self._arcount: int  # number of additional records
+
+        # Optional: parsed flags
+        self._opcode: int
+        self._aa: bool
+        self._tc: bool
+        self._rd: bool
+        self._ra: bool
+        self._rcode: int
+            
+    def parse_dns_query():
+        pass
+    def get_remaining_bytes_after_dns():
+        pass
 
 
 
