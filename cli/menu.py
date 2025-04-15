@@ -5,6 +5,7 @@ menu.py            → Shows menu and navigation
 └── output_handlers→ Show results
 
 """
+from typing import Callable
 
 import input_handlers, output_handlers, commands
 
@@ -14,7 +15,8 @@ import input_handlers, output_handlers, commands
 def main():
     output_handlers.print_welcome_message()
 
-    menu_options = {
+    menu_options: dict[str, Callable[[], None]] = {
+        
         "1":commands.capture_packets, # returns a tuple
         "2":commands.clean_packets,
         "3":commands.calculate_packets_stats,

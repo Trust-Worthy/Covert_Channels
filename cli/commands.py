@@ -114,9 +114,13 @@ def capture_packets()->None:
 
 
 def clean_packets()-> None:
+
+    output_handlers.print_clean_packets_options()
     pass
 
 def calculate_packets_stats() -> None:
+    output_handlers.print_packet_stats_options()
+    
     pass
 def get_network_interfaces() -> dict[str,str]:
 

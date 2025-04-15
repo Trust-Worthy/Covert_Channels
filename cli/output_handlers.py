@@ -1,6 +1,6 @@
 
+from pathlib import Path
 
-from configuration.system_config import get_network_interfaces
 
 def print_welcome_message()-> None:
     print("_____________________________")
@@ -24,10 +24,8 @@ def print_available_interfaces(available_interfaces: dict[str,str]) -> None:
     
 
     print("_____________________________")
-    for key, value in user_interfaces.items():
+    for key, value in available_interfaces.items():
         print(f'{key}: {value}')
-
-    return user_interfaces
 
 
 def print_help_message()->None:

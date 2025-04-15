@@ -86,39 +86,8 @@ def get_user_main_menu_selection() -> str:
     ### Secure software dev practices belong here with input sanitization   
     user_option = user_option.strip().lower()
 
-    
-
-    
-    
-
-
-    returned_func = option_dict[option]
-    returned_func()
-
-def process_user_input(*,option: str)->None:
-    
-    
-
-
-def display_menu()->None:
-
-    # Show the welcome message
-    welcome_message()
-
-    #Print the menu options. Get the input from the user.
-    user_option = print_menu_options()
-
-    
-    """
-    Control Flow:
-
-    Print menu options --> Process user input --> Func that handles specific option
-
-
-    """
-
-
+    return user_option
 
 
 if __name__ == "__main__":
-    display_menu()
+    pass
