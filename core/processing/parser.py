@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from protocols.layer_3_protocols import arp, icmp ,ip
     from protocols.layer_4_protocols import tcp,udp
     from protocols.application_layer import http,dns, quic, tls
-    from protocols.undefined_layer import undefined_protocol as undef
+    from protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
 class Packet_parser:
@@ -38,7 +38,7 @@ class Packet_parser:
             dns.DNS,
             quic.QUIC_HEADER,
             tls.TLS_Packet,
-            undef.OTHER_PROTOCOL]
+            OTHER_PROTOCOL]
 
     def store_and_track_bytes(self, offset:int , all_bytes: bytes = None, is_eth: bool = False) -> None:
         """
@@ -91,7 +91,7 @@ class Packet_parser:
             dns.DNS,
             quic.QUIC_HEADER,
             tls.TLS_Packet,
-            undef.OTHER_PROTOCOL]:
+            OTHER_PROTOCOL]:
 
         return self._packet_type
     
@@ -107,7 +107,7 @@ class Packet_parser:
             dns.DNS,
             quic.QUIC_HEADER,
             tls.TLS_Packet,
-            undef.OTHER_PROTOCOL]):
+            OTHER_PROTOCOL]):
         
         ### keeps track of the changes in the packet type
         ### This is really smart actually. Forgot I did this.

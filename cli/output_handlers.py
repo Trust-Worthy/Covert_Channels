@@ -44,7 +44,8 @@ def print_clean_packets_options()->dict[str,str]:
 
     for i, file in enumerate(directory.glob("*.txt")):
         if file.is_file():
-            file_dict[str(i)] = file.name
+            # Get the full path of the file using .resolve()
+            file_dict[str(i)] = str(file.resolve()) 
     
     print(file_dict)
 
