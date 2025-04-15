@@ -1,11 +1,12 @@
-from typing import Optional, Union
-import sys
+from typing import Union
+
 
 
 from core.processing.parser import Packet_parser
 from layer_4_protocols.tcp import TCP_HEADER
 from layer_4_protocols.udp import UDP_HEADER
-from layer_3_protocols.icmp import ICMP_MESSAGE
+
+from . import ICMP_MESSAGE
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
