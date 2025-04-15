@@ -1,6 +1,14 @@
 
 import subprocess
 import input_handlers, output_handlers
+from typing import Optional
+from core.processing.parser import Packet_parser
+
+from core.protocols.layer_2_protocols import ethernet
+from core.protocols.layer_3_protocols import arp, icmp, ip
+from core.protocols.layer_4_protocols import tcp, udp
+from core.protocols.application_layer import dns, http, https, quic, tls
+from core.protocols.undefined_layer import undefined_protocol
 
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
@@ -113,14 +121,50 @@ def capture_packets()->None:
     print(f"{name_of_capture} is capturing {num_packets_to_capture} on interface {user_interface_choice}...")
 
 
-def clean_packets()-> None:
+def clean_packets()-> list[Optional[]]:
 
-    output_handlers.print_clean_packets_options()
-    pass
+    available_files = output_handlers.print_clean_packets_options()
+
+    '''
+    1. Open file
+    2. clean file
+        2.a remove un-important stuff
+        2.b re-write data to cleaned_captures dir with same name
+    
+        
+    prompt: 
+
+            Can you please finish writing this function 
+
+    available_files = output_handlers.print_clean_packets_options()
+
+        
+        1. Open file
+        2. clean file
+            2.a remove un-important stuff
+            2.b re-write data to cleaned_captures dir with same name
+        
+        
+
+        for file in available_files.values():
+
+            with open(file, "r") as uncleaned_file:
+
+                for line in uncleaned_file:
+
+    That properly 
+    '''
+
+    for file in available_files.values():
+
+        with open(file, "r") as uncleaned_file:
+
+            for line in uncleaned_file:
+
 
 def calculate_packets_stats() -> None:
     output_handlers.print_packet_stats_options()
-    
+
     pass
 def get_network_interfaces() -> dict[str,str]:
 
@@ -136,13 +180,6 @@ def get_network_interfaces() -> dict[str,str]:
 
     return output_handlers.format_interfaces(interfaces)
 
-
-
-def run_main_menu() -> None:
-
-    
-    output_handlers.print_menu_options()
-    user_choice: str = input_handlers.get_user_main_menu_selection()
 
 def exit_program()->None:
     print("exiting program...")

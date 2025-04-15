@@ -33,9 +33,22 @@ def print_help_message()->None:
     print("The viable options are listed below.")
     print_menu_options()
 
-def print_clean_packets_options()->None:
-    pass
+def print_clean_packets_options()->dict[str,str]:
 
+
+    print("Please select txt files to ")
+
+    directory = Path("../captures")
+
+    file_dict = {}
+
+    for i, file in enumerate(directory.glob("*.txt")):
+        if file.is_file():
+            file_dict[str(i)] = file.name
+    
+    print(file_dict)
+
+    return file_dict
 
 def print_packet_stats_options()->None:
     path = Path('captured_packets')
