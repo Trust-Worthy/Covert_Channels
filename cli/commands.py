@@ -160,11 +160,18 @@ def clean_packets()-> list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADE
 import os
 
 def clean_file(file_path: str, output_dir: str):
+
+    protocol_set = set("UDP","ICMP","ICMP6","TCP","TLS","IP","ARP","ETHERNET")
+    packet_metadata: dict[str,str] = {}
     with open(file_path, "r") as uncleaned_file:
         cleaned_data = []
 
         for line in uncleaned_file:
+            
             # Match lines containing protocol info (e.g., "UDP", "ICMP6")
+            for i,protocol in enumerate(protocol_set):
+                if protocol in line:
+                    packet_metadata[str(i)] = line.strip()
             if "UDP" in line or "ICMP6" in line or "TCP" in line or "IP" in line:
                 # Keep the timestamp, source/destination addresses, and protocol info
                 cleaned_data.append(line.strip())  # Save the protocol line
