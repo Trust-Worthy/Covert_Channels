@@ -2,13 +2,14 @@ import numpy as np
 from typing import Union, TYPE_CHECKING
 import logging
 
-if TYPE_CHECKING:
-    from protocols.layer_2_protocols.ethernet import Ethernet_Frame
-    from protocols.layer_3_protocols import arp, icmp ,ip
-    from protocols.layer_4_protocols import tcp,udp
-    from protocols.application_layer import http,dns, quic, tls
-    from protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
+# if TYPE_CHECKING:
+#     from protocols.layer_2_protocols.ethernet import Ethernet_Frame
+#     from protocols.layer_3_protocols import arp, icmp ,ip
+#     from protocols.layer_4_protocols import tcp,udp
+#     from protocols.application_layer import http,dns, quic, tls
+#     from protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
+from protocols.all_protocols import *
 
 class Packet_parser:
     """
@@ -29,15 +30,15 @@ class Packet_parser:
         
         self._packet_type: Union[
             Ethernet_Frame,
-            arp.ARP_PACKET,
-            icmp.ICMP_MESSAGE,
-            ip.IP_HEADER,
-            tcp.TCP_HEADER,
-            udp.UDP_HEADER,
-            http.HTTP,
-            dns.DNS,
-            quic.QUIC_HEADER,
-            tls.TLS_Packet,
+            ARP_PACKET,
+            ICMP_MESSAGE,
+            IP_HEADER,
+            TCP_HEADER,
+            UDP_HEADER,
+            HTTP,
+            DNS,
+            QUIC_HEADER,
+            TLS_Packet,
             OTHER_PROTOCOL]
 
     def store_and_track_bytes(self, offset:int , all_bytes: bytes = None, is_eth: bool = False) -> None:
@@ -82,15 +83,15 @@ class Packet_parser:
     @property
     def packet_type(self) -> Union[
             Ethernet_Frame,
-            arp.ARP_PACKET,
-            icmp.ICMP_MESSAGE,
-            ip.IP_HEADER,
-            tcp.TCP_HEADER,
-            udp.UDP_HEADER,
-            http.HTTP,
-            dns.DNS,
-            quic.QUIC_HEADER,
-            tls.TLS_Packet,
+            ARP_PACKET,
+            ICMP_MESSAGE,
+            IP_HEADER,
+            TCP_HEADER,
+            UDP_HEADER,
+            HTTP,
+            DNS,
+            QUIC_HEADER,
+            TLS_Packet,
             OTHER_PROTOCOL]:
 
         return self._packet_type
@@ -98,15 +99,15 @@ class Packet_parser:
     @packet_type.setter
     def packet_type(self, value:Union[
             Ethernet_Frame,
-            arp.ARP_PACKET,
-            icmp.ICMP_MESSAGE,
-            ip.IP_HEADER,
-            tcp.TCP_HEADER,
-            udp.UDP_HEADER,
-            http.HTTP,
-            dns.DNS,
-            quic.QUIC_HEADER,
-            tls.TLS_Packet,
+            ARP_PACKET,
+            ICMP_MESSAGE,
+            IP_HEADER,
+            TCP_HEADER,
+            UDP_HEADER,
+            HTTP,
+            DNS,
+            QUIC_HEADER,
+            TLS_Packet,
             OTHER_PROTOCOL]):
         
         ### keeps track of the changes in the packet type

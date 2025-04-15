@@ -51,6 +51,7 @@ def print_clean_packets_options()->dict[str,str]:
 
     return file_dict
 
+
 def print_packet_stats_options()->None:
     path = Path('captured_packets')
 
