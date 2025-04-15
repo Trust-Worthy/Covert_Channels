@@ -1,10 +1,15 @@
 from typing import Optional
-import numpy as np
 
+
+
+from processing import Packet_parser
 
 class TLS_Packet:
     
-    def __init__(self):
+    def __init__(self, parser: Packet_parser):
+
+        ### TO-DO ##
+        # implement the parser 
         self.tls_record_data: Optional[bytes] = None
         self.handshake_type: Optional[bytes] = None  # Offset: Byte 5 (1 byte)
         self.handshake_length: Optional[bytes] = None  # Offset: Bytes 6-9 (4 bytes)

@@ -62,5 +62,9 @@ class HTTPS(HTTP):
             self.body = self.decrypted_http.body
 
     @property
+    def parser(self) -> Packet_parser:
+        return self._parser
+    
+    @property
     def get_encrypted_status(self) -> bool:
         return self.is_encrypted

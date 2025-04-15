@@ -1,8 +1,8 @@
 
-from core.processing.parser import Packet_parser
+from typing import Optional
 
-from typing import Union, Optional
-from core.processing.parser import Packet_parser
+from processing import Packet_parser
+
 
 class QUIC_HEADER:
     """
