@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Union, TYPE_CHECKING
 import logging
+from core.protocols.all_protocols import *
 
 # if TYPE_CHECKING:
 #     from protocols.layer_2_protocols.ethernet import Ethernet_Frame
@@ -9,7 +10,7 @@ import logging
 #     from protocols.application_layer import http,dns, quic, tls
 #     from protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
-from protocols.all_protocols import *
+
 
 class Packet_parser:
     """
