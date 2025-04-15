@@ -1,23 +1,3 @@
-"""
-Capture
-
-Date: 11/25/2024
-
-Main Function: Capture specific network packets based on user input and a specified number of packets.
-
-
-Author: Trust Worthy
-
-
-"""
-
-
-import subprocess
-from typing import Tuple
-from pathlib import Path
-
-
-
 
 
 # (interface:str,protocol:str,quantity:int)
@@ -103,8 +83,30 @@ def capture_packets(capture_name:str,desired_interface:str,num_packets:int)->Non
     execute_commands(command_1,command_2,pcap_file,output_txt)
 
 
-def main()->None:
+
+def get_network_interfaces() -> dict[str,str]:
+
+    result = subprocess.run(['tcpdump','-D'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
-   return None
-if __name__ == "__main__":
-     main()
+    if result.returncode == 0:
+        interfaces = []
+        
+        #Split the output by lines and  extract interface names
+        for line in result.stdout.splitlines():
+            line.strip(".")
+            interfaces.append(line)
+
+    return format_interfaces(interfaces)
+
+def format_interfaces(interfaces: list[str]) -> dict[str,str]:
+    interface_dict = {} 
+    
+    
+    
+    # Loop through the list and process each entry
+    for i, interface in enumerate(interfaces):
+        stripped_interface = re.sub(r'^[^.]*\.', '', interface)
+        interface_dict[str(i)] = stripped_interface
+   
+    return interface_dict
+    

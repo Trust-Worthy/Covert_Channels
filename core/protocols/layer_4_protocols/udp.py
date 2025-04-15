@@ -5,7 +5,7 @@ from typing import Union
 
 from application_layer.quic import QUIC_HEADER
 from application_layer.dns import DNS
-from cleaning_captures.packet_parser import Packet_parser
+from core.processing.parser import Packet_parser
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 class UDP_HEADER():

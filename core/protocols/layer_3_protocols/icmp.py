@@ -1,5 +1,5 @@
 
-from cleaning_captures.packet_parser import Packet_parser
+from core.processing.parser import Packet_parser
 from datetime import datetime
 from typing import Optional, Union
 

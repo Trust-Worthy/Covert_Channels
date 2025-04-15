@@ -27,7 +27,7 @@ from typing import Tuple, Union
 
 from pathlib import Path
 from capture_data.capture import capture_packets
-from packet_menu.menu_output import print_available_interfaces
+from packet_menu.menu_output import print_available_interfaces,print_clean_packets_options,print_packet_stats_options, print_help_message, exit_program
 
 def get_existing_captures() -> set[str]:
     print("Finding existing captures...")
@@ -99,18 +99,18 @@ def get_name_of_capture() -> str:
     capture_main(capture_name, desired_interface,num_packets)
 
 
-
-
 def get_user_main_menu_selection() -> str:
     user_option: str = input("Select Menu Option\n==> ")
 
     process_user_input(option=user_option)
 
+    return user_option
+
 def process_user_input(*,option: str)->None:
     
     option = option.strip().lower()
     option_dict = {
-        "1":capture_options, # returns a tuple
+        "1":print_available_interfaces, # returns a tuple
         "2":print_clean_packets_options,
         "3":print_packet_stats_options,
         "help":print_help_message,
@@ -119,7 +119,7 @@ def process_user_input(*,option: str)->None:
 
     while option not in option_dict:
         print(f"Invalid option: {option}. Please try again.")
-        option = input("Enter an option:\n-->").lower()
+        get_user_main_menu_selection()
     
 
 

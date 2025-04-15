@@ -20,9 +20,9 @@ def print_available_interfaces() -> dict[str,str]:
     print("_____________________________")
     print("Capture Options")
     print("Please select an interface to capture network traffic on.")
-
     
     user_interfaces: dict = get_network_interfaces()
+
     print("_____________________________")
     for key, value in user_interfaces.items():
         print(f'{key}: {value}')
@@ -72,11 +72,3 @@ def print_packet_stats_options()->None:
 def exit_program()->None:
     print("exiting program...")
     exit()
-
-def check_if_exit(user_input: str) -> bool:
-
-    try:
-        if user_input.strip() == "exit":
-            True
-    except ValueError:
-        return False

@@ -1,6 +1,6 @@
 from typing import Union
 
-from cleaning_captures.packet_parser import Packet_parser
+from core.processing.parser import Packet_parser
 
 from application_layer.tls import TLS_Packet
 from application_layer.dns import DNS
