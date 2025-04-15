@@ -119,7 +119,7 @@ def capture_packets()->None:
     print(f"{name_of_capture} is capturing {num_packets_to_capture} on interface {user_interface_choice}...")
 
 
-def clean_packets()-> list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADER,TCP_HEADER, UDP_HEADER,OTHER_PROTOCOL]]:
+def clean_packets()-> None:
 
     available_files = output_handlers.print_clean_packets_options()
 
@@ -131,38 +131,42 @@ def clean_packets()-> list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADE
 
 def clean_file(file_path: str, output_dir: str):
 
-    protocol_set = set("UDP","ICMP","ICMP6","TCP","TLS","IP","ARP","ETHERNET")
+    protocol_set = {b"UDP", b"ICMP", b"ICMP6", b"TCP", b"TLS", b"IP", b"ARP", b"ETHERNET"}
     
 
     with open(file_path, "r") as uncleaned_file:
-        cleaned_data: list[bytes] = []
-        packet_metadata: list[str] = []
+        cleaned_data: list[bytes] = []  # Data will be stored as bytes
+        packet_metadata: list[bytes] = []  # Metadata will be stored as bytes
 
         for line in uncleaned_file:
             
             # Match lines containing protocol info (e.g., "UDP", "ICMP6")
-            for i,protocol in enumerate(protocol_set):
-                if protocol in line:
-                    packet_metadata.append(line.strip())
+            for protocol in protocol_set:
+                if protocol in line.encode():  # Convert line to bytes for matching
+                    packet_metadata.append(line.strip().encode())  # Store metadata as bytes
 
             # Skip the lines containing hexadecimal data offsets (e.g., "0x0000:")
             if line.startswith("0x"):
                 # Skip the offset and extract just the hex data (remove the "0x0000:" part)
-                cleaned_data.append(line.split(":")[1].strip())  # Extract and keep just the hex bytes
+                hex_data = line.split(":")[1].strip()  # Extract hex data
+                byte_data = bytes.fromhex(hex_data)  # Convert hex data to bytes
+                cleaned_data.append(byte_data)  # Add byte data to cleaned_data
 
             # Optionally, keep the raw byte data if it's not part of the "0x" offset
-            elif len(line.strip()) == 47 and not line.startswith("0x"):
-                cleaned_data.append(line.strip())  # Keep the raw byte data line (without changes)
+            elif len(line.strip()) == 47 and not line.startswith("0x"):  # Check for raw byte-like lines
+                byte_data = bytes.fromhex(line.strip())  # Convert the line to bytes
+                cleaned_data.append(byte_data)  # Add byte data to cleaned_data
 
         # Write the cleaned data to a new file in the cleaned_captures directory
         cleaned_filename = os.path.join(output_dir, "cleaned" + os.path.basename(file_path))
 
-        cleaned_data += "| " + packet_metadata
-        
-        with open(cleaned_filename, "w") as cleaned_file:
-            cleaned_file.write("\n".join(cleaned_data))
+        # Combine the packet metadata and cleaned data (metadata might need to be byte-encoded as well)
+
+        with open(cleaned_filename, "wb") as cleaned_file:  # Open in binary write mode
+            cleaned_file.write(b"\n".join(cleaned_data))  # Write bytes to the file
             print(f"Cleaned file saved as {cleaned_filename}")
 
+def create_protocols(file_path) ->list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADER,TCP_HEADER, UDP_HEADER,OTHER_PROTOCOL]]: 
 
 
 def calculate_packets_stats() -> None:
@@ -190,18 +194,4 @@ def exit_program()->None:
 
 if __name__ == "__main__":
 
-    # Directory containing the uncleaned packet files
-    uncleaned_files_dir = 'path/to/uncleaned/captures'
-    # Directory where cleaned files will be saved
-    cleaned_files_dir = 'path/to/cleaned_captures'
-
-    # Example: List all files in the uncleaned captures directory
-    available_files = {
-        "file1": os.path.join(uncleaned_files_dir, "capture1.txt"),
-        "file2": os.path.join(uncleaned_files_dir, "capture2.txt"),
-        # Add other files here
-    }
-
-    # Clean each available file
-    for file in available_files.values():
-        clean_file(file, cleaned_files_dir)
+    clean_packets()
