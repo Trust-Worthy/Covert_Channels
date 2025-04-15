@@ -1,7 +1,7 @@
 
 
 # (interface:str,protocol:str,quantity:int)
-def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
+def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
     output_dir = Path("captured_packets/")
 
@@ -37,7 +37,7 @@ def construct_commands(capture_name:str,user_interface:str,num_packets:int)->tup
 
     return command_1,command_2,pcap_file,output_txt
 
-def execute_commands(command_1:list[str],command_2:list[str],pcap_file:str,output_txt:str)->None:
+def run_tcpdump_capture_commands(command_1:list[str],command_2:list[str],pcap_file:str,output_txt:str)->None:
         """_summary_
 
         :param command_1: _description_
@@ -98,15 +98,12 @@ def get_network_interfaces() -> dict[str,str]:
 
     return format_interfaces(interfaces)
 
-def format_interfaces(interfaces: list[str]) -> dict[str,str]:
-    interface_dict = {} 
+
     
-    
-    
-    # Loop through the list and process each entry
-    for i, interface in enumerate(interfaces):
-        stripped_interface = re.sub(r'^[^.]*\.', '', interface)
-        interface_dict[str(i)] = stripped_interface
-   
-    return interface_dict
-    
+
+
+
+
+def exit_program()->None:
+    print("exiting program...")
+    exit()

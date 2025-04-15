@@ -39,15 +39,7 @@ def get_existing_captures() -> set[str]:
     for file in file_names:
         print(file)
 
-def run_capture():
-    available_interfaces = print_interface_options()
-    user_interface_choice = get_user_interface_choice()
-    num_packets_to_capture = get_num_packets_to_capture()
-    name_of_capture = get_name_of_capture()
 
-    print(f"{name_of_capture} is capturing {num_packets_to_capture} on interface {user_interface_choice}...")
-
-    capture_packets(name_of_capture,user_interface_choice,num_packets_to_capture)
 
 def get_user_interface_choice(user_interfaces: dict[str,str]) -> str:
     

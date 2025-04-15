@@ -1,16 +1,25 @@
 """
-
+menu.py            → Shows menu and navigation
+├── input_handlers → Ask & validate inputs
+├── commands       → Call the actual logic
+└── output_handlers→ Show results
 
 """
 
-
-from packet_menu.menu_input import display_menu, execute_option
-import packet_menu.configuration.system_config as system_config 
+import input_handlers, output_handlers, commands
 
 
 client_interfaces = []
 
+def run_capture():
+    available_interfaces = print_interface_options()
+    user_interface_choice = get_user_interface_choice()
+    num_packets_to_capture = get_num_packets_to_capture()
+    name_of_capture = get_name_of_capture()
 
+    print(f"{name_of_capture} is capturing {num_packets_to_capture} on interface {user_interface_choice}...")
+
+    capture_packets(name_of_capture,user_interface_choice,num_packets_to_capture)
 
 
 def main():
