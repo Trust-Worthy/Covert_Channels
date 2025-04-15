@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Optional, Union
 import time
 
-from packet_menu.cleaning_captures.packet_parser import Packet_parser
+from core.processing.parser import Packet_parser
 from layer_3_protocols.arp import ARP_PACKET
 from layer_3_protocols.ip import IP_HEADER
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
@@ -35,7 +35,7 @@ from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 # ADD separate sub classe for arp request, arp reply, icmp request, icmp reply
 # What is the maximum size that a packet can be?
 # Verify that all the fields for the class method are correct! Chatgpt is buggy as a mug
-# Add class method for all classes missing them!
+# Add class method for all classes missing them! this way  class can be created more pyhtonic-y
 # Create a get_packet_size_func
 # Create functions in my clean.py for each class or create them in thie file. Basically... WAIT. I don't need 
 ### Next prompt ###
@@ -49,16 +49,10 @@ So let's say that I'm parsing bytes from a txt file that I captured packets usin
 Would I declare an instance of ethernet? stop at the proper byte offset for ethernet. Then create the ip header class and call the getter for the ethernet class?
 '''
 
-
-
 class Ethernet_Frame:
     """
     Simple Ethernet Frame class for tracking the ethernet frame data.
     """
-    
-    
-
-
     def __init__(self, timestamp_data: str, all_bytes: bytes):
         """
         Ethernet Frame initialization function.

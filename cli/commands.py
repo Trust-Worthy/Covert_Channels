@@ -1,14 +1,10 @@
 
 import subprocess
 import input_handlers, output_handlers
-from typing import Optional
+from typing import Optional, Union
 from core.processing.parser import Packet_parser
 
-from core.protocols.layer_2_protocols import ethernet
-from core.protocols.layer_3_protocols import arp, icmp, ip
-from core.protocols.layer_4_protocols import tcp, udp
-from core.protocols.application_layer import dns, http, https, quic, tls
-from core.protocols.undefined_layer import undefined_protocol
+from core.protocols.all_protocols import *
 
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
@@ -121,7 +117,7 @@ def capture_packets()->None:
     print(f"{name_of_capture} is capturing {num_packets_to_capture} on interface {user_interface_choice}...")
 
 
-def clean_packets()-> list[Optional[]]:
+def clean_packets()-> list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADER,TCP_HEADER, UDP_HEADER,]]:
 
     available_files = output_handlers.print_clean_packets_options()
 

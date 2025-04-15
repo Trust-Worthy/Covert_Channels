@@ -1,13 +1,14 @@
 import numpy as np
-from typing import Union, Optional
-
-from protocols.layer_2_protocols.ethernet import Ethernet_Frame
-from protocols.layer_3_protocols import arp, icmp ,ip
-from protocols.layer_4_protocols import tcp,udp
-from protocols.application_layer import http,dns, quic, tls
-from protocols.undefined_layer import undefined_protocol as undef
-
+from typing import Union, TYPE_CHECKING
 import logging
+
+if TYPE_CHECKING:
+    from protocols.layer_2_protocols.ethernet import Ethernet_Frame
+    from protocols.layer_3_protocols import arp, icmp ,ip
+    from protocols.layer_4_protocols import tcp,udp
+    from protocols.application_layer import http,dns, quic, tls
+    from protocols.undefined_layer import undefined_protocol as undef
+
 
 class Packet_parser:
     """
@@ -27,6 +28,7 @@ class Packet_parser:
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
         
         self._packet_type: Union[
+            Ethernet_Frame,
             arp.ARP_PACKET,
             icmp.ICMP_MESSAGE,
             ip.IP_HEADER,
@@ -79,6 +81,7 @@ class Packet_parser:
         
     @property
     def packet_type(self) -> Union[
+            Ethernet_Frame,
             arp.ARP_PACKET,
             icmp.ICMP_MESSAGE,
             ip.IP_HEADER,
@@ -86,7 +89,7 @@ class Packet_parser:
             udp.UDP_HEADER,
             http.HTTP,
             dns.DNS,
-            quic.QUIC_PACKET,
+            quic.QUIC_HEADER,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]:
 
@@ -94,6 +97,7 @@ class Packet_parser:
     
     @packet_type.setter
     def packet_type(self, value:Union[
+            Ethernet_Frame,
             arp.ARP_PACKET,
             icmp.ICMP_MESSAGE,
             ip.IP_HEADER,
@@ -101,7 +105,7 @@ class Packet_parser:
             udp.UDP_HEADER,
             http.HTTP,
             dns.DNS,
-            quic.QUIC_PACKET,
+            quic.QUIC_HEADER,
             tls.TLS_Packet,
             undef.OTHER_PROTOCOL]):
         

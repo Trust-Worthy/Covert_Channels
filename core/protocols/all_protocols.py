@@ -15,7 +15,7 @@ from .layer_3_protocols.ip import IP_HEADER
 from .layer_4_protocols.tcp import TCP_HEADER
 from .layer_4_protocols.udp import UDP_HEADER
 
-from .undefined_layer import undefined_protocol 
+from .undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 __all__ = [
     "DNS",
@@ -29,5 +29,5 @@ __all__ = [
     "IP_HEADER",
     "TCP_HEADER",
     "UDP_HEADER",
-    "undefined_protocol"
+    "OTHER_PROTOCOL"
 ]
