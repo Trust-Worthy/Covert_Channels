@@ -2,12 +2,12 @@ from typing import Union
 
 
 
-from core.processing.parser import Packet_parser
-from layer_4_protocols.tcp import TCP_HEADER
-from layer_4_protocols.udp import UDP_HEADER
+# from core.processing.parser import Packet_parser
+# from layer_4_protocols.tcp import TCP_HEADER
+# from layer_4_protocols.udp import UDP_HEADER
 
 from . import ICMP_MESSAGE
-from undefined_layer.undefined_protocol import OTHER_PROTOCOL
+# from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
 class IP_HEADER():

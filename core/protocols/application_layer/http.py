@@ -1,12 +1,17 @@
-
-from layer_4_protocols.tcp import TCP_SEGMENT
 from typing import Optional, Dict
 
+from protocols import TCP_SEGMENT
+from processing import Packet_parser
 
-from typing import Optional, Dict
 
 class HTTP:
-    def __init__(self, raw_data: bytes):
+    def __init__(self, raw_data: bytes, parser: Packet_parser):
+        
+        ### TO-DO###
+        # properly implement the parser so that it tracks all the tracked bytes
+        self._parser = parser
+        self._parser.packet_type = type(self)
+
         self.is_request: Optional[bool] = None  # True if request, False if response
         self.method: Optional[bytes] = None  # Only for requests
         self.request_uri: Optional[bytes] = None  # Only for requests
@@ -19,6 +24,9 @@ class HTTP:
         self.body: Optional[bytes] = None  # Optional body
         
         self.parse(raw_data)  # Parse the raw HTTP data when an instance is created
+
+        if not self._parser.check_if_finished_parsing():
+            raise ValueError("There should be no bytes left bruh")
 
     def parse(self, raw_data: bytes):
         # Separate headers and body
@@ -55,6 +63,11 @@ class HTTP:
         # Store body
         self.body = body_section
 
+    # Getter for parser, no setter
+    @property
+    def parser(self) -> Packet_parser:
+        return self._parser
+
     @property
     def get_method(self) -> Optional[bytes]:
         return self.method
@@ -78,5 +91,6 @@ class HTTP:
     @property
     def get_body(self) -> Optional[bytes]:
         return self.body
+
 
 

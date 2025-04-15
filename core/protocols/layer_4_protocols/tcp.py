@@ -1,11 +1,9 @@
 from typing import Union
 
-from core.processing.parser import Packet_parser
+from processing import Packet_parser
 
-from application_layer.tls import TLS_Packet
-from application_layer.dns import DNS
-from application_layer.http import HTTP
-from application_layer.https import HTTPS
+from application_layer import TLS_Packet, DNS, HTTP, HTTPS
+
 from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 class TCP_HEADER():
@@ -29,8 +27,9 @@ class TCP_HEADER():
         self._next_protocol_type: bytes
         self._next_protocol: Union[TLS_Packet,DNS,HTTP,HTTPS] ### Protocols I'm choosing to capture.
 
-        self.parse_tcp_header(all_bytes, self._parser)
+        self.parse_tcp_header(all_bytes, all_bytes)
         remaining_bytes: bytearray = self.get_remaining_bytes_after_tcp_header(all_bytes)
+        
         if not self._parser.check_if_finished_parsing():
             self.create_next_protocol(remaining_bytes,self._parser)
 
@@ -127,9 +126,6 @@ class TCP_HEADER():
     @property
     def parser(self) -> Packet_parser:
         return self._parser
-    @parser.setter
-    def parser(self, value: Packet_parser) -> None:
-        self._parser = value
 
     @property
     def next_protocol(self) -> Union[HTTP,DNS,TLS_Packet]:

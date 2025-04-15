@@ -1,10 +1,20 @@
 
-from application_layer.http import HTTP
 from typing import Optional
+
+from processing import Packet_parser
+from application_layer import HTTP
+
 
 
 class HTTPS(HTTP):
-    def __init__(self, raw_data: bytes, is_encrypted: bool = True):
+    def __init__(self, parser: Packet_parser, raw_data: bytes, is_encrypted: bool = True):
+        
+        ### TO-DO ###
+        ## properly implement the parser...
+
+        self._parser = parser
+        self._parser.packet_type = type(self)
+        
         self.is_encrypted: bool = is_encrypted
         self.encrypted_data: Optional[bytes] = None
         self.decrypted_http: Optional[HTTP] = None

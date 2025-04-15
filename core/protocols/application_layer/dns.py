@@ -1,7 +1,9 @@
 
-from core.processing.parser import Packet_parser
+
 
 from typing import NamedTuple
+
+from processing import Packet_parser
 
 class DNSQuery(NamedTuple):
     """
@@ -74,6 +76,9 @@ class DNS:
         self._remaining_bytes: bytearray
 
         self.parse_dns_message(all_bytes)
+
+        if not self._parser.check_if_finished_parsing():
+            remaining_bytes = self.get_remaining_bytes_after_dns()
 
 
     def parse_dns_message(self,all_bytes:bytearray) -> None:
@@ -357,3 +362,8 @@ class DNS:
     def has_extra_bytes(self) -> bool: return self._has_extra_bytes
     @has_extra_bytes.setter
     def has_extra_bytes(self, value: bool) -> None: self._has_extra_bytes = value
+
+    # Getter for parser, no setter
+    @property
+    def parser(self) -> Packet_parser:
+        return self._parser

@@ -1,5 +1,5 @@
 
-from core.processing.parser import Packet_parser
+# from core.processing.parser import Packet_parser
 
 
 class ARP_PACKET():
