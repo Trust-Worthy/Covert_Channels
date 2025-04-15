@@ -1,11 +1,12 @@
 
 import subprocess
-from typing import Optional, Union
+from typing import Union
+from pathlib import Path
+import os, re
+
 
 from cli import input_handlers, output_handlers
 from core.processing.parser import Packet_parser
-from pathlib import Path
-import os, re
 
 from core.protocols.all_protocols import *
 
