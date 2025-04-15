@@ -39,21 +39,10 @@ def get_existing_captures() -> set[str]:
         print(file)
 
 
-
-def get_user_interface_choice(user_interfaces: dict[str,str]) -> Optional[str, bool]:
-    
+def get_user_interface_choice(user_interfaces: dict[str,str]) -> str:
    
-    while True:
-        desired_interface: str = input("==> ")
-
-        if desired_interface in user_interfaces:
-            break
-            
-        else:
-            
-            print_available_interfaces(user_interfaces)
-            continue
-    
+    desired_interface: str = input("==> ")
+        
     return desired_interface
 
 def get_num_packets_to_capture()->int:
@@ -93,30 +82,23 @@ def get_name_of_capture() -> str:
 def get_user_main_menu_selection() -> str:
     user_option: str = input("Select Menu Option\n==> ")
 
-    process_user_input(option=user_option)
-
-    return user_option
-
-def process_user_input(*,option: str)->None:
     
-    option = option.strip().lower()
-    option_dict = {
-        "1":print_available_interfaces, # returns a tuple
-        "2":print_clean_packets_options,
-        "3":print_packet_stats_options,
-        "help":print_help_message,
-        "exit":exit_program,
-    }
+    ### Secure software dev practices belong here with input sanitization   
+    user_option = user_option.strip().lower()
 
-    while option not in option_dict:
-        print(f"Invalid option: {option}. Please try again.")
-        get_user_main_menu_selection()
+    
+
+    
     
 
 
     returned_func = option_dict[option]
     returned_func()
+
+def process_user_input(*,option: str)->None:
     
+    
+
 
 def display_menu()->None:
 

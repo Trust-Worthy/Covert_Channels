@@ -80,12 +80,12 @@ def run_tcpdump_capture_commands(command_1:list[str],command_2:list[str],pcap_fi
 
         
 def capture_packets()->None:
-    
-    
-    
+    """
+    Capture packets function interfaces with all necessary functions to take in user input for a 
+    user-defined packet capture.
+    """
+
     available_interfaces: dict = get_network_interfaces()
-    
-    
 
     while True:
         output_handlers.print_available_interfaces(available_interfaces)
@@ -132,6 +132,13 @@ def get_network_interfaces() -> dict[str,str]:
 
     return output_handlers.format_interfaces(interfaces)
 
+
+
+def run_main_menu() -> None:
+
+    
+    output_handlers.print_menu_options()
+    user_choice: str = input_handlers.get_user_main_menu_selection()
 
 def exit_program()->None:
     print("exiting program...")
