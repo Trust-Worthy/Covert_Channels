@@ -1,6 +1,7 @@
 
+import subprocess
+import input_handlers, output_handlers
 
-# (interface:str,protocol:str,quantity:int)
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
     output_dir = Path("captured_packets/")
@@ -36,6 +37,7 @@ def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_p
     ]
 
     return command_1,command_2,pcap_file,output_txt
+
 
 def run_tcpdump_capture_commands(command_1:list[str],command_2:list[str],pcap_file:str,output_txt:str)->None:
         """_summary_
@@ -77,13 +79,45 @@ def run_tcpdump_capture_commands(command_1:list[str],command_2:list[str],pcap_fi
             print(f"An error occurred: {e}")
 
         
-def capture_packets(capture_name:str,desired_interface:str,num_packets:int)->None:
-    command_1,command_2,pcap_file,output_txt = construct_commands(capture_name,desired_interface,num_packets)
+def capture_packets()->None:
+    
+    
+    
+    available_interfaces: dict = get_network_interfaces()
+    
+    
 
-    execute_commands(command_1,command_2,pcap_file,output_txt)
+    while True:
+        output_handlers.print_available_interfaces(available_interfaces)
+        user_interface_choice: str = input_handlers.get_user_interface_choice(user_interfaces=available_interfaces)
+        if user_interface_choice in available_interfaces:
+            break
+        elif user_interface_choice.strip() == "exit":
+            exit_program()
+        else:
+            print(f" {user_interface_choice} is invalid. Try again.")
+            continue
+    
+    num_packets_to_capture: int = input_handlers.get_num_packets_to_capture()
+
+    ### These places where I'm taking in input are where secure software practices come into play!!
+    name_of_capture: str = input_handlers.get_name_of_capture()
 
 
+    command_1,command_2,pcap_file,output_txt = construct_tcpdump_capture_commands(name_of_capture,user_interface=user_interface_choice,num_packets=num_packets_to_capture)
 
+    run_tcpdump_capture_commands(command_1,command_2,pcap_file,output_txt)
+
+    
+
+    print(f"{name_of_capture} is capturing {num_packets_to_capture} on interface {user_interface_choice}...")
+
+
+def clean_packets()-> None:
+    pass
+
+def calculate_packets_stats() -> None:
+    pass
 def get_network_interfaces() -> dict[str,str]:
 
     result = subprocess.run(['tcpdump','-D'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -96,12 +130,7 @@ def get_network_interfaces() -> dict[str,str]:
             line.strip(".")
             interfaces.append(line)
 
-    return format_interfaces(interfaces)
-
-
-    
-
-
+    return output_handlers.format_interfaces(interfaces)
 
 
 def exit_program()->None:

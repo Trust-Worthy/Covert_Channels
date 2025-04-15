@@ -16,12 +16,12 @@ def print_menu_options()->str:
     print("Help: Displays the help menu")
     print("Exit: Exit program and terminate.\n")
 
-def print_available_interfaces() -> dict[str,str]:
+def print_available_interfaces(available_interfaces: dict[str,str]) -> None:
     print("_____________________________")
     print("Capture Options")
     print("Please select an interface to capture network traffic on.")
     
-    user_interfaces: dict = get_network_interfaces()
+    
 
     print("_____________________________")
     for key, value in user_interfaces.items():

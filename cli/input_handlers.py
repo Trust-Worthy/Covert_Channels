@@ -23,11 +23,10 @@ Author: Trust-Worthy
 """
 
 
-from typing import Tuple, Union
+from typing import Optional
 
 from pathlib import Path
-from capture_data.capture import capture_packets
-from packet_menu.menu_output import print_available_interfaces,print_clean_packets_options,print_packet_stats_options, print_help_message, exit_program
+
 
 def get_existing_captures() -> set[str]:
     print("Finding existing captures...")
@@ -41,7 +40,7 @@ def get_existing_captures() -> set[str]:
 
 
 
-def get_user_interface_choice(user_interfaces: dict[str,str]) -> str:
+def get_user_interface_choice(user_interfaces: dict[str,str]) -> Optional[str, bool]:
     
    
     while True:
@@ -51,7 +50,7 @@ def get_user_interface_choice(user_interfaces: dict[str,str]) -> str:
             break
             
         else:
-            print(f" {desired_interface} is invalid. Try again")
+            
             print_available_interfaces(user_interfaces)
             continue
     
