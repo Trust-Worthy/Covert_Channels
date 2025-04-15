@@ -4,6 +4,7 @@ import input_handlers, output_handlers
 from typing import Optional, Union
 from core.processing.parser import Packet_parser
 from pathlib import Path
+import os
 
 from core.protocols.all_protocols import *
 
@@ -123,61 +124,29 @@ def clean_packets()-> list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADE
     available_files = output_handlers.print_clean_packets_options()
 
     output_directory = Path("../captures/cleaned_captures")
-    '''
-    1. Open file
-    2. clean file
-        2.a remove un-important stuff
-        2.b re-write data to cleaned_captures dir with same name
-    
-        
-    prompt: 
-
-            Can you please finish writing this part
-
-    available_files = output_handlers.print_clean_packets_options()
-
-        
-        1. Open file
-        2. clean file
-            2.a remove un-important stuff
-            2.b re-write data to cleaned_captures dir with same name
-        
-        
-
-        for file in available_files.values():
-
-            with open(file, "r") as uncleaned_file:
-
-                for line in uncleaned_file:
-
-    That properly 
-    '''
 
     for file in available_files.values():
 
         clean_file(file, output_dir=output_directory)
 
-import os
-
 def clean_file(file_path: str, output_dir: str):
 
     protocol_set = set("UDP","ICMP","ICMP6","TCP","TLS","IP","ARP","ETHERNET")
-    packet_metadata: dict[str,str] = {}
+    
+
     with open(file_path, "r") as uncleaned_file:
-        cleaned_data = []
+        cleaned_data: list[bytes] = []
+        packet_metadata: list[str] = []
 
         for line in uncleaned_file:
             
             # Match lines containing protocol info (e.g., "UDP", "ICMP6")
             for i,protocol in enumerate(protocol_set):
                 if protocol in line:
-                    packet_metadata[str(i)] = line.strip()
-            if "UDP" in line or "ICMP6" in line or "TCP" in line or "IP" in line:
-                # Keep the timestamp, source/destination addresses, and protocol info
-                cleaned_data.append(line.strip())  # Save the protocol line
+                    packet_metadata.append(line.strip())
 
             # Skip the lines containing hexadecimal data offsets (e.g., "0x0000:")
-            elif line.startswith("0x"):
+            if line.startswith("0x"):
                 # Skip the offset and extract just the hex data (remove the "0x0000:" part)
                 cleaned_data.append(line.split(":")[1].strip())  # Extract and keep just the hex bytes
 
@@ -186,26 +155,15 @@ def clean_file(file_path: str, output_dir: str):
                 cleaned_data.append(line.strip())  # Keep the raw byte data line (without changes)
 
         # Write the cleaned data to a new file in the cleaned_captures directory
-        cleaned_filename = os.path.join(output_dir, os.path.basename(file_path))
+        cleaned_filename = os.path.join(output_dir, "cleaned" + os.path.basename(file_path))
+
+        cleaned_data += "| " + packet_metadata
+        
         with open(cleaned_filename, "w") as cleaned_file:
             cleaned_file.write("\n".join(cleaned_data))
             print(f"Cleaned file saved as {cleaned_filename}")
 
-# # Directory containing the uncleaned packet files
-# uncleaned_files_dir = 'path/to/uncleaned/captures'
-# # Directory where cleaned files will be saved
-# cleaned_files_dir = 'path/to/cleaned_captures'
 
-# # Example: List all files in the uncleaned captures directory
-# available_files = {
-#     "file1": os.path.join(uncleaned_files_dir, "capture1.txt"),
-#     "file2": os.path.join(uncleaned_files_dir, "capture2.txt"),
-#     # Add other files here
-# }
-
-# # Clean each available file
-# for file in available_files.values():
-#     clean_file(file, cleaned_files_dir)
 
 def calculate_packets_stats() -> None:
     output_handlers.print_packet_stats_options()
@@ -229,3 +187,21 @@ def get_network_interfaces() -> dict[str,str]:
 def exit_program()->None:
     print("exiting program...")
     exit()
+
+if __name__ == "__main__":
+
+    # Directory containing the uncleaned packet files
+    uncleaned_files_dir = 'path/to/uncleaned/captures'
+    # Directory where cleaned files will be saved
+    cleaned_files_dir = 'path/to/cleaned_captures'
+
+    # Example: List all files in the uncleaned captures directory
+    available_files = {
+        "file1": os.path.join(uncleaned_files_dir, "capture1.txt"),
+        "file2": os.path.join(uncleaned_files_dir, "capture2.txt"),
+        # Add other files here
+    }
+
+    # Clean each available file
+    for file in available_files.values():
+        clean_file(file, cleaned_files_dir)
