@@ -8,8 +8,7 @@ import os, re
 from cli import input_handlers, output_handlers
 from core.processing.parser import Packet_parser
 
-from core.protocols.all_protocols import *
-
+from core import *
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
     output_dir = Path("captured_packets/")

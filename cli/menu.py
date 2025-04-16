@@ -7,7 +7,7 @@ menu.py            → Shows menu and navigation
 """
 from typing import Callable
 
-from . import 
+from cli import *
 
 
 
@@ -17,20 +17,20 @@ def main():
 
     menu_options: dict[str, Callable[[], None]] = {
         
-        "1":commands.capture_packets, # returns a tuple
-        "2":commands.clean_packets,
-        "3":commands.calculate_packets_stats,
-        "help":output_handlers.print_help_message,
-        "exit":commands.exit_program,
+        "1":capture_packets, # returns a tuple
+        "2":clean_packets,
+        "3":calculate_packets_stats,
+        "help":print_help_message,
+        "exit":exit_program,
     }
 
     while True:
         
-        output_handlers.print_menu_options()
+        print_menu_options()
         
     
         while True:
-            user_selection: str = input_handlers.get_user_main_menu_selection()
+            user_selection: str = get_user_main_menu_selection()
             if user_selection in menu_options:
                 
                 ### Call that function
