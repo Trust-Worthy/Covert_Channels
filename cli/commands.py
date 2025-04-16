@@ -10,6 +10,8 @@ from cli.output_handlers import(
     print_packet_stats_options, 
     format_interfaces) 
 
+from core.utils.protocol_loader import Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADER,TCP_HEADER, UDP_HEADER,OTHER_PROTOCOL
+
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
     output_dir = Path("captured_packets/")
