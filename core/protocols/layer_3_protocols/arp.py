@@ -1,8 +1,5 @@
 
 
-
-
-
 class ARP_PACKET():
 
 
