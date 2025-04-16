@@ -7,4 +7,17 @@ from .output_handlers import print_welcome_message, print_menu_options, print_he
 
 
 
-__all__ = []
+__all__ = [
+    "capture_packets",
+    "clean_packets",
+    "create_protocols",
+    "calculate_packets_stats",
+    "exit_program",
+    "get_user_main_menu_selection",
+    "print_welcome_message",
+    "print_menu_options",
+    "print_help_message",
+    "print_packet_stats_options",
+    "print_clean_packets_options",
+    "format_interfaces",
+]

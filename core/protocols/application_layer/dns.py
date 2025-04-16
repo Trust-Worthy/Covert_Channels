@@ -3,7 +3,7 @@
 
 from typing import NamedTuple
 
-from processing import Packet_parser
+from core import Packet_parser
 
 class DNSQuery(NamedTuple):
     """

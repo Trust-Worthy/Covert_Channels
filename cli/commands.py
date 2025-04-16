@@ -5,8 +5,10 @@ from pathlib import Path
 import os, re
 
 
-from cli import print_clean_packets_options, print_packet_stats_options, format_interfaces
-from core import *
+from cli.output_handlers import(
+    print_clean_packets_options, 
+    print_packet_stats_options, 
+    format_interfaces) 
 
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
@@ -189,7 +191,7 @@ def clean_file(file_path: str, output_dir: str):
 
 
 def create_protocols(file_path) ->list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADER,TCP_HEADER, UDP_HEADER,OTHER_PROTOCOL]]: 
-
+    
     pass
 
 def calculate_packets_stats() -> None:
