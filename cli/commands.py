@@ -5,10 +5,9 @@ from pathlib import Path
 import os, re
 
 
-from cli import input_handlers, output_handlers
-from core.processing.parser import Packet_parser
-
+from cli import print_clean_packets_options, print_packet_stats_options, format_interfaces
 from core import *
+
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
     output_dir = Path("captured_packets/")
@@ -122,7 +121,7 @@ def capture_packets()->None:
 
 def clean_packets()-> None:
 
-    available_files = output_handlers.print_clean_packets_options()
+    available_files = print_clean_packets_options()
 
     ### TO-DO ### 
     # allow user to choose what files to clean
@@ -194,7 +193,7 @@ def create_protocols(file_path) ->list[Union[Ethernet_Frame,ARP_PACKET,ICMP_MESS
     pass
 
 def calculate_packets_stats() -> None:
-    output_handlers.print_packet_stats_options()
+    print_packet_stats_options()
 
     pass
 def get_network_interfaces() -> dict[str,str]:
@@ -209,7 +208,7 @@ def get_network_interfaces() -> dict[str,str]:
             line.strip(".")
             interfaces.append(line)
 
-    return output_handlers.format_interfaces(interfaces)
+    return format_interfaces(interfaces)
 
 
 def exit_program()->None:
