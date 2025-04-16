@@ -1,8 +1,6 @@
 
 from typing import Optional
 
-from processing import Packet_parser
-from application_layer import HTTP
 
 
 

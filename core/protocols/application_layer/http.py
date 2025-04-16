@@ -1,7 +1,5 @@
 from typing import Optional, Dict
 
-from protocols import TCP_SEGMENT
-from processing import Packet_parser
 
 
 class HTTP:

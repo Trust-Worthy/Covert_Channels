@@ -1,10 +1,5 @@
 from typing import Union
 
-from processing import Packet_parser
-
-from application_layer import TLS_Packet, DNS, HTTP, HTTPS
-
-from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 class TCP_HEADER():
     def __init__(self,all_bytes: bytes, parser: Packet_parser):

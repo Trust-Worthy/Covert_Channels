@@ -2,8 +2,6 @@ from typing import Optional
 
 
 
-from processing import Packet_parser
-
 class TLS_Packet:
     
     def __init__(self, parser: Packet_parser):

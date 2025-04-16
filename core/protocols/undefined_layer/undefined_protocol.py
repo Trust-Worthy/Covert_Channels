@@ -1,7 +1,4 @@
 
-from protocols.layer_2_protocols.ethernet import Ethernet_Frame
-from core.processing.parser import Packet_parser
-
 
 
 

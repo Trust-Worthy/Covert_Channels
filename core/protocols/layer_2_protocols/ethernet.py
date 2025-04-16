@@ -24,10 +24,6 @@ from datetime import datetime
 from typing import Optional, Union
 import time
 
-from processing import Packet_parser
-from layer_3_protocols import ARP_PACKET, IP_HEADER
-
-from undefined_layer.undefined_protocol import OTHER_PROTOCOL
 
 
 ### TO-DO ###

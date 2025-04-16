@@ -1,15 +1,6 @@
 import numpy as np
 from typing import Union, TYPE_CHECKING
 import logging
-from interface import *
-
-# if TYPE_CHECKING:
-#     from protocols.layer_2_protocols.ethernet import Ethernet_Frame
-#     from protocols.layer_3_protocols import arp, icmp ,ip
-#     from protocols.layer_4_protocols import tcp,udp
-#     from protocols.application_layer import http,dns, quic, tls
-#     from protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
-
 
 
 class Packet_parser:
