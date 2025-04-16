@@ -7,13 +7,13 @@ menu.py            → Shows menu and navigation
 """
 from typing import Callable
 
-import input_handlers, output_handlers, commands
+from . import 
 
 
 
 
 def main():
-    output_handlers.print_welcome_message()
+    print_welcome_message()
 
     menu_options: dict[str, Callable[[], None]] = {
         
