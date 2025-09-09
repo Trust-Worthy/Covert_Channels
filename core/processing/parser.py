@@ -33,18 +33,18 @@ class Packet_parser:
         self._packet_data_np_arr: np.ndarray  # Full packet data as a NumPy array
         self._finished_parsing: bool ### flag needs to be set when the last nested protocol is finished being parsed
         
-        self._packet_type: Union[
-            Ethernet_Frame,
-            ARP_PACKET,
-            ICMP_MESSAGE,
-            IP_HEADER,
-            TCP_HEADER,
-            UDP_HEADER,
-            HTTP,
-            DNS,
-            QUIC_HEADER,
-            TLS_Packet,
-            OTHER_PROTOCOL]
+        # self._packet_type: Union[
+        #     Ethernet_Frame,
+        #     ARP_PACKET,
+        #     ICMP_MESSAGE,
+        #     IP_HEADER,
+        #     TCP_HEADER,
+        #     UDP_HEADER,
+        #     HTTP,
+        #     DNS,
+        #     QUIC_HEADER,
+        #     TLS_Packet,
+        #     OTHER_PROTOCOL]
 
     def store_and_track_bytes(self, offset:int , all_bytes: bytes = None, is_eth: bool = False) -> None:
         """

@@ -83,14 +83,4 @@ def print_packet_stats_options()->None:
 
 
 
-def format_interfaces(interfaces: list[str]) -> dict[str,str]:
-    interface_dict = {} 
-    
-    
-    
-    # Loop through the list and process each entry
-    for i, interface in enumerate(interfaces):
-        stripped_interface = re.sub(r'^[^.]*\.', '', interface)
-        interface_dict[str(i)] = stripped_interface
-   
-    return interface_dict
+
