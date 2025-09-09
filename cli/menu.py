@@ -8,9 +8,8 @@ menu.py            → Shows menu and navigation
 from typing import Callable
 
 from cli.output_handlers import print_welcome_message, print_menu_options, print_help_message
-from input_handlers import get_user_main_menu_selection
-
-from commands import capture_packets, clean_packets, calculate_packets_stats, exit_program
+from cli.input_handlers import get_user_main_menu_selection
+from cli.commands import capture_packets, clean_packets, calculate_packets_stats, exit_program
 
 def main():
     print_welcome_message()

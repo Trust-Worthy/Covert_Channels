@@ -7,7 +7,18 @@ import os, re
 
 
 
-from interface import Ethernet_Frame,ARP_PACKET,ICMP_MESSAGE,IP_HEADER,TCP_HEADER, UDP_HEADER,OTHER_PROTOCOL
+from core.protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
+from core.protocols.layer_2_protocols.ethernet import Ethernet_Frame
+from core.protocols.layer_3_protocols.arp import ARP_PACKET
+from core.protocols.layer_3_protocols.icmp import ICMP_MESSAGE
+from core.protocols.layer_3_protocols.ip import IP_HEADER
+from core.protocols.layer_4_protocols.tcp import TCP_HEADER
+from core.protocols.layer_4_protocols.udp import UDP_HEADER
+from core.protocols.application_layer.dns import DNS
+from core.protocols.application_layer.http import HTTP
+from core.protocols.application_layer.https import HTTPS
+from core.protocols.application_layer.tls import TLS_Packet
+from core.protocols.application_layer.quic import QUIC_HEADER
 
 def construct_tcpdump_capture_commands(capture_name:str,user_interface:str,num_packets:int)->tuple[list[str],list[str],str,str]:
 
