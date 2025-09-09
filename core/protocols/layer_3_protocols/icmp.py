@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional, Union
 
-
+from core.processing.parser import Packet_parser
 
 class ICMP_MESSAGE():
     

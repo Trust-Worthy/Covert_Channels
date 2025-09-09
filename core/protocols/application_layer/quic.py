@@ -1,7 +1,7 @@
 
 from typing import Optional
 
-
+from core.processing.parser import Packet_parser
 
 class QUIC_HEADER:
     """

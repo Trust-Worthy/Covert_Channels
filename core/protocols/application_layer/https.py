@@ -1,8 +1,8 @@
 
 from typing import Optional
 
-
-
+from core.processing.parser import Packet_parser
+from core.protocols.application_layer.http import HTTP
 
 class HTTPS(HTTP):
     def __init__(self, parser: Packet_parser, raw_data: bytes, is_encrypted: bool = True):

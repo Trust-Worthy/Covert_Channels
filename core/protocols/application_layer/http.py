@@ -1,6 +1,6 @@
 from typing import Optional, Dict
 
-
+from core.processing.parser import Packet_parser
 
 class HTTP:
     def __init__(self, raw_data: bytes, parser: Packet_parser):

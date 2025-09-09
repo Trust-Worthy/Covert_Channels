@@ -1,5 +1,5 @@
 from typing import Union
-
+from core.processing.parser import Packet_parser
 
 class TCP_HEADER():
     def __init__(self,all_bytes: bytes, parser: Packet_parser):

@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Optional, Union
 import time
 
-
+from core.processing.parser import Packet_parser
 
 ### TO-DO ###
 # add error handling to TLS functions if necessary so that nothing breaks

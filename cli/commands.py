@@ -6,7 +6,6 @@ import os, re
 
 
 
-
 from core.protocols.undefined_layer.undefined_protocol import OTHER_PROTOCOL
 from core.protocols.layer_2_protocols.ethernet import Ethernet_Frame
 from core.protocols.layer_3_protocols.arp import ARP_PACKET

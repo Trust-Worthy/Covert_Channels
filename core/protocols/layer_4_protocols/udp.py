@@ -1,7 +1,7 @@
 
 
 from typing import Union
-
+from core.processing.parser import Packet_parser
 
 
 class UDP_HEADER():

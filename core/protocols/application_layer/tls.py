@@ -1,6 +1,6 @@
 from typing import Optional
 
-
+from core.processing.parser import Packet_parser
 
 class TLS_Packet:
     
