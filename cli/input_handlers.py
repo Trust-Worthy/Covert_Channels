@@ -22,9 +22,6 @@ Author: Trust-Worthy
 
 """
 
-
-from typing import Optional
-
 from pathlib import Path
 
 

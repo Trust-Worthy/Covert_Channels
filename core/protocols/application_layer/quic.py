@@ -106,7 +106,7 @@ class QUIC_HEADER:
 
         self._parser.store_and_track_bytes(offset)
 
-    def parse_varint(self, data: bytes) -> Tuple[int, int]:
+    def parse_varint(self, data: bytes) -> tuple[int, int]:
         """Parse QUIC variable-length integer and return (value, length in bytes)."""
         first_byte = data[0]
         if first_byte < 0x40:
