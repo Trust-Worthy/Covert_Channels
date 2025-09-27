@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# ide settings
+.vscode
+
 # env
 covert-channels-env
 # C extensions
