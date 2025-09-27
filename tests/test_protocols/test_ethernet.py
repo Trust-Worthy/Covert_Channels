@@ -79,7 +79,7 @@ class TestEthernetClassFunctions:
         assert frame.timestamp == datetime.fromtimestamp(1758944483.242245)
 
     def test_generate_unique_packet_id(self, all_ethernet_pcap_packets: list):
-        frame_ids: set = []
+        frame_ids = set()
         for packet_data in all_ethernet_pcap_packets:
             frame = EthernetFrame(
                 timestamp=packet_data['timestamp'],
