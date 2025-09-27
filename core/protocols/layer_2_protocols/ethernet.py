@@ -3,15 +3,12 @@
 
 '''
 
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 import time
 
 from core.processing.parser import Packet_parser
-
-
 
 class Ethernet_Frame:
     """
@@ -99,7 +96,7 @@ class Ethernet_Frame:
 
 
     def generate_unique_packet_id() -> int:
-            # Get the current timestamp in seconds
+        # Get the current timestamp in seconds
         timestamp = int(time.time())
         
         # Use modulo to ensure it is an 8-digit number
