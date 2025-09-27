@@ -11,9 +11,6 @@ import pytest
 from datetime import datetime
 from covert_hunter.protocols.ethernet import EthernetFrame
 
-
-
-
 class TestEthernetWithRealData:
     
     def test_ethernet_parsing_with_real_data(self, real_ethernet_data):
@@ -81,6 +78,18 @@ class TestEthernetClassFunctions:
         assert frame.ethernet_type == b"\x08\x00"
         assert frame.timestamp == datetime.fromtimestamp(1758944483.242245)
 
+    def test_generate_unique_packet_id(self, all_ethernet_pcap_packets: list):
+        frame_ids: set = []
+        for packet_data in all_ethernet_pcap_packets:
+            frame = EthernetFrame(
+                timestamp=packet_data['timestamp'],
+                all_bytes=packet_data['data']
+            )
+            # ensure id hasn't already been assigned
+            assert frame.packet_id not in frame_ids 
+            frame_ids.add(frame.packet_id)
+                
+        
 class TestAllPcapPackets:
     
     def test_all_packets_parse_successfully(self, all_ethernet_pcap_packets):

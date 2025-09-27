@@ -1,6 +1,7 @@
 # covert_hunter/protocols/ethernet.py
 
 from datetime import datetime
+import time
 from covert_hunter.core.parser import Packet_Parser
 
 
@@ -38,6 +39,7 @@ class EthernetFrame:
         if len(all_bytes) < 14:  # Ethernet frame header is 14 bytes
             raise ValueError("Ethernet frame is too short.")
         return True
+    
         
     @property
     def timestamp(self) -> datetime:
