@@ -1,6 +1,5 @@
 # capture_test.py
 from core.utils.capture import construct_tcpdump_capture_commands, run_tcpdump_capture_commands
-
 if __name__ == "__main__":
     iface = "en0"  # replace with your network interface
     num_packets = 10
