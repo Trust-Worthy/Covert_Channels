@@ -1,11 +1,10 @@
 '''
 @Author Trust-Worthy
 
+File: core/protocols/layer_2_protocols/ethernet.py
 '''
 
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, Union
 import time
 
 from core.processing.parser import Packet_parser
@@ -14,7 +13,7 @@ class Ethernet_Frame:
     """
     Simple Ethernet Frame class for tracking the ethernet frame data.
     """
-    def __init__(self, timestamp_data: str, all_bytes: bytes):
+    def __init__(self, timestamp_data: str, all_bytes: bytes, parser: Packet_parser):
         """
         Ethernet Frame initialization function.
 
@@ -29,7 +28,7 @@ class Ethernet_Frame:
         
         self._timestamp: datetime  # Timestamp of packet capture is ONLY captured in the ethernet portion.
         
-        self._parser: Packet_parser = Packet_parser()
+        self._parser: Packet_parser = parser
         self._parser._packet_type = type(self)
 
         self.parse_str_to_datetime_obj(timestamp_data)
@@ -95,9 +94,10 @@ class Ethernet_Frame:
     #         self.other_protocol = OTHER_PROTOCOL(remaining_bytes,parser)
 
 
-    def generate_unique_packet_id() -> int:
+    def generate_unique_packet_id(self) -> int:
+        
         # Get the current timestamp in seconds
-        timestamp = int(time.time())
+        self.timestamp = int(time.time())
         
         # Use modulo to ensure it is an 8-digit number
         packet_id = timestamp % 100000000  # 8 digits
