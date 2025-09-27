@@ -29,9 +29,9 @@ class EthernetFrame:
         
         # Optionally parse if data was passed in
         if all_bytes is not None and timestamp is not None:
-            self.parse_ethernet_frame(timestamp, all_bytes)
+            self.parse_ethernet_frame(timestamp,    all_bytes)
         
-    def parse_ethernet_frame(cls, self, timestamp:datetime, all_bytes: bytes) -> TypeError:
+    def parse_ethernet_frame(self, timestamp:datetime, all_bytes: bytes) -> None:
         
         self.check_bytes(all_bytes=all_bytes)
         
@@ -39,7 +39,7 @@ class EthernetFrame:
         self.destination_mac = all_bytes[0:6]
         self.source_mac = all_bytes[6:12]
         self.ethernet_type = all_bytes[12:14]
-        self.packet_id = cls.generate_unique_packet_id()
+        self.packet_id = self.__class__.generate_unique_packet_id()
         
     def check_bytes(self, all_bytes: bytes) -> bool:
         if not isinstance(all_bytes, bytes):
@@ -98,10 +98,15 @@ class EthernetFrame:
         return self._packet_id
     
     @packet_id.setter
-    def packet_id(cls, self, id: int):
+    def packet_id(self, id: int):
         if not isinstance(id, int):
             raise TypeError("Packet ID should be of type int")
         
-        if id in cls.packet_ids:
+        if id in self.__class__.packet_ids:
             raise ValueError(f"{id} already assigned")
+        
+        self.__class__.packet_ids.add(id)
+        self._packet_id = id
+        
+        
         
