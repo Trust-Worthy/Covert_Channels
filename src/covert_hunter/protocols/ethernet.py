@@ -8,14 +8,18 @@ class EthernetFrame:
     """_summary_
     Ethernet Frame class for extracting layer 2 ethernet data.
     """
-    def __init__(self, timestamp: datetime, all_bytes:bytes, parser: Packet_Parser = None):
+    def __init__(self, timestamp: datetime = None, all_bytes: bytes = None, parser: Packet_Parser = None):
         
-        self._timestamp: datetime = None
-        self._destination_mac: bytes = None
-        self._source_mac: bytes = None
-        self._ethernet_type: bytes = None
+        self._timestamp: datetime | None = None
+        self._destination_mac: bytes | None = None
+        self._source_mac: bytes | None  = None
+        self._ethernet_type: bytes | None = None
         
-        self.parse_ethernet_frame(timestamp, all_bytes)
+        
+        # Optionally parse if data was passed in
+        if all_bytes is not None and timestamp is not None:
+            self.parse_ethernet_frame(timestamp, all_bytes)
+        
         
    
         
@@ -29,9 +33,10 @@ class EthernetFrame:
         self.ethernet_type = all_bytes[12:14]
         
     def check_bytes(self, all_bytes: bytes) -> bool:
-    
-        if type(all_bytes) != bytes:
-            raise TypeError("Incoming packet data is not of type bytes.")
+        if not isinstance(all_bytes, bytes):
+                raise TypeError("Incoming packet data is not of type bytes.")
+        if len(all_bytes) < 14:  # Ethernet frame header is 14 bytes
+            raise ValueError("Ethernet frame is too short.")
         return True
         
     @property

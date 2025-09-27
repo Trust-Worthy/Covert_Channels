@@ -8,7 +8,11 @@ Run with: python -m pytest tests/protocols/test_ethernet.py -v
 """
 
 import pytest
+from datetime import datetime
 from covert_hunter.protocols.ethernet import EthernetFrame
+
+
+
 
 class TestEthernetWithRealData:
     
@@ -32,6 +36,50 @@ class TestEthernetWithRealData:
         print(f"  Dst MAC: {frame.destination_mac.hex(':')}")
         print(f"  Src MAC: {frame.source_mac.hex(':')}")
         print(f"  EtherType: 0x{frame.ethernet_type.hex()}")
+        
+    def test_ethernet_timestamp_invalid(self):
+        frame = EthernetFrame()
+        with pytest.raises(TypeError):
+            frame.timestamp = "not datetime object"
+    def test_ethernet_destination_mac_invalid(self):
+        frame = EthernetFrame()
+        with pytest.raises(ValueError):
+            frame.destination_mac = b"\x01\x02"
+    def test_ethernet_source_mac_invalid(self):
+        frame = EthernetFrame()
+        with pytest.raises(ValueError):
+            frame.source_mac = b"\x01\x02"
+    def test_ethernet_type_invalid(self):
+        frame = EthernetFrame()
+        with pytest.raises(ValueError):
+            frame.ethernet_type = b"\x02"
+class TestEthernetClassFunctions:
+    
+    def test_check_bytes_valid(self, real_ethernet_data):
+        frame = EthernetFrame()
+        assert frame.check_bytes(real_ethernet_data['data']) is True
+        
+    def test_check_bytes_invalid(self):
+        frame = EthernetFrame()
+        with pytest.raises(TypeError):
+            frame.check_bytes("not bytses") # str instead of bytes
+            
+    def test_check_bytes_len_invalid(self):
+        frame = EthernetFrame()
+        with pytest.raises(ValueError):
+            frame.check_bytes(b"\x01\x92") # Ethernet Frame is less than 14 bytes
+            
+    def test_parse_ethernet_frame_valid(self, real_ethernet_data):
+        
+        frame = EthernetFrame(
+            timestamp=real_ethernet_data['timestamp'],
+            all_bytes= real_ethernet_data['data']
+        )
+        
+        assert frame.destination_mac == bytes.fromhex('c44fd5c7d107')
+        assert frame.source_mac == bytes.fromhex("5689c323ec50")
+        assert frame.ethernet_type == b"\x08\x00"
+        assert frame.timestamp == datetime.fromtimestamp(1758944483.242245)
 
 class TestAllPcapPackets:
     
@@ -69,8 +117,6 @@ class TestAllPcapPackets:
         print(f"  MAC src: {frame.source_mac.hex(':')}")
         print(f"  Type: 0x{frame.ethernet_type.hex()}")
         
-class TestEthernetWithBadData:
-    
-    def test_check_bytes(self):
+
         
         
