@@ -68,3 +68,9 @@ class TestAllPcapPackets:
         print(f"  MAC dst: {frame.destination_mac.hex(':')}")
         print(f"  MAC src: {frame.source_mac.hex(':')}")
         print(f"  Type: 0x{frame.ethernet_type.hex()}")
+        
+class TestEthernetWithBadData:
+    
+    def test_check_bytes(self):
+        
+        
