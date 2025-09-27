@@ -16,7 +16,7 @@ class TestEthernetWithRealData:
         """Test parsing with real packet data from pcap file."""
         
         # Use the real data from pcap file
-        
+
         frame = EthernetFrame(
             timestamp=real_ethernet_data['timestamp'],
             all_bytes= real_ethernet_data['data']
