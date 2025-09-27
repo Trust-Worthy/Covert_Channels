@@ -1,0 +1,226 @@
+# pyproject.toml - Your professional covert channels detector
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "covert-hunter"
+version = "0.1.0"
+authors = [
+    {name = "Your Name", email = "you@example.com"},
+]
+description = "Advanced covert channel detection for network security analysis"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators", 
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9", 
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Security",
+    "Topic :: System :: Networking :: Monitoring",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+keywords = [
+    "security", "covert-channels", "network-analysis", "threat-detection",
+    "steganography", "network-security", "packet-analysis", "cybersecurity"
+]
+dependencies = [
+    "click>=8.0.0",           # CLI framework
+    "rich>=13.0.0",           # Beautiful terminal output
+    "pydantic>=2.0.0",        # Data validation
+    "numpy>=1.21.0",          # Numerical analysis
+    "pandas>=1.3.0",          # Data analysis
+    "scikit-learn>=1.1.0",    # ML algorithms
+    "scapy>=2.5.0",           # Packet manipulation (optional: build your own)
+    "matplotlib>=3.5.0",      # Visualization
+    "seaborn>=0.11.0",        # Statistical visualization
+    "psutil>=5.8.0",          # System monitoring
+    "typer>=0.9.0",           # Modern CLI alternative to click
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-mock>=3.8",
+    "pytest-asyncio>=0.20",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+    "pre-commit>=3.0",
+    "ipython>=8.0",          # Better REPL for development
+    "jupyter>=1.0",          # Notebooks for research
+]
+docs = [
+    "mkdocs>=1.4",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.20",
+]
+ml = [
+    "tensorflow>=2.10.0",    # Deep learning (optional)
+    "torch>=1.13.0",         # PyTorch alternative
+    "xgboost>=1.7.0",        # Gradient boosting
+    "lightgbm>=3.3.0",       # Fast gradient boosting
+]
+viz = [
+    "plotly>=5.11.0",        # Interactive plots
+    "dash>=2.7.0",           # Web dashboards
+    "streamlit>=1.15.0",     # Quick web apps
+]
+test = [
+    "pytest>=7.0",
+    "pytest-benchmark>=4.0", # Performance testing
+    "hypothesis>=6.0",       # Property-based testing
+    "factory-boy>=3.2.0",    # Test data generation
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Trust-Worthy/covert-hunter"
+"Bug Reports" = "https://github.com/Trust-Worthy/covert-hunter/issues"
+"Funding" = "https://github.com/sponsors/Trust-Worthy"
+"Source" = "https://github.com/Trust-Worthy/covert-hunter"
+"Documentation" = "https://covert-hunter.readthedocs.io/"
+"Changelog" = "https://github.com/Trust-Worthy/covert-hunter/blob/main/CHANGELOG.md"
+
+[project.scripts]
+covert-hunter = "covert_hunter.cli:main"
+hunt-covert = "covert_hunter.cli:hunt_command"
+analyze-covert = "covert_hunter.analysis:analyze_command"
+
+# Package configuration
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["covert_hunter*"]
+
+[tool.setuptools.package-data]
+covert_hunter = [
+    "data/*.json",
+    "data/*.csv", 
+    "models/*.pkl",
+    "signatures/*.yaml",
+    "py.typed",              # Indicates this package supports type hints
+]
+
+# Development tools configuration
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.venv
+    | build
+    | dist
+    | notebooks
+)/
+'''
+
+[tool.ruff]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "S",   # bandit security lints
+    "T20", # flake8-print
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "S101",  # use of assert detected (ok in tests)
+    "T201",  # print statements (ok for CLI)
+]
+line-length = 88
+target-version = "py38"
+exclude = [
+    ".git",
+    ".mypy_cache", 
+    ".pytest_cache",
+    ".venv",
+    "build",
+    "dist",
+    "notebooks",
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S101", "ARG001", "ARG002"]  # Allow asserts and unused args in tests
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "scapy.*",
+    "matplotlib.*", 
+    "seaborn.*",
+    "sklearn.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config --cov=covert_hunter"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests", 
+    "unit: marks tests as unit tests",
+    "ml: marks tests as machine learning tests",
+    "network: marks tests that require network access",
+    "packet: marks tests that work with packet data",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py", 
+    "*/__main__.py",
+    "*/cli.py",  # CLI code is hard to test comprehensively
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError", 
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+    "TYPE_CHECKING",
+]
+show_missing = true
+precision = 2
