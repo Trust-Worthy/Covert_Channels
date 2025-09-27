@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import time
-from covert_hunter.core.parser import Packet_Parser
+from covert_hunter.utils.parser import Packet_Parser
 
 
 class EthernetFrame:

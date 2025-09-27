@@ -1,4 +1,4 @@
-# covert_hunter/core/parser.py
+# covert_hunter/utils/parser.py
 
 class Packet_Parser:
     
