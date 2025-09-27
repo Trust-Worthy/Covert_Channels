@@ -50,6 +50,7 @@ class TestEthernetWithRealData:
         frame = EthernetFrame()
         with pytest.raises(ValueError):
             frame.ethernet_type = b"\x02"
+    
 class TestEthernetClassFunctions:
     
     def test_check_bytes_valid(self, real_ethernet_data):
@@ -79,16 +80,25 @@ class TestEthernetClassFunctions:
         assert frame.timestamp == datetime.fromtimestamp(1758944483.242245)
 
     def test_generate_unique_packet_id(self, all_ethernet_pcap_packets: list):
+        frame = EthernetFrame()
         frame_ids = set()
         for packet_data in all_ethernet_pcap_packets:
-            frame = EthernetFrame(
-                timestamp=packet_data['timestamp'],
-                all_bytes=packet_data['data']
-            )
+            frame.parse_ethernet_frame(timestamp=packet_data['timestamp'],all_bytes=packet_data['data'])
             # ensure id hasn't already been assigned
-            assert frame.packet_id not in frame_ids 
+            assert frame.packet_id not in frame_ids
             frame_ids.add(frame.packet_id)
-                
+            
+    def test_ethernet_packet_id_duplicate(self, real_ethernet_data):
+        frame1 = EthernetFrame()
+        frame2 = EthernetFrame()
+        
+        with pytest.raises(ValueError):
+            frame1.packet_id = 123
+            frame2.packet_id = 123
+    def test_ethernet_packet_id_not_int(self):
+        frame = EthernetFrame()
+        with pytest.raises(TypeError):
+            frame.packet_id = "not an int"
         
 class TestAllPcapPackets:
     
