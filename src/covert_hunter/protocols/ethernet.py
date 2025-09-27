@@ -47,8 +47,6 @@ class EthernetFrame:
         if len(all_bytes) < 14:  # Ethernet frame header is 14 bytes
             raise ValueError("Ethernet frame is too short.")
         return True
-    
-    
         
     @property
     def timestamp(self) -> datetime:
